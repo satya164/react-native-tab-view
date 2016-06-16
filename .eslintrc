@@ -272,7 +272,7 @@
     "import/no-named-as-default": 0,
     "import/no-named-as-default-member": 0,
     "import/no-deprecated": 0,
-    "import/no-extraneous-dependencies": 2,
+    "import/no-extraneous-dependencies": 0,
     "import/no-commonjs": 1,
     "import/no-amd": 1,
     "import/no-nodejs-modules": 0,
