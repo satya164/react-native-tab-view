@@ -66,6 +66,8 @@
 .*/node_modules/isemail/.*\.json
 .*/node_modules/tr46/.*\.json
 
+# Ignore examples
+.*/example/.*
 
 [include]
 
