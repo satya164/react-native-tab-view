@@ -3,4 +3,3 @@ export { default as TabViewAnimated } from './src/TabViewAnimated';
 export { default as TabViewPage } from './src/TabViewPage';
 export { default as TabBar } from './src/TabBar';
 export { default as TabBarTop } from './src/TabBarTop';
-export { default as TabBarBottom } from './src/TabBarBottom';
