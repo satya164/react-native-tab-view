@@ -85,6 +85,7 @@ export default class TabBar extends Component<DefaultProps, Props, void> {
             route,
             focused,
             index: i,
+            position,
           };
           const icon = this.props.renderIcon ? this.props.renderIcon(scene) : null;
           const label = this.props.renderLabel ? this.props.renderLabel(scene) : null;
