@@ -18,6 +18,7 @@ type Props = {
 }
 
 type DefaultProps = {
+  delayPressIn: number;
   pressColor: string;
 }
 
@@ -30,6 +31,7 @@ export default class TouchableItem extends Component<DefaultProps, Props, void> 
   };
 
   static defaultProps = {
+    delayPressIn: 0,
     pressColor: 'rgba(255, 255, 255, .4)',
   };
 
