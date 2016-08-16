@@ -33,7 +33,7 @@ type Props = SceneRendererProps & {
   labelStyle?: any;
 }
 
-export default class TabBarTop extends Component<Props, void> {
+export default class TabBarTop extends Component<void, Props, void> {
   static propTypes = {
     ...SceneRendererPropType,
     renderLabel: PropTypes.func,
