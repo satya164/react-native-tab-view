@@ -48,6 +48,7 @@ export default class TopBarTextExample extends Component {
         pressColor='rgba(0, 0, 0, .2)'
         indicatorStyle={styles.indicator}
         style={styles.tabbar}
+        labelStyle={{ color: '#fbdc08', fontWeight: '500' }}
       />
     );
   };
