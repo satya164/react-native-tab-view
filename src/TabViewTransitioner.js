@@ -5,7 +5,6 @@ import {
   Animated,
   View,
 } from 'react-native';
-import shallowCompare from 'react-addons-shallow-compare';
 import { NavigationStatePropType } from './TabViewPropTypes';
 import type { NavigationState, SceneRendererProps } from './TabViewTypeDefinitions';
 
@@ -72,10 +71,6 @@ export default class TabViewTransitioner extends Component<DefaultProps, Props, 
 
   componentDidMount() {
     this._positionListener = this.state.position.addListener(this._trackPosition);
-  }
-
-  shouldComponentUpdate(nextProps: Props, nextState: State) {
-    return shallowCompare(this, nextProps, nextState);
   }
 
   componentDidUpdate() {

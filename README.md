@@ -27,6 +27,7 @@ npm install --save react-native-tab-view react-addons-shallow-compare
 
 ```js
 import React, { Component } from 'react';
+import shallowCompare from 'react-addons-shallow-compare';
 import { View, StyleSheet } from 'react-native';
 import { TabViewAnimated, TabViewPage, TabBarTop } from 'react-native-tab-view';
 
@@ -49,6 +50,10 @@ export default class TabViewExample extends Component {
       { key: '2', title: 'Second' },
     ],
   };
+
+  shouldComponentUpdate(nextProps: Props, nextState: void) {
+    return shallowCompare(this, nextProps, nextState);
+  }
 
   _handleChangeTab = (index) => {
     this.setState({ index });
@@ -144,36 +149,6 @@ It accepts the following props in addition to the props accepted by `<TabBar />`
 
 
 Check the [type definitions](src/TabViewTypeDefinitions.js) for details on shape of different objects.
-
-
-## Caveats
-
-`<TabViewAnimated />` and `<TabViewTransitioner />` implement `shouldComponentUpdate` to prevent unnecessary re-rendering. As a side-effect, the tabs won't re-render if something changes in the parent's state. If you need it to trigger a re-render, put it in the `navigationState`.
-
-For example, consider you have a `loaded` property on state which should trigger re-render. You can have your state like the following -
-
-```js
-state = {
-  index: 0,
-  routes: [
-    { key: '1', title: 'First' },
-    { key: '2', title: 'Second' },
-  ],
-  loaded: false,
-}
-```
-
-Then just pass `this.state` as the `navigationState` prop to `<TabViewAnimated />` or `<TabViewTransitioner />`.
-
-
-```js
-<TabViewAnimated
-  navigationState={this.state}
-  renderScene={this._renderPage}
-  renderHeader={this._renderHeader}
-  onRequestChangeTab={this._handleChangeTab}
-/>
-```
 
 
 ## Optimization Tips
