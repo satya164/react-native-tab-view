@@ -5,7 +5,6 @@ import {
   View,
   StyleSheet,
 } from 'react-native';
-import shallowCompare from 'react-addons-shallow-compare';
 import TabViewTransitioner from './TabViewTransitioner';
 import { NavigationStatePropType } from './TabViewPropTypes';
 import type { NavigationState, Route, SceneRendererProps } from './TabViewTypeDefinitions';
@@ -51,10 +50,6 @@ export default class TabViewAnimated extends Component<void, Props, State> {
   }
 
   state: State;
-
-  shouldComponentUpdate(nextProps: Props, nextState: State) {
-    return shallowCompare(this, nextProps, nextState);
-  }
 
   _renderScene = (props: SceneRendererProps & { route: Route }) => {
     const { renderScene, navigationState, lazy } = this.props;
