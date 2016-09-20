@@ -1,7 +1,9 @@
 # OSX
 #
 .DS_Store
-.exponent/*
+
+# XDE
+.exponent/
 
 # Xcode
 #
