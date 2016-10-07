@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
-import { TabViewAnimated, TabViewPage, TabBar } from 'react-native-tab-view';
+import { TabViewAnimated, TabViewPanPager, TabBar } from 'react-native-tab-view';
 
 const styles = StyleSheet.create({
   container: {
@@ -73,14 +73,8 @@ export default class TopBarIconExample extends Component {
     }
   };
 
-  _renderPage = (props) => {
-    return (
-      <TabViewPage
-        {...props}
-        swipeEnabled={false}
-        renderScene={this._renderScene}
-      />
-    );
+  _renderPager = (props) => {
+    return <TabViewPanPager {...props} swipeEnabled={false} />;
   };
 
   _configureTransition = () => null;
@@ -91,7 +85,8 @@ export default class TopBarIconExample extends Component {
         style={[ styles.container, this.props.style ]}
         navigationState={this.state}
         configureTransition={this._configureTransition}
-        renderScene={this._renderPage}
+        renderPager={this._renderPager}
+        renderScene={this._renderScene}
         renderFooter={this._renderFooter}
         onRequestChangeTab={this._handleChangeTab}
       />

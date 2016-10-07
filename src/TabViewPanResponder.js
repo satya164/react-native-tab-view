@@ -2,16 +2,12 @@
 
 import { Platform } from 'react-native';
 import type { GestureEvent, GestureState } from './PanResponderTypes';
-import type { Route, SceneRendererProps } from './TabViewTypeDefinitions';
-
-type Props = SceneRendererProps & {
-  route: Route
-}
+import type { SceneRendererProps } from './TabViewTypeDefinitions';
 
 const POSITION_THRESHOLD = 120;
 const VELOCITY_THRESHOLD = Platform.OS === 'android' ? 0.00000025 : 0.25; // on Android, velocity is way lower, perhaps due to timestamp being in nanosecond
 
-function forHorizontal(props: Props) {
+function forHorizontal(props: SceneRendererProps) {
   let lastValue = null;
   let isMoving = null;
 

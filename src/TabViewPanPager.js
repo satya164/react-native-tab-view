@@ -10,24 +10,30 @@ import {
 import TabViewPanResponder from './TabViewPanResponder';
 import TabViewStyleInterpolator from './TabViewStyleInterpolator';
 import { SceneRendererPropType } from './TabViewPropTypes';
-import type { Route, Scene, SceneRendererProps } from './TabViewTypeDefinitions';
+import type { SceneRendererProps } from './TabViewTypeDefinitions';
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    overflow: 'hidden',
+  },
+
+  sheet: {
+    flex: 1,
+  },
+});
 
 type Props = SceneRendererProps & {
-  route: Route;
-  renderScene: (scene: Scene) => ?React.Element<any>;
   swipeEnabled?: boolean;
-  style?: any;
+  children?: any;
 }
 
 export default class TabViewPage extends Component<void, Props, void> {
   static propTypes = {
     ...SceneRendererPropType,
-    renderScene: PropTypes.func.isRequired,
     swipeEnabled: PropTypes.bool,
-    style: PropTypes.any,
+    children: PropTypes.element,
   };
-
-  static StyleInterpolator = TabViewStyleInterpolator;
 
   componentWillMount() {
     this._setPanHandlers(this.props);
@@ -103,20 +109,17 @@ export default class TabViewPage extends Component<void, Props, void> {
   _panResponder: any;
 
   render() {
-    const { navigationState, renderScene, style, route } = this.props;
-    const { routes, index } = navigationState;
+    const { navigationState, layout } = this.props;
+    const { routes } = navigationState;
 
-    const viewStyle = typeof style !== 'undefined' ? style : TabViewStyleInterpolator.forHorizontal(this.props);
-    const scene = {
-      route,
-      focused: index === routes.indexOf(route),
-      index: routes.indexOf(route),
-    };
+    const style = TabViewStyleInterpolator.forHorizontal(this.props);
 
     return (
-      <Animated.View style={[ StyleSheet.absoluteFill, viewStyle ]} {...this._panResponder.panHandlers}>
-        {renderScene(scene)}
-      </Animated.View>
+      <View style={styles.container}>
+        <Animated.View style={[ styles.sheet, style, { width: layout.width * routes.length } ]} {...this._panResponder.panHandlers}>
+          {this.props.children}
+        </Animated.View>
+      </View>
     );
   }
 }

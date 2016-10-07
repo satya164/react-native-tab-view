@@ -7,19 +7,31 @@ import {
 } from 'react-native';
 import shallowCompare from 'react-addons-shallow-compare';
 import TabViewTransitioner from './TabViewTransitioner';
+import TabViewPanPager from './TabViewPanPager';
 import { NavigationStatePropType } from './TabViewPropTypes';
-import type { NavigationState, Route, SceneRendererProps } from './TabViewTypeDefinitions';
+import type { NavigationState, Scene, SceneRendererProps } from './TabViewTypeDefinitions';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     overflow: 'hidden',
   },
+
+  row: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'stretch',
+  },
 });
+
+type DefaultProps = {
+  renderPager: (props: SceneRendererProps) => React.Element<any>;
+}
 
 type Props = {
   navigationState: NavigationState;
-  renderScene: (props: SceneRendererProps) => ?React.Element<any>;
+  renderPager: (props: SceneRendererProps) => React.Element<any>;
+  renderScene: (props: SceneRendererProps & Scene) => ?React.Element<any>;
   renderHeader?: () => ?React.Element<any>;
   renderFooter?: () => ?React.Element<any>;
   onChangePosition?: (value: number) => void;
@@ -32,9 +44,10 @@ type State = {
   loaded: Array<number>;
 }
 
-export default class TabViewAnimated extends Component<void, Props, State> {
+export default class TabViewAnimated extends Component<DefaultProps, Props, State> {
   static propTypes = {
     navigationState: NavigationStatePropType.isRequired,
+    renderPager: PropTypes.func.isRequired,
     renderScene: PropTypes.func.isRequired,
     renderHeader: PropTypes.func,
     renderFooter: PropTypes.func,
@@ -42,6 +55,10 @@ export default class TabViewAnimated extends Component<void, Props, State> {
     shouldOptimizeUpdates: PropTypes.bool,
     lazy: PropTypes.bool,
     style: View.propTypes.style,
+  };
+
+  static defaultProps = {
+    renderPager: (props: SceneRendererProps) => <TabViewPanPager {...props} />,
   };
 
   constructor(props: Props) {
@@ -62,7 +79,7 @@ export default class TabViewAnimated extends Component<void, Props, State> {
     }
   }
 
-  _renderScene = (props: SceneRendererProps & { route: Route }) => {
+  _renderScene = (props: SceneRendererProps & Scene) => {
     const { renderScene, navigationState, lazy } = this.props;
     const { loaded } = this.state;
     if (lazy) {
@@ -75,20 +92,29 @@ export default class TabViewAnimated extends Component<void, Props, State> {
   };
 
   _renderItems = (props: SceneRendererProps) => {
-    const { renderHeader, renderFooter } = this.props;
+    const { renderPager, renderHeader, renderFooter } = this.props;
 
     return (
       <View style={styles.container}>
         {renderHeader && renderHeader(props)}
-        <View style={styles.container}>
-          {props.layout.measured ?
-            <View style={styles.container}>
-              {this.props.navigationState.routes.map(route => {
-                return this._renderScene({ ...props, route, key: route.key });
+        {renderPager({
+          ...props,
+          children: props.layout.measured ?
+            <View style={styles.row}>
+              {props.navigationState.routes.map((route, index) => {
+                return (
+                  <View key={route.key} style={{ width: props.layout.width }}>
+                    {this._renderScene({
+                      ...props,
+                      route,
+                      index,
+                      focused: index === props.navigationState.index,
+                    })}
+                  </View>
+                );
               })}
-            </View> : null
-          }
-        </View>
+            </View> : null,
+        })}
         {renderFooter && renderFooter(props)}
       </View>
     );
