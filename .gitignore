@@ -5,6 +5,10 @@
 # XDE
 .exponent/
 
+# VSCode
+.vscode/
+tsconfig.json
+
 # Xcode
 #
 build/
