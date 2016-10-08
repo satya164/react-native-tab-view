@@ -20,6 +20,8 @@ const styles = StyleSheet.create({
 
   sheet: {
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'stretch',
   },
 });
 
@@ -32,7 +34,7 @@ export default class TabViewPanPager extends Component<void, Props, void> {
   static propTypes = {
     ...SceneRendererPropType,
     swipeEnabled: PropTypes.bool,
-    children: PropTypes.element,
+    children: PropTypes.node,
   };
 
   componentWillMount() {

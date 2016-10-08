@@ -2,6 +2,7 @@
 
 import React, { Component, PropTypes } from 'react';
 import {
+  View,
   ScrollView,
   StyleSheet,
 } from 'react-native';
@@ -11,6 +12,11 @@ import type { SceneRendererProps } from './TabViewTypeDefinitions';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+
+  row: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
   },
 });
 
@@ -27,24 +33,24 @@ export default class TabViewScrollPager extends Component<void, Props, void> {
   };
 
   componentDidMount() {
-    this._positionListener = this.props.position.addListener(this._updatePosition);
+    this._positionListener = this.props.subscribe('position', this._updatePosition);
   }
 
   componentWillUnmount() {
-    this.props.position.removeListener(this._positionListener);
+    this._positionListener.remove();
   }
 
-  _positionListener: string;
+  _positionListener: Object;
   _scrollView: Object;
   _isManualScroll: boolean = false;
   _isMomentumScroll: boolean = false;
 
-  _updatePosition = (e: { value: number }) => {
+  _updatePosition = (value: number) => {
     if (this._isManualScroll) {
       return;
     }
     this._scrollView.scrollTo({
-      x: e.value * this.props.layout.width,
+      x: value * this.props.layout.width,
       animated: false,
     });
   };
@@ -95,6 +101,7 @@ export default class TabViewScrollPager extends Component<void, Props, void> {
         horizontal
         pagingEnabled
         directionalLockEnabled
+        keyboardDismissMode='on-drag'
         scrollEnabled={this.props.swipeEnabled}
         automaticallyAdjustContentInsets={false}
         bounces={false}
@@ -109,7 +116,9 @@ export default class TabViewScrollPager extends Component<void, Props, void> {
         style={styles.container}
         ref={this._setRef}
       >
-        {this.props.children}
+        <View style={styles.row}>
+          {this.props.children}
+        </View>
       </ScrollView>
     );
   }

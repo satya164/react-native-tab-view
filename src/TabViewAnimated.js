@@ -16,12 +16,6 @@ const styles = StyleSheet.create({
     flex: 1,
     overflow: 'hidden',
   },
-
-  row: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'stretch',
-  },
 });
 
 type DefaultProps = {
@@ -100,20 +94,18 @@ export default class TabViewAnimated extends Component<DefaultProps, Props, Stat
         {renderPager({
           ...props,
           children: props.layout.measured ?
-            <View style={styles.row}>
-              {props.navigationState.routes.map((route, index) => {
-                return (
-                  <View key={route.key} style={{ width: props.layout.width }}>
-                    {this._renderScene({
-                      ...props,
-                      route,
-                      index,
-                      focused: index === props.navigationState.index,
-                    })}
-                  </View>
-                );
-              })}
-            </View> : null,
+            props.navigationState.routes.map((route, index) => {
+              return (
+                <View key={route.key} style={{ width: props.layout.width }}>
+                  {this._renderScene({
+                    ...props,
+                    route,
+                    index,
+                    focused: index === props.navigationState.index,
+                  })}
+                </View>
+              );
+            }) : null,
         })}
         {renderFooter && renderFooter(props)}
       </View>
