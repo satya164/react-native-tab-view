@@ -33,6 +33,7 @@ export default class TabViewScrollPager extends Component<void, Props, void> {
   };
 
   componentDidMount() {
+    this._updatePosition(this.props.navigationState.index);
     this._positionListener = this.props.subscribe('position', this._updatePosition);
   }
 
@@ -78,10 +79,16 @@ export default class TabViewScrollPager extends Component<void, Props, void> {
     this._isMomentumScroll = true;
   };
 
-  _handleMomentumScrollEnd = () => {
+  _handleMomentumScrollEnd = (e) => {
     // onMomentumScrollEnd fires when the scroll finishes
     this._isMomentumScroll = false;
     this._isManualScroll = false;
+
+    const nextIndex = e.nativeEvent.contentOffset.x / this.props.layout.width;
+
+    if (nextIndex && nextIndex !== this.props.navigationState.index) {
+      this.props.jumpToIndex(nextIndex);
+    }
   };
 
   _handleScroll = (e) => {
