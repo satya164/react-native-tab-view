@@ -4,8 +4,6 @@ import { Platform } from 'react-native';
 import type { GestureEvent, GestureState } from './PanResponderTypes';
 import type { SceneRendererProps } from './TabViewTypeDefinitions';
 
-const POSITION_THRESHOLD = 120;
-
 type Props = SceneRendererProps & {
   swipeDistanceThreshold: number;
   swipeVelocityThreshold: number;
@@ -37,7 +35,7 @@ function forHorizontal(props: Props) {
 
   function getNextIndex(evt: GestureEvent, gestureState: GestureState) {
     const { index } = props.navigationState;
-    if (Math.abs(gestureState.dx) > POSITION_THRESHOLD || Math.abs(gestureState.vx) > swipeVelocityThreshold) {
+    if (Math.abs(gestureState.dx) > props.swipeDistanceThreshold || Math.abs(gestureState.vx) > swipeVelocityThreshold) {
       const nextIndex = index - (gestureState.dx / Math.abs(gestureState.dx));
       if (isIndexInRange(nextIndex)) {
         return nextIndex;
