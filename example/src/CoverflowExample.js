@@ -95,7 +95,6 @@ export default class CoverflowExample extends Component {
     });
 
     return {
-      width,
       transform: [
         { translateX },
         { scale },
