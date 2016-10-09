@@ -25,16 +25,28 @@ const styles = StyleSheet.create({
   },
 });
 
+type DefaultProps = {
+  swipeDistanceThreshold: number;
+  swipeVelocityThreshold: number;
+}
+
 type Props = SceneRendererProps & {
   swipeEnabled?: boolean;
+  swipeDistanceThreshold?: number;
+  swipeVelocityThreshold?: number;
   children?: any;
 }
 
-export default class TabViewPagerPan extends Component<void, Props, void> {
+export default class TabViewPagerPan extends Component<DefaultProps, Props, void> {
   static propTypes = {
     ...SceneRendererPropType,
     swipeEnabled: PropTypes.bool,
     children: PropTypes.node,
+  };
+
+  static defaultProps = {
+    swipeDistanceThreshold: 120,
+    swipeVelocityThreshold: 0.25,
   };
 
   componentWillMount() {

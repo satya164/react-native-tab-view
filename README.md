@@ -124,6 +124,8 @@ Pager component based on `PanResponder`
 
 It accepts the following props,
 - `swipeEnabled` - whether to enable swipe gestures
+- `swipeDistanceThreshold` - minimum swipe distance to trigger page switch
+- `swipeVelocityThreshold` - minimum swipe velocity to trigger page switch
 - `children` - React Element(s) to render
 
 ### `<TabBar />`

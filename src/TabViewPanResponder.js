@@ -5,9 +5,21 @@ import type { GestureEvent, GestureState } from './PanResponderTypes';
 import type { SceneRendererProps } from './TabViewTypeDefinitions';
 
 const POSITION_THRESHOLD = 120;
-const VELOCITY_THRESHOLD = Platform.OS === 'android' ? 0.00000025 : 0.25; // on Android, velocity is way lower, perhaps due to timestamp being in nanosecond
 
-function forHorizontal(props: SceneRendererProps) {
+type Props = SceneRendererProps & {
+  swipeDistanceThreshold: number;
+  swipeVelocityThreshold: number;
+}
+
+function forHorizontal(props: Props) {
+  let { swipeVelocityThreshold } = props;
+
+  if (Platform.OS === 'android') {
+    // on Android, velocity is way lower due to timestamp being in nanosecond
+    // normalize it to be have same velocity on both iOS and Android
+    swipeVelocityThreshold /= 1000000;
+  }
+
   let lastValue = null;
   let isMoving = null;
 
@@ -25,7 +37,7 @@ function forHorizontal(props: SceneRendererProps) {
 
   function getNextIndex(evt: GestureEvent, gestureState: GestureState) {
     const { index } = props.navigationState;
-    if (Math.abs(gestureState.dx) > POSITION_THRESHOLD || Math.abs(gestureState.vx) > VELOCITY_THRESHOLD) {
+    if (Math.abs(gestureState.dx) > POSITION_THRESHOLD || Math.abs(gestureState.vx) > swipeVelocityThreshold) {
       const nextIndex = index - (gestureState.dx / Math.abs(gestureState.dx));
       if (isIndexInRange(nextIndex)) {
         return nextIndex;
