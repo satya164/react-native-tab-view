@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Image, StyleSheet } from 'react-native';
+import { Animated, View, Image, StyleSheet } from 'react-native';
 import { TabViewAnimated, TabBar } from 'react-native-tab-view';
 
 const styles = StyleSheet.create({
@@ -7,7 +7,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   tabbar: {
-    backgroundColor: '#212121',
+    backgroundColor: '#222',
+  },
+  tab: {
+    opacity: 1,
+  },
+  indicator: {
+    flex: 1,
+    backgroundColor: '#0084ff',
+    margin: 4,
+    borderRadius: 2,
   },
   page: {
     flex: 1,
@@ -17,6 +26,9 @@ const styles = StyleSheet.create({
 });
 
 export default class TopBarIconExample extends Component {
+
+  static appbarElevation = 4;
+
   static propTypes = {
     style: View.propTypes.style,
   };
@@ -34,6 +46,18 @@ export default class TopBarIconExample extends Component {
     this.setState({
       index,
     });
+  };
+
+  _renderIndicator = (props) => {
+    const { width, position } = props;
+
+    const translateX = Animated.multiply(position, new Animated.Value(width));
+
+    return (
+      <Animated.View
+        style={[ styles.indicator, { width: width - 8, transform: [ { translateX } ] } ]}
+      />
+    );
   };
 
   _renderIcon = ({ route }) => {
@@ -55,7 +79,9 @@ export default class TopBarIconExample extends Component {
         {...props}
         pressColor='rgba(0, 0, 0, .2)'
         renderIcon={this._renderIcon}
+        renderIndicator={this._renderIndicator}
         style={styles.tabbar}
+        tabStyle={styles.tab}
       />
     );
   };
