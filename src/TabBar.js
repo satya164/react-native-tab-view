@@ -157,7 +157,7 @@ export default class TabBar extends Component<DefaultProps, Props, State> {
   };
 
   _resetScrollOffset = (props: Props) => {
-    if (this._scrollOffset === 0 || !props.scrollEnabled) {
+    if (this._scrollOffset === 0 || !props.scrollEnabled || !this._scrollView) {
       return;
     }
 
@@ -174,7 +174,7 @@ export default class TabBar extends Component<DefaultProps, Props, State> {
   };
 
   _adjustScroll = (index: number) => {
-    if (!this.props.scrollEnabled) {
+    if (!this.props.scrollEnabled || !this._scrollView) {
       return;
     }
 

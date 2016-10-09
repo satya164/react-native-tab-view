@@ -33,7 +33,7 @@ export default class TabViewPagerAndroid extends Component<void, Props, void> {
   componentDidUpdate() {
     global.requestAnimationFrame(() => {
       const { index } = this.props.navigationState;
-      if (this._isTransitioning) {
+      if (this._isTransitioning || !this._viewPager) {
         this._nextIndex = index;
         return;
       }
@@ -53,7 +53,9 @@ export default class TabViewPagerAndroid extends Component<void, Props, void> {
 
   _handleJump = (index: number) => {
     this._nextIndex = null;
-    this._viewPager.setPage(index);
+    if (this._viewPager) {
+      this._viewPager.setPage(index);
+    }
   };
 
   _handlePageScroll = (e) => {

@@ -47,7 +47,7 @@ export default class TabViewPagerScroll extends Component<void, Props, void> {
   _isMomentumScroll: boolean = false;
 
   _updatePosition = (value: number) => {
-    if (this._isManualScroll) {
+    if (this._isManualScroll || !this._scrollView) {
       return;
     }
     this._scrollView.scrollTo({
