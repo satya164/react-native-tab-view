@@ -30,16 +30,15 @@ export default class TabViewPagerAndroid extends Component<void, Props, void> {
     this._jumpListener = this.props.subscribe('jump', this._jumpToPage);
   }
 
-  componentWillReceiveProps(nextProps: Props) {
-    if (this.props.navigationState === nextProps.navigationState) {
-      return;
-    }
-    const { index } = nextProps.navigationState;
-    if (nextProps.swipeEnabled !== false) {
-      this._viewPager.setPage(index);
-    } else {
-      this._viewPager.setPageWithoutAnimation(index);
-    }
+  componentDidUpdate() {
+    global.requestAnimationFrame(() => {
+      const { index } = this.props.navigationState;
+      if (this._isTransitioning) {
+        this._nextIndex = index;
+        return;
+      }
+      this._jumpToPage(index);
+    });
   }
 
   componentWillUnmount() {
@@ -48,6 +47,7 @@ export default class TabViewPagerAndroid extends Component<void, Props, void> {
 
   _jumpListener: Object;
   _viewPager: Object;
+  _isTransitioning: boolean = false;
   _isManualScroll: boolean = false;
   _nextIndex: ?number;
 
@@ -69,6 +69,7 @@ export default class TabViewPagerAndroid extends Component<void, Props, void> {
   };
 
   _handlePageScrollStateChanged = (e) => {
+    this._isTransitioning = e !== 'idle';
     if (e === 'dragging') {
       this._nextIndex = null;
       this._isManualScroll = true;
