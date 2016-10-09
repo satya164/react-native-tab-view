@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
-import { TabViewAnimated, TabViewPanPager, TabBar } from 'react-native-tab-view';
+import { TabViewAnimated, TabViewPagerPan, TabBar } from 'react-native-tab-view';
 
 const styles = StyleSheet.create({
   container: {
@@ -74,7 +74,7 @@ export default class TopBarIconExample extends Component {
   };
 
   _renderPager = (props) => {
-    return <TabViewPanPager {...props} swipeEnabled={false} />;
+    return <TabViewPagerPan {...props} swipeEnabled={false} />;
   };
 
   _configureTransition = () => null;

@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import { Animated, View, Image, Text, StyleSheet } from 'react-native';
-import { TabViewAnimated, TabViewPanPager } from 'react-native-tab-view';
+import { TabViewAnimated, TabViewPagerPan } from 'react-native-tab-view';
 
 const styles = StyleSheet.create({
   container: {
@@ -122,7 +122,7 @@ export default class CoverflowExample extends Component {
   };
 
   _renderPager = (props) => {
-    return <TabViewPanPager {...props} />;
+    return <TabViewPagerPan {...props} />;
   };
 
   render() {

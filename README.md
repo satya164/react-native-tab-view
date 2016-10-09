@@ -118,7 +118,7 @@ It accepts the following props in addition to all the props accepted by `<TabVie
 - `renderScene` - callback which renders a single scene
 - `lazy` - whether to load tabs lazily when you start switching
 
-### `<TabViewPanPager />`
+### `<TabViewPagerPan />`
 
 Pager component based on `PanResponder`
 

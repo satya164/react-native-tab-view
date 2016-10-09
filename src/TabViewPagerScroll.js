@@ -25,7 +25,7 @@ type Props = SceneRendererProps & {
   children?: any;
 }
 
-export default class TabViewScrollPager extends Component<void, Props, void> {
+export default class TabViewPagerScroll extends Component<void, Props, void> {
   static propTypes = {
     ...SceneRendererPropType,
     swipeEnabled: PropTypes.bool,
