@@ -31,8 +31,14 @@ export default class TabViewPagerAndroid extends Component<void, Props, void> {
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    if (this.props.navigationState !== nextProps.navigationState) {
-      this._jumpToPage(nextProps.navigationState.index);
+    if (this.props.navigationState === nextProps.navigationState) {
+      return;
+    }
+    const { index } = nextProps.navigationState;
+    if (nextProps.swipeEnabled !== false) {
+      this._viewPager.setPage(index);
+    } else {
+      this._viewPager.setPageWithoutAnimation(index);
     }
   }
 
@@ -45,8 +51,12 @@ export default class TabViewPagerAndroid extends Component<void, Props, void> {
   _isManualScroll: boolean = false;
   _nextIndex: ?number;
 
-  _jumpToPage = (value: number) => {
-    this._viewPager.setPage(value);
+  _jumpToPage = (index: number) => {
+    if (this.props.swipeEnabled !== false) {
+      this._viewPager.setPage(index);
+    } else {
+      this._viewPager.setPageWithoutAnimation(index);
+    }
   };
 
   _handlePageScroll = (e) => {
