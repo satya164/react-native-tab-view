@@ -195,7 +195,7 @@ export default class TabViewTransitioner extends Component<DefaultProps, Props, 
       remove: () => {
         const index = this._subscriptions[event].indexOf(callback);
         if (index > -1) {
-          this._subscriptions[event].splice(index, 0);
+          this._subscriptions[event].splice(index, 1);
         }
       },
     };
