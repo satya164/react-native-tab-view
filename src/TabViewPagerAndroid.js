@@ -77,6 +77,7 @@ export default class TabViewPagerAndroid extends Component<void, Props, void> {
       }
       if (this._nextIndex && this._nextIndex !== this.props.navigationState.index) {
         this.props.jumpToIndex(this._nextIndex);
+        this._nextIndex = null;
       }
       this._isManualScroll = false;
     }
