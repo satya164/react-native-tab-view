@@ -27,18 +27,14 @@ export default class TabViewPagerAndroid extends Component<void, Props, void> {
   };
 
   componentWillMount() {
+    this._currentIndex = this.props.navigationState.index;
     this._jumpListener = this.props.subscribe('jump', this._handleJump);
   }
 
   componentDidUpdate() {
-    global.requestAnimationFrame(() => {
-      const { index } = this.props.navigationState;
-      if (this._isTransitioning || !this._viewPager) {
-        this._nextIndex = index;
-        return;
-      }
-      this._viewPager.setPage(index);
-    });
+    if (this._isIdle) {
+      this._setPage(this.props.navigationState.index);
+    }
   }
 
   componentWillUnmount() {
@@ -47,45 +43,45 @@ export default class TabViewPagerAndroid extends Component<void, Props, void> {
 
   _jumpListener: Object;
   _viewPager: Object;
-  _isTransitioning: boolean = false;
-  _isManualScroll: boolean = false;
-  _nextIndex: ?number;
+  _isDrag: boolean = false;
+  _isIdle: boolean = true;
+  _currentIndex: number;
+
+  _setPage = (index: number) => {
+    if (this._viewPager && this._currentIndex !== index) {
+      this._currentIndex = index;
+      this._viewPager.setPage(index);
+    }
+  }
 
   _handleJump = (index: number) => {
-    this._nextIndex = null;
-    if (this._viewPager) {
-      this._viewPager.setPage(index);
+    if (this._isIdle) {
+      this._setPage(index);
     }
   };
 
   _handlePageScroll = (e) => {
-    if (!this._isManualScroll) {
-      return;
+    if (this._isDrag) {
+      this.props.position.setValue(
+        e.nativeEvent.position + e.nativeEvent.offset
+      );
     }
-    this.props.position.setValue(
-      e.nativeEvent.position + e.nativeEvent.offset
-    );
   };
 
   _handlePageScrollStateChanged = (e) => {
-    this._isTransitioning = e !== 'idle';
+    this._isIdle = e === 'idle';
     if (e === 'dragging') {
-      this._nextIndex = null;
-      this._isManualScroll = true;
-    } else {
-      if (e === 'settling') {
-        return;
+      this._isDrag = true;
+    } else if (e === 'idle') {
+      this._isDrag = false;
+      if (this._currentIndex !== this.props.navigationState.index) {
+        this.props.jumpToIndex(this._currentIndex);
       }
-      if (typeof this._nextIndex === 'number') {
-        this.props.jumpToIndex(this._nextIndex);
-        this._nextIndex = null;
-      }
-      this._isManualScroll = false;
     }
   };
 
   _handlePageSelected = (e) => {
-    this._nextIndex = e.nativeEvent.position;
+    this._currentIndex = e.nativeEvent.position;
   };
 
   _setRef = (el: Object) => (this._viewPager = el);
