@@ -1,6 +1,6 @@
 /* @flow */
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component, Children, PropTypes } from 'react';
 import {
   ViewPagerAndroid,
   StyleSheet,
@@ -29,6 +29,16 @@ export default class TabViewPagerAndroid extends Component<void, Props, void> {
   componentWillMount() {
     this._currentIndex = this.props.navigationState.index;
     this._jumpListener = this.props.subscribe('jump', this._handleJump);
+  }
+
+  componentWillReceiveProps(nextProps: Props) {
+    if (this.props.layout !== nextProps.layout || Children.count(this.props.children) !== Children.count(nextProps.children)) {
+      global.requestAnimationFrame(() => {
+        if (this._viewPager) {
+          this._viewPager.setPageWithoutAnimation(nextProps.navigationState.index);
+        }
+      });
+    }
   }
 
   componentDidUpdate() {

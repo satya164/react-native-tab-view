@@ -1,6 +1,6 @@
 /* @flow */
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component, Children, PropTypes } from 'react';
 import {
   View,
   ScrollView,
@@ -33,8 +33,16 @@ export default class TabViewPagerScroll extends Component<void, Props, void> {
   };
 
   componentDidMount() {
-    this._updatePosition(this.props.navigationState.index);
     this._positionListener = this.props.subscribe('position', this._updatePosition);
+    this._scrollTo(this.props.navigationState.index * this.props.layout.width);
+  }
+
+  componentWillReceiveProps(nextProps: Props) {
+    if (this.props.layout !== nextProps.layout || Children.count(this.props.children) !== Children.count(nextProps.children)) {
+      global.requestAnimationFrame(() =>
+        this._scrollTo(nextProps.navigationState.index * nextProps.layout.width)
+      );
+    }
   }
 
   componentWillUnmount() {
@@ -46,14 +54,20 @@ export default class TabViewPagerScroll extends Component<void, Props, void> {
   _isManualScroll: boolean = false;
   _isMomentumScroll: boolean = false;
 
+  _scrollTo = (x: number) => {
+    if (this._scrollView) {
+      this._scrollView.scrollTo({
+        x,
+        animated: false,
+      });
+    }
+  };
+
   _updatePosition = (value: number) => {
     if (this._isManualScroll || !this._scrollView) {
       return;
     }
-    this._scrollView.scrollTo({
-      x: value * this.props.layout.width,
-      animated: false,
-    });
+    this._scrollTo(value * this.props.layout.width);
   };
 
   _handleBeginDrag = () => {
