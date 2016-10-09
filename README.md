@@ -128,6 +128,22 @@ It accepts the following props,
 - `swipeVelocityThreshold` - minimum swipe velocity to trigger page switch
 - `children` - React Element(s) to render
 
+### `<TabViewPagerScroll />`
+
+Pager component based on `ScrollView` (default on iOS)
+
+It accepts the following props,
+- `swipeEnabled` - whether to enable swipe gestures
+- `children` - React Element(s) to render
+
+### `<TabViewPagerAndroid />`
+
+Pager component based on `ViewPagerAndroid` (default on Android)
+
+It accepts the following props,
+- `swipeEnabled` - whether to enable swipe gestures
+- `children` - React Element(s) to render
+
 ### `<TabBar />`
 
 Basic tab bar
