@@ -70,12 +70,13 @@ export default class TabViewPagerAndroid extends Component<void, Props, void> {
 
   _handlePageScrollStateChanged = (e) => {
     if (e === 'dragging') {
+      this._nextIndex = null;
       this._isManualScroll = true;
     } else {
       if (e === 'settling') {
         return;
       }
-      if (this._nextIndex && this._nextIndex !== this.props.navigationState.index) {
+      if (typeof this._nextIndex === 'number') {
         this.props.jumpToIndex(this._nextIndex);
         this._nextIndex = null;
       }

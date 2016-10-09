@@ -149,9 +149,6 @@ export default class TabViewTransitioner extends Component<DefaultProps, Props, 
 
   _transitionTo = (toValue: number, callback) => {
     const lastPosition = this._getLastPosition();
-    if (lastPosition === toValue) {
-      return;
-    }
     const currentTransitionProps = {
       progress: lastPosition,
     };

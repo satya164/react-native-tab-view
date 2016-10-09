@@ -85,10 +85,7 @@ export default class TabViewPagerScroll extends Component<void, Props, void> {
     this._isManualScroll = false;
 
     const nextIndex = e.nativeEvent.contentOffset.x / this.props.layout.width;
-
-    if (nextIndex && nextIndex !== this.props.navigationState.index) {
-      this.props.jumpToIndex(nextIndex);
-    }
+    this.props.jumpToIndex(nextIndex);
   };
 
   _handleScroll = (e) => {
