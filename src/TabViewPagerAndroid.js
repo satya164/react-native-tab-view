@@ -26,8 +26,8 @@ export default class TabViewPagerAndroid extends Component<void, Props, void> {
     children: PropTypes.node,
   };
 
-  componentDidMount() {
-    this._jumpListener = this.props.subscribe('jump', this._viewPager.setPage.bind(this._viewPager));
+  componentWillMount() {
+    this._jumpListener = this.props.subscribe('jump', this._handleJump);
   }
 
   componentDidUpdate() {
@@ -50,6 +50,11 @@ export default class TabViewPagerAndroid extends Component<void, Props, void> {
   _isTransitioning: boolean = false;
   _isManualScroll: boolean = false;
   _nextIndex: ?number;
+
+  _handleJump = (index: number) => {
+    this._nextIndex = null;
+    this._viewPager.setPage(index);
+  };
 
   _handlePageScroll = (e) => {
     if (!this._isManualScroll) {
