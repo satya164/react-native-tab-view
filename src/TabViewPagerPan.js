@@ -32,8 +32,8 @@ type DefaultProps = {
 
 type Props = SceneRendererProps & {
   swipeEnabled?: boolean;
-  swipeDistanceThreshold?: number;
-  swipeVelocityThreshold?: number;
+  swipeDistanceThreshold: number;
+  swipeVelocityThreshold: number;
   children?: any;
 }
 
@@ -41,6 +41,8 @@ export default class TabViewPagerPan extends Component<DefaultProps, Props, void
   static propTypes = {
     ...SceneRendererPropType,
     swipeEnabled: PropTypes.bool,
+    swipeDistanceThreshold: PropTypes.number.isRequired,
+    swipeVelocityThreshold: PropTypes.number.isRequired,
     children: PropTypes.node,
   };
 
