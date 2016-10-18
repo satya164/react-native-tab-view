@@ -36,9 +36,9 @@ function forHorizontal(props: Props) {
 
   function isReverseDirection(gestureState: GestureState) {
     if (startingDirection > 0) {
-      return gestureState.vx < 0
+      return gestureState.vx < 0;
     } else {
-      return gestureState.vx > 0
+      return gestureState.vx > 0;
     }
   }
 
@@ -104,7 +104,7 @@ function forHorizontal(props: Props) {
       if (canMove) {
         startingDirection = gestureState.dx;
       }
-      return canMove
+      return canMove;
     },
     onPanResponderGrant: (evt: GestureEvent, gestureState: GestureState) => {
       startGesture(evt, gestureState);
