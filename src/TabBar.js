@@ -272,7 +272,7 @@ export default class TabBar extends Component<DefaultProps, Props, State> {
     });
 
     return (
-      <View style={[ styles.tabbar, this.props.style ]}>
+      <Animated.View style={[ styles.tabbar, this.props.style ]}>
         <Animated.View pointerEvents='none' style={[ styles.indiator, scrollEnabled ? { width: tabBarWidth, transform: [ { translateX } ] } : null ]}>
           {this.props.renderIndicator ?
             this.props.renderIndicator({
@@ -357,7 +357,7 @@ export default class TabBar extends Component<DefaultProps, Props, State> {
             );
           })}
         </ScrollView>
-      </View>
+      </Animated.View>
     );
   }
 }
