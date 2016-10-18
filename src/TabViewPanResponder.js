@@ -20,7 +20,7 @@ function forHorizontal(props: Props) {
 
   let lastValue = null;
   let isMoving = null;
-  let startingDirection = null;
+  let startingDirection = 0;
 
   function isIndexInRange(index: number) {
     const { routes } = props.navigationState;
