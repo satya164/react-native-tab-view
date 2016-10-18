@@ -57,8 +57,8 @@ function forHorizontal(props: Props) {
     const { routes, index } = props.navigationState;
     return (
       isMovingHorzontally(evt, gestureState) && (
-        (gestureState.dx >= 20 && index >= 0) ||
-        (gestureState.dx <= -20 && index <= routes.length - 1)
+        (gestureState.dx >= 0 && index >= 0) ||
+        (gestureState.dx <= -0 && index <= routes.length - 1)
     ));
   }
 
