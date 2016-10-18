@@ -94,12 +94,8 @@ function forHorizontal(props: Props) {
   }
 
   return {
-    onStartShouldSetPanResponder: (evt: GestureEvent, gestureState: GestureState) => {
-      return canMoveScreen(evt, gestureState);
-    },
-    onStartShouldSetPanResponderCapture: (evt: GestureEvent, gestureState: GestureState) => {
-      return canMoveScreen(evt, gestureState);
-    },
+    onStartShouldSetPanResponder: () => false,
+    onStartShouldSetPanResponderCapture: () => false,
     onMoveShouldSetPanResponder: (evt: GestureEvent, gestureState: GestureState) => {
       return canMoveScreen(evt, gestureState);
     },
