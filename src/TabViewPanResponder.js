@@ -20,6 +20,7 @@ function forHorizontal(props: Props) {
 
   let lastValue = null;
   let isMoving = null;
+  let deadzone = 20;
 
   function isIndexInRange(index: number) {
     const { routes } = props.navigationState;
@@ -48,8 +49,8 @@ function forHorizontal(props: Props) {
     const { routes, index } = props.navigationState;
     return (
       isMovingHorzontally(evt, gestureState) && (
-        (gestureState.dx >= 20 && index >= 0) ||
-        (gestureState.dx <= -20 && index <= routes.length - 1)
+        (gestureState.dx >= deadzone && index >= 0) ||
+        (gestureState.dx <= -deadzone && index <= routes.length - 1)
     ));
   }
 
