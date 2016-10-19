@@ -164,6 +164,7 @@ export default class TabViewTransitioner extends Component<DefaultProps, Props, 
     if (canJumpToTab && !canJumpToTab(navigationState.routes[index])) {
       return;
     }
+    
     this._triggerEvent('jump', index);
     this._nextIndex = index;
     this._transitionTo(index, () =>
@@ -176,8 +177,8 @@ export default class TabViewTransitioner extends Component<DefaultProps, Props, 
           onRequestChangeTab(index);
           // Change back to previous index if it didn't change
           global.requestAnimationFrame(() => {
-            if (navigationState.index !== index) {
-              this._jumpToIndex(navigationState.index);
+            if (this.props.navigationState.index !== index) {
+              this._jumpToIndex(this.props.navigationState.index);
             }
           });
         }
