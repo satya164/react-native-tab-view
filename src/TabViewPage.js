@@ -23,9 +23,8 @@ export default class TabViewPage extends Component<void, Props, void> {
       return;
     }
 
-    /* eslint-disable no-console */
+    // eslint-disable-next-line no-console
     console.warn('`<TabViewPage />` is deprecated. Pass the `renderScene` prop to `<TabViewAnimated />` instead.');
-    /* eslint-enable no-console */
     warned = true;
   }
 

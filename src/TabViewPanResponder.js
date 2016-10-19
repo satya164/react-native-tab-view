@@ -20,7 +20,7 @@ function forHorizontal(props: Props) {
 
   let lastValue = null;
   let isMoving = null;
-  let startingDirection = 0;
+  let startDirection = 0;
 
   function isIndexInRange(index: number) {
     const { routes } = props.navigationState;
@@ -35,7 +35,7 @@ function forHorizontal(props: Props) {
   }
 
   function isReverseDirection(gestureState: GestureState) {
-    if (startingDirection > 0) {
+    if (startDirection > 0) {
       return gestureState.vx < 0;
     } else {
       return gestureState.vx > 0;
@@ -55,11 +55,14 @@ function forHorizontal(props: Props) {
 
   function canMoveScreen(evt: GestureEvent, gestureState: GestureState) {
     const { routes, index } = props.navigationState;
-    return (
-      isMovingHorzontally(evt, gestureState) && (
+    const canMove = isMovingHorzontally(evt, gestureState) && (
         (gestureState.dx >= 0 && index >= 0) ||
         (gestureState.dx <= -0 && index <= routes.length - 1)
-    ));
+      );
+    if (canMove) {
+      startDirection = gestureState.dx;
+    }
+    return canMove;
   }
 
   function startGesture() {
@@ -100,11 +103,7 @@ function forHorizontal(props: Props) {
       return canMoveScreen(evt, gestureState);
     },
     onMoveShouldSetPanResponderCapture: (evt: GestureEvent, gestureState: GestureState) => {
-      const canMove = canMoveScreen(evt, gestureState);
-      if (canMove) {
-        startingDirection = gestureState.dx;
-      }
-      return canMove;
+      return canMoveScreen(evt, gestureState);
     },
     onPanResponderGrant: (evt: GestureEvent, gestureState: GestureState) => {
       startGesture(evt, gestureState);
