@@ -159,7 +159,7 @@ export default class TabViewTransitioner extends Component<DefaultProps, Props, 
   }
 
   _jumpToIndex = (index: number) => {
-    const { canJumpToTab, navigationState, onRequestChangeTab } = this.props
+    const { canJumpToTab, navigationState, onRequestChangeTab } = this.props;
 
     if (canJumpToTab && !canJumpToTab(navigationState.routes[index])) {
       return;
