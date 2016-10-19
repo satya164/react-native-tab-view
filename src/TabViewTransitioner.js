@@ -41,6 +41,7 @@ export default class TabViewTransitioner extends Component<DefaultProps, Props, 
     onRequestChangeTab: PropTypes.func.isRequired,
     onChangePosition: PropTypes.func,
     shouldOptimizeUpdates: PropTypes.bool,
+    canJumpToTab: PropTypes.func,
   };
 
   static defaultProps = {
@@ -158,20 +159,25 @@ export default class TabViewTransitioner extends Component<DefaultProps, Props, 
   }
 
   _jumpToIndex = (index: number) => {
+    const { canJumpToTab, navigationState, onRequestChangeTab } = this.props
+
+    if (canJumpToTab && !canJumpToTab(navigationState.routes[index])) {
+      return;
+    }
     this._triggerEvent('jump', index);
     this._nextIndex = index;
     this._transitionTo(index, () =>
       global.requestAnimationFrame(() => {
-        if (this.props.navigationState.index === index) {
+        if (navigationState.index === index) {
           return;
         }
         // Prevent extra setState when index updated mid-transition
         if (this._nextIndex === index) {
-          this.props.onRequestChangeTab(index);
+          onRequestChangeTab(index);
           // Change back to previous index if it didn't change
           global.requestAnimationFrame(() => {
-            if (this.props.navigationState.index !== index) {
-              this._jumpToIndex(this.props.navigationState.index);
+            if (navigationState.index !== index) {
+              this._jumpToIndex(navigationState.index);
             }
           });
         }

@@ -106,6 +106,7 @@ It accepts the following props,
 - `onChangePosition` - callback called with position value as it changes (e.g. - on swipe or tab change), avoid doing anything expensive here
 - `shouldOptimizeUpdates` - whether to implement a `shouldComponentUpdate` strategy to minimize updates, enabled by default
 - `render` - callback which renders the tab view, gets a special set of props as argument
+- `canJumpToTab` - optional callback which return a route it wants to jump to, return false to disallow the jump.
 
 ### `<TabViewAnimated />`
 
