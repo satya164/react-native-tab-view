@@ -22,6 +22,7 @@ function forHorizontal(props: Props) {
 
   let lastValue = null;
   let isMoving = null;
+  let startDirection = 0;
 
   function isIndexInRange(index: number) {
     const { routes } = props.navigationState;
@@ -33,6 +34,14 @@ function forHorizontal(props: Props) {
       (Math.abs(gestureState.dx) > Math.abs(gestureState.dy * 3)) &&
       (Math.abs(gestureState.vx) > Math.abs(gestureState.vy * 3))
     );
+  }
+
+  function isReverseDirection(gestureState: GestureState) {
+    if (startDirection > 0) {
+      return gestureState.vx < 0;
+    } else {
+      return gestureState.vx > 0;
+    }
   }
 
   function getNextIndex(evt: GestureEvent, gestureState: GestureState) {
@@ -48,11 +57,14 @@ function forHorizontal(props: Props) {
 
   function canMoveScreen(evt: GestureEvent, gestureState: GestureState) {
     const { routes, index } = props.navigationState;
-    return (
-      isMovingHorzontally(evt, gestureState) && (
+    const canMove = isMovingHorzontally(evt, gestureState) && (
         (gestureState.dx >= DEAD_ZONE && index >= 0) ||
         (gestureState.dx <= -DEAD_ZONE && index <= routes.length - 1)
-    ));
+      );
+    if (canMove) {
+      startDirection = gestureState.dx;
+    }
+    return canMove;
   }
 
   function startGesture() {
@@ -75,7 +87,7 @@ function forHorizontal(props: Props) {
     const currentIndex = props.navigationState.index;
     const currentValue = props.getLastPosition();
     if (currentValue !== currentIndex) {
-      if (isMoving) {
+      if (isMoving && !isReverseDirection(gestureState)) {
         const nextIndex = getNextIndex(evt, gestureState);
         props.jumpToIndex(nextIndex);
       } else {
@@ -87,12 +99,8 @@ function forHorizontal(props: Props) {
   }
 
   return {
-    onStartShouldSetPanResponder: (evt: GestureEvent, gestureState: GestureState) => {
-      return canMoveScreen(evt, gestureState);
-    },
-    onStartShouldSetPanResponderCapture: (evt: GestureEvent, gestureState: GestureState) => {
-      return canMoveScreen(evt, gestureState);
-    },
+    onStartShouldSetPanResponder: () => false,
+    onStartShouldSetPanResponderCapture: () => false,
     onMoveShouldSetPanResponder: (evt: GestureEvent, gestureState: GestureState) => {
       return canMoveScreen(evt, gestureState);
     },
