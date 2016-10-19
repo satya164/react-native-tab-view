@@ -10,6 +10,7 @@ type Props = SceneRendererProps & {
 }
 
 const DEAD_ZONE = 20;
+
 function forHorizontal(props: Props) {
   let { swipeVelocityThreshold } = props;
 
