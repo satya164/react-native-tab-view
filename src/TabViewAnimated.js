@@ -29,6 +29,7 @@ type Props = TransitionerProps & {
   renderHeader?: () => ?React.Element<any>;
   renderFooter?: () => ?React.Element<any>;
   lazy?: boolean;
+  swipeEnabled?: boolean;
 }
 
 type State = {
@@ -45,6 +46,7 @@ export default class TabViewAnimated extends Component<DefaultProps, Props, Stat
     onChangePosition: PropTypes.func,
     shouldOptimizeUpdates: PropTypes.bool,
     lazy: PropTypes.bool,
+    swipeEnabled: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -84,26 +86,27 @@ export default class TabViewAnimated extends Component<DefaultProps, Props, Stat
   };
 
   _renderItems = (props: SceneRendererProps) => {
-    const { renderPager, renderHeader, renderFooter } = this.props;
+    const { renderPager, renderHeader, renderFooter, swipeEnabled } = this.props;
 
     return (
       <View style={styles.container}>
         {renderHeader && renderHeader(props)}
         {renderPager({
           ...props,
+          swipeEnabled,
           children: props.layout.measured ?
-            props.navigationState.routes.map((route, index) => {
-              return (
-                <View key={route.key} style={{ width: props.layout.width }}>
-                  {this._renderScene({
-                    ...props,
-                    route,
-                    index,
-                    focused: index === props.navigationState.index,
-                  })}
-                </View>
-              );
-            }) : null,
+          props.navigationState.routes.map((route, index) => {
+            return (
+              <View key={route.key} style={{ width: props.layout.width }}>
+                {this._renderScene({
+                  ...props,
+                  route,
+                  index,
+                  focused: index === props.navigationState.index,
+                })}
+              </View>
+            );
+          }) : null,
         })}
         {renderFooter && renderFooter(props)}
       </View>
