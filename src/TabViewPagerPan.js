@@ -55,7 +55,7 @@ export default class TabViewPagerPan extends Component<DefaultProps, Props, void
   };
 
   componentWillMount() {
-    this._normalizeSwipeVelocityThreshold()
+    this._normalizeSwipeVelocityThreshold();
 
     this._panResponder = PanResponder.create({
       onMoveShouldSetPanResponder: this._canMoveScreen,
@@ -64,16 +64,16 @@ export default class TabViewPagerPan extends Component<DefaultProps, Props, void
       onPanResponderMove: this._respondToGesture,
       onPanResponderTerminate: this._finishGesture,
       onPanResponderRelease: this._finishGesture,
-      onPanResponderTerminationRequest: () => true
+      onPanResponderTerminationRequest: () => true,
     });
   }
 
   componentDidUpdate() {
-    this._normalizeSwipeVelocityThreshold()
+    this._normalizeSwipeVelocityThreshold();
   }
 
   _normalizeSwipeVelocityThreshold = () => {
-    this._swipeVelocityThreshold = this.props.swipeVelocityThreshold
+    this._swipeVelocityThreshold = this.props.swipeVelocityThreshold;
     if (Platform.OS === 'android') {
       // on Android, velocity is way lower due to timestamp being in nanosecond
       // normalize it to have the same velocity on both iOS and Android
