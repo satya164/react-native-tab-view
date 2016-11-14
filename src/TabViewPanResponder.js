@@ -10,6 +10,7 @@ type Props = SceneRendererProps & {
 }
 
 const DEAD_ZONE = 12;
+let startDirection = 0;
 
 function forHorizontal(props: Props) {
   let { swipeVelocityThreshold } = props;
@@ -22,7 +23,6 @@ function forHorizontal(props: Props) {
 
   let lastValue = null;
   let isMoving = null;
-  let startDirection = 0;
 
   function isIndexInRange(index: number) {
     const { routes } = props.navigationState;
@@ -41,8 +41,6 @@ function forHorizontal(props: Props) {
       return gestureState.vx < 0;
     } else if (startDirection < 0) {
       return gestureState.vx > 0;
-    } else {
-      return false;
     }
   }
 
