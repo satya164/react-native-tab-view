@@ -10,7 +10,6 @@ type Props = SceneRendererProps & {
 }
 
 const DEAD_ZONE = 12;
-let startDirection = 0;
 
 function forHorizontal(props: Props) {
   let { swipeVelocityThreshold } = props;
@@ -36,10 +35,10 @@ function forHorizontal(props: Props) {
     );
   }
 
-  function isReverseDirection(gestureState: GestureState) {
+  function isReverseDirection(gestureState: GestureState, startDirection: number) {
     if (startDirection > 0) {
       return gestureState.vx < 0;
-    } else if (startDirection < 0) {
+    } else {
       return gestureState.vx > 0;
     }
   }
@@ -57,14 +56,10 @@ function forHorizontal(props: Props) {
 
   function canMoveScreen(evt: GestureEvent, gestureState: GestureState) {
     const { routes, index } = props.navigationState;
-    const canMove = isMovingHorzontally(evt, gestureState) && (
-      (gestureState.dx >= DEAD_ZONE && index >= 0) ||
-      (gestureState.dx <= -DEAD_ZONE && index <= routes.length - 1)
-    );
-    if (canMove) {
-      startDirection = gestureState.dx;
-    }
-    return canMove;
+    return isMovingHorzontally(evt, gestureState) && (
+        (gestureState.dx >= DEAD_ZONE && index >= 0) ||
+        (gestureState.dx <= -DEAD_ZONE && index <= routes.length - 1)
+      );
   }
 
   function startGesture() {
@@ -84,11 +79,11 @@ function forHorizontal(props: Props) {
     }
   }
 
-  function finishGesture(evt: GestureEvent, gestureState: GestureState) {
+  function finishGesture(evt: GestureEvent, gestureState: GestureState, startDirection: number) {
     const currentIndex = props.navigationState.index;
     const currentValue = props.getLastPosition();
     if (currentValue !== currentIndex) {
-      if (isMoving && !isReverseDirection(gestureState)) {
+      if (isMoving && !isReverseDirection(gestureState, startDirection)) {
         const nextIndex = getNextIndex(evt, gestureState);
         props.jumpToIndex(nextIndex);
       } else {

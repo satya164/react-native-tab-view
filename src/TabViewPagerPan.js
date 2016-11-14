@@ -11,6 +11,7 @@ import TabViewPanResponder from './TabViewPanResponder';
 import TabViewStyleInterpolator from './TabViewStyleInterpolator';
 import { SceneRendererPropType } from './TabViewPropTypes';
 import type { SceneRendererProps } from './TabViewTypeDefinitions';
+import type { GestureEvent, GestureState } from './PanResponderTypes';
 
 const styles = StyleSheet.create({
   container: {
@@ -51,6 +52,8 @@ export default class TabViewPagerPan extends Component<DefaultProps, Props, void
     swipeVelocityThreshold: 0.25,
   };
 
+  startDirection = 0;
+
   componentWillMount() {
     this._setPanHandlers(this.props);
 
@@ -66,10 +69,10 @@ export default class TabViewPagerPan extends Component<DefaultProps, Props, void
         return this._callResponderMethod('onStartShouldSetPanResponderCapture', false)(...args);
       },
       onMoveShouldSetPanResponder: (...args) => {
-        return this._callResponderMethod('onMoveShouldSetPanResponder', false)(...args);
+        return this._canMove(...args)
       },
       onMoveShouldSetPanResponderCapture: (...args) => {
-        return this._callResponderMethod('onMoveShouldSetPanResponderCapture', false)(...args);
+        return this._canMove(...args)
       },
       onPanResponderReject: (...args) => {
         this._callResponderMethod('onPanResponderReject', null)(...args);
@@ -84,13 +87,13 @@ export default class TabViewPagerPan extends Component<DefaultProps, Props, void
         this._callResponderMethod('onPanResponderEnd', null)(...args);
       },
       onPanResponderRelease: (...args) => {
-        this._callResponderMethod('onPanResponderRelease', null)(...args);
+        this._callResponderMethod('onPanResponderRelease', null)(...args, this.startDirection);
       },
       onPanResponderMove: (...args) => {
         this._callResponderMethod('onPanResponderMove', null)(...args);
       },
       onPanResponderTerminate: (...args) => {
-        this._callResponderMethod('onPanResponderTerminate', null)(...args);
+        this._callResponderMethod('onPanResponderTerminate', null)(...args, this.startDirection);
       },
       onPanResponderTerminationRequest: (...args) => {
         return this._callResponderMethod('onPanResponderTerminationRequest', true)(...args);
@@ -120,6 +123,14 @@ export default class TabViewPagerPan extends Component<DefaultProps, Props, void
     }
     return returnValue;
   };
+  
+  _canMove = (evt: GestureEvent, gestureState: GestureState) => {
+    const shouldCapture = this._callResponderMethod('onMoveShouldSetPanResponder', false)(evt, gestureState);
+    if (shouldCapture) {
+      this.startDirection = gestureState.dx;
+    }
+    return shouldCapture;
+  }
 
   _panHandlers: any;
   _panResponder: any;
