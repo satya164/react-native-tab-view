@@ -52,8 +52,6 @@ export default class TabViewPagerPan extends Component<DefaultProps, Props, void
     swipeVelocityThreshold: 0.25,
   };
 
-  startDirection = 0;
-
   componentWillMount() {
     this._setPanHandlers(this.props);
 
@@ -69,10 +67,10 @@ export default class TabViewPagerPan extends Component<DefaultProps, Props, void
         return this._callResponderMethod('onStartShouldSetPanResponderCapture', false)(...args);
       },
       onMoveShouldSetPanResponder: (...args) => {
-        return this._canMove(...args)
+        return this._canMove(...args);
       },
       onMoveShouldSetPanResponderCapture: (...args) => {
-        return this._canMove(...args)
+        return this._canMove(...args);
       },
       onPanResponderReject: (...args) => {
         this._callResponderMethod('onPanResponderReject', null)(...args);
@@ -123,7 +121,7 @@ export default class TabViewPagerPan extends Component<DefaultProps, Props, void
     }
     return returnValue;
   };
-  
+
   _canMove = (evt: GestureEvent, gestureState: GestureState) => {
     const shouldCapture = this._callResponderMethod('onMoveShouldSetPanResponder', false)(evt, gestureState);
     if (shouldCapture) {
@@ -134,6 +132,7 @@ export default class TabViewPagerPan extends Component<DefaultProps, Props, void
 
   _panHandlers: any;
   _panResponder: any;
+  startDirection = 0;
 
   render() {
     const { navigationState, layout } = this.props;
