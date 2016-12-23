@@ -17,6 +17,7 @@ type Props = {
   activeOpacity?: number;
   children?: React.Element<*>;
   style?: any;
+  testID?: string;
 }
 
 type DefaultProps = {
@@ -52,7 +53,7 @@ export default class TouchableItem extends Component<DefaultProps, Props, void> 
       );
     } else {
       return (
-        <TouchableOpacity {...this.props}>
+        <TouchableOpacity accessibilityTraits="button" {...this.props}>
           {this.props.children}
         </TouchableOpacity>
       );
