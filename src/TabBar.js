@@ -90,6 +90,7 @@ type Props = SceneRendererProps & {
   onTabPress?: Function;
   tabWidth?: number;
   tabStyle?: any;
+  tabContainerStyle?: any;
   style?: any;
 }
 
@@ -340,7 +341,7 @@ export default class TabBar extends Component<DefaultProps, Props, State> {
                   key={route.key}
                   accessibilityTraits='button'
                   testID={route.testID}
-                  style={styles.tab}
+                  style={[ styles.tab, this.props.tabContainerStyle ]}
                   pressColor={this.props.pressColor}
                   activeOpacity={this.props.activeOpacity}
                   delayPressIn={0}
