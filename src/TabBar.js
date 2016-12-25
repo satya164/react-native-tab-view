@@ -83,13 +83,14 @@ type Props = SceneRendererProps & {
   scrollEnabled?: boolean;
   pressColor?: string;
   activeOpacity?: number;
-  renderLabel: (scene: Scene) => ?React.Element<*>;
-  renderIcon?: (scene: Scene) => ?React.Element<*>;
-  renderBadge?: (scene: Scene) => ?React.Element<*>;
+  renderLabel: (scene: Scene, props: SceneRendererProps) => ?React.Element<*>;
+  renderIcon?: (scene: Scene, props: SceneRendererProps) => ?React.Element<*>;
+  renderBadge?: (scene: Scene, props: SceneRendererProps) => ?React.Element<*>;
   renderIndicator?: (props: IndicatorProps) => ?React.Element<*>;
   onTabPress?: Function;
   tabWidth?: number;
   tabStyle?: any;
+  tabContainerStyle?: any;
   style?: any;
 }
 
@@ -316,9 +317,9 @@ export default class TabBar extends Component<DefaultProps, Props, State> {
                 focused,
                 index: i,
               };
-              const icon = this.props.renderIcon ? this.props.renderIcon(scene) : null;
-              const label = this.props.renderLabel ? this.props.renderLabel(scene) : null;
-              const badge = this.props.renderBadge ? this.props.renderBadge(scene) : null;
+              const icon = this.props.renderIcon ? this.props.renderIcon(scene, this.props) : null;
+              const label = this.props.renderLabel ? this.props.renderLabel(scene, this.props) : null;
+              const badge = this.props.renderBadge ? this.props.renderBadge(scene, this.props) : null;
 
               const tabStyle = {};
 
@@ -340,7 +341,7 @@ export default class TabBar extends Component<DefaultProps, Props, State> {
                   key={route.key}
                   accessibilityTraits='button'
                   testID={route.testID}
-                  style={styles.tab}
+                  style={[ styles.tab, this.props.tabContainerStyle ]}
                   pressColor={this.props.pressColor}
                   activeOpacity={this.props.activeOpacity}
                   delayPressIn={0}

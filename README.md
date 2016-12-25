@@ -161,6 +161,7 @@ It accepts the following props,
 - `scrollEnabled` - whether to enable scrollable tabs
 - `tabWidth` - optional custom tab width for scrollable tabs
 - `tabStyle` - style object for the tab
+- `tabContainerStyle` - style object for the tab container (defaults to `flex: 1`)
 
 ### `<TabBarTop />`
 
