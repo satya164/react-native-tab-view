@@ -8,5 +8,4 @@ module.exports = {
   get TabViewPagerScroll() { return require('./src/TabViewPagerScroll').default; },
   get TabViewPagerAndroid() { return require('./src/TabViewPagerAndroid').default; },
   get TabBar() { return require('./src/TabBar').default; },
-  get TabBarTop() { return require('./src/TabBarTop').default; },
 };
