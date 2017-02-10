@@ -2,7 +2,6 @@
 /* eslint-disable import/no-commonjs */
 
 module.exports = {
-  get TabViewTransitioner() { return require('./src/TabViewTransitioner').default; },
   get TabViewAnimated() { return require('./src/TabViewAnimated').default; },
   get TabViewPagerPan() { return require('./src/TabViewPagerPan').default; },
   get TabViewPagerScroll() { return require('./src/TabViewPagerScroll').default; },
