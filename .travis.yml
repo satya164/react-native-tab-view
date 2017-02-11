@@ -7,6 +7,6 @@ before_install:
   - export PATH=$HOME/.yarn/bin:$PATH
 install:
   - yarn
-script:
-  - npm run flow -- check
-  - npm run lint
+before_script:
+  - yarn run flow -- check
+  - yarn run lint
