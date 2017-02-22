@@ -30,6 +30,7 @@ export type SceneRendererProps = {
   layout: Layout & {
     measured: boolean;
   };
+  keyboardShouldPersistTapsType: string;
   navigationState: NavigationState;
   position: Animated.Value;
   jumpToIndex: (index: number) => void;
