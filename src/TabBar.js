@@ -405,6 +405,8 @@ export default class TabBar extends PureComponent<DefaultProps, Props, State> {
               const tabStyle = {};
 
               tabStyle.opacity = opacity;
+              const { activeBackgroundColor } = this.props;
+              if( focused && activeBackgroundColor ) tabStyle.backgroundColor = activeBackgroundColor;
 
               if (icon) {
                 if (label) {
