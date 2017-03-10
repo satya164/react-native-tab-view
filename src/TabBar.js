@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scroll: {
-    overflow: Platform.OS === 'web' ? 'none' : 'scroll',
+    overflow: Platform.OS === 'web' ? 'auto' : 'scroll',
   },
   tabBar: {
     backgroundColor: '#2196f3',
