@@ -123,14 +123,14 @@ export default class TabViewPagerScroll extends PureComponent<void, Props, void>
   _setRef = (el: Object) => (this._scrollView = el);
 
   render() {
-    const { children, layout, navigationState } = this.props;
+    const { children, layout, navigationState, keyboardShouldPersistTapsType } = this.props;
     return (
       <ScrollView
         horizontal
         pagingEnabled
         directionalLockEnabled
         keyboardDismissMode='on-drag'
-        keyboardShouldPersistTaps='always'
+        keyboardShouldPersistTaps={keyboardShouldPersistTapsType || true}
         scrollEnabled={this.props.swipeEnabled}
         automaticallyAdjustContentInsets={false}
         bounces={false}
@@ -157,14 +157,14 @@ export default class TabViewPagerScroll extends PureComponent<void, Props, void>
             {child}
           </View>
         )) : (
-          <View
-            key={navigationState.routes[navigationState.index].key}
-            testID={navigationState.routes[navigationState.index].testID}
-            style={styles.page}
-          >
-            {Children.toArray(children)[navigationState.index]}
-          </View>
-        )}
+            <View
+              key={navigationState.routes[navigationState.index].key}
+              testID={navigationState.routes[navigationState.index].testID}
+              style={styles.page}
+            >
+              {Children.toArray(children)[navigationState.index]}
+            </View>
+          )}
       </ScrollView>
     );
   }
