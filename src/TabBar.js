@@ -117,6 +117,7 @@ export default class TabBar extends PureComponent<DefaultProps, Props, State> {
     renderIndicator: PropTypes.func,
     onTabPress: PropTypes.func,
     tabStyle: View.propTypes.style,
+    tabHeaderStyle: View.propTypes.style,
     indicatorStyle: View.propTypes.style,
     labelStyle: Text.propTypes.style,
     style: PropTypes.any,
