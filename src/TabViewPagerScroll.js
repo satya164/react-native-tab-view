@@ -23,9 +23,9 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
 
-  row: {
-    flexDirection: 'row',
-    alignItems: 'stretch',
+  page: {
+    flex: 1,
+    overflow: 'hidden',
   },
 });
 
@@ -123,8 +123,7 @@ export default class TabViewPagerScroll extends PureComponent<void, Props, void>
   _setRef = (el: Object) => (this._scrollView = el);
 
   render() {
-    const { children } = this.props;
-    const single = Children.count(children) === 1;
+    const { children, layout, navigationState } = this.props;
     return (
       <ScrollView
         horizontal
@@ -146,12 +145,22 @@ export default class TabViewPagerScroll extends PureComponent<void, Props, void>
         onMomentumScrollEnd={this._handleMomentumScrollEnd}
         contentOffset={{ x: this.props.navigationState.index * this.props.layout.width, y: 0 }}
         style={styles.container}
-        contentContainerStyle={single ? styles.container : null}
+        contentContainerStyle={layout.width ? null : styles.container}
         ref={this._setRef}
       >
-        <View style={single ? styles.container : styles.row}>
-          {children}
-        </View>
+        {Children.map(children, (child, i) => (
+          <View
+            key={navigationState.routes[i].key}
+            testID={navigationState.routes[i].testID}
+            style={
+              layout.width ?
+                { width: layout.width, overflow: 'hidden' } :
+                i === navigationState.index ? styles.page : null
+            }
+          >
+            {i === navigationState.index || layout.width ? child : null}
+          </View>
+        ))}
       </ScrollView>
     );
   }

@@ -43,7 +43,6 @@ export default class TabViewTransitioner extends PureComponent<DefaultProps, Pro
       width: PropTypes.number.isRequired,
     }),
     canJumpToTab: PropTypes.func,
-    shouldOptimizeUpdates: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -171,7 +170,7 @@ export default class TabViewTransitioner extends PureComponent<DefaultProps, Pro
     if (canJumpToTab && !canJumpToTab(navigationState.routes[index])) {
       const lastPosition = this._getLastPosition();
       if (lastPosition !== navigationState.index) {
-        this._jumpToIndex(navigationState.index);
+        this._transitionTo(navigationState.index);
       }
       return;
     }
@@ -186,12 +185,6 @@ export default class TabViewTransitioner extends PureComponent<DefaultProps, Pro
         // Prevent extra setState when index updated mid-transition
         if (this._nextIndex === index && this._mounted) {
           this.props.onRequestChangeTab(index);
-          // Change back to previous index if it didn't change
-          setTimeout(() => {
-            if (this.props.navigationState.index !== index) {
-              this._jumpToIndex(this.props.navigationState.index);
-            }
-          }, 0);
         }
       })
     );

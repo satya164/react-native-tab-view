@@ -7,6 +7,7 @@ import {
   View,
   Text,
   ScrollView,
+  Platform,
 } from 'react-native';
 import TouchableItem from './TouchableItem';
 import { SceneRendererPropType } from './TabViewPropTypes';
@@ -14,10 +15,10 @@ import type { Scene, SceneRendererProps } from './TabViewTypeDefinitions';
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
+    flex: 1,
   },
   scroll: {
-    overflow: 'scroll',
+    overflow: Platform.OS === 'web' ? 'auto' : 'scroll',
   },
   tabBar: {
     backgroundColor: '#2196f3',
@@ -131,14 +132,6 @@ export default class TabBar extends PureComponent<DefaultProps, Props, State> {
   };
 
   componentWillMount() {
-    if (typeof this.props.tabWidth !== 'undefined') {
-      console.warn('`tabWidth` prop is not supported. Set `width` in `tabStyle` instead.');
-    }
-
-    if (typeof this.props.activeOpacity !== 'undefined') {
-      console.warn('`activeOpacity` prop is not supported. Pass `pressOpacity` instead.');
-    }
-
     if (this.props.scrollEnabled === true) {
       const tabWidth = this._getTabWidthFromStyle(this.props.tabStyle);
       if (this.props.layout.width || tabWidth) {
@@ -183,7 +176,6 @@ export default class TabBar extends PureComponent<DefaultProps, Props, State> {
 
   _positionListener: Object;
   _scrollView: Object;
-  _scrollOffset: number = 0;
   _isManualScroll: boolean = false;
   _isMomentumScroll: boolean = false;
 
@@ -229,6 +221,9 @@ export default class TabBar extends PureComponent<DefaultProps, Props, State> {
     if (typeof tabWidth === 'number') {
       return tabWidth;
     }
+    if (typeof tabWidth === 'string' && tabWidth.endsWith('%')) {
+      return layout.width * (parseFloat(tabWidth, 10) / 100);
+    }
     if (props.scrollEnabled) {
       return (layout.width / 5) * 2;
     }
@@ -260,12 +255,11 @@ export default class TabBar extends PureComponent<DefaultProps, Props, State> {
   };
 
   _resetScrollOffset = (props: Props) => {
-    if (this._scrollOffset === 0 || !props.scrollEnabled || !this._scrollView) {
+    if (!props.scrollEnabled || !this._scrollView) {
       return;
     }
 
     const scrollAmount = this._getScrollAmount(props, props.navigationState.index);
-    this._scrollOffset = 0;
     this._scrollView.scrollTo({
       x: scrollAmount,
       animated: true,
@@ -281,9 +275,9 @@ export default class TabBar extends PureComponent<DefaultProps, Props, State> {
       return;
     }
 
-    const scrollAmount = this._getScrollAmount(this.props, index) + this._scrollOffset;
+    const scrollAmount = this._getScrollAmount(this.props, index);
     this._scrollView.scrollTo({
-      x: this._normalizeScrollValue(this.props, scrollAmount),
+      x: scrollAmount,
       animated: false,
     });
   };
@@ -295,7 +289,6 @@ export default class TabBar extends PureComponent<DefaultProps, Props, State> {
 
     const scrollAmount = this._getScrollAmount(this.props, this.props.navigationState.index);
     const scrollOffset = value - scrollAmount;
-    this._scrollOffset = scrollOffset;
 
     if (this._isMomentumScroll) {
       Animated.spring(this.state.offset, {
@@ -423,7 +416,7 @@ export default class TabBar extends PureComponent<DefaultProps, Props, State> {
               }
 
               const passedTabStyle = StyleSheet.flatten(this.props.tabStyle);
-              const isWidthSet = passedTabStyle && typeof passedTabStyle.width === 'number' || scrollEnabled === true;
+              const isWidthSet = (passedTabStyle && typeof passedTabStyle.width !== 'undefined') || scrollEnabled === true;
               const tabContainerStyle = {};
 
               if (isWidthSet) {
@@ -436,12 +429,16 @@ export default class TabBar extends PureComponent<DefaultProps, Props, State> {
                 tabContainerStyle.flex = 1;
               }
 
+              const accessibilityLabel = route.accessibilityLabel || route.title;
+
               return (
                 <TouchableItem
                   borderless
                   key={route.key}
-                  accessibilityTraits='button'
                   testID={route.testID}
+                  accessible={route.accessible}
+                  accessibilityLabel={accessibilityLabel}
+                  accessibilityTraits='button'
                   pressColor={this.props.pressColor}
                   pressOpacity={this.props.pressOpacity}
                   delayPressIn={0}
