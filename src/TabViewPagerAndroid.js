@@ -74,21 +74,21 @@ export default class TabViewPagerAndroid extends PureComponent<void, Props, void
   _isIdle: boolean = true;
   _currentIndex: number;
 
-  _getPageIndex = (index) => (
+  _getPageIndex = (index: number) => (
     I18nManager.isRTL ?
       (Children.count(this.props.children) - 1) - index :
       index
   )
 
   _setPage = (index: number) => {
-    index = this._getPageIndex(index);
+    const pageIndex = this._getPageIndex(index);
 
-    if (this._viewPager && this._currentIndex !== index) {
-      this._currentIndex = index;
+    if (this._viewPager && this._currentIndex !== pageIndex) {
+      this._currentIndex = pageIndex;
       if (this.props.animationEnabled !== false) {
-        this._viewPager.setPage(index);
+        this._viewPager.setPage(pageIndex);
       } else {
-        this._viewPager.setPageWithoutAnimation(index);
+        this._viewPager.setPageWithoutAnimation(pageIndex);
       }
     }
   }
