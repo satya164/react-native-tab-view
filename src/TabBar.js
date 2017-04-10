@@ -118,6 +118,7 @@ export default class TabBar extends PureComponent<DefaultProps, Props, State> {
     renderIndicator: PropTypes.func,
     onTabPress: PropTypes.func,
     tabStyle: View.propTypes.style,
+    tabHeaderStyle: View.propTypes.style,
     indicatorStyle: View.propTypes.style,
     labelStyle: Text.propTypes.style,
     style: PropTypes.any,
@@ -362,7 +363,7 @@ export default class TabBar extends PureComponent<DefaultProps, Props, State> {
     });
 
     return (
-      <Animated.View style={[ styles.tabBar, this.props.style ]}>
+      <Animated.View style={[ this.props.tabHeaderStyle ? this.props.tabHeaderStyle : styles.tabBar, this.props.style ]}>
         <Animated.View pointerEvents='none' style={[ styles.indicatorContainer, scrollEnabled ? { width: tabBarWidth, transform: [ { translateX } ] } : null ]}>
           {this._renderIndicator({
             ...this.props,
