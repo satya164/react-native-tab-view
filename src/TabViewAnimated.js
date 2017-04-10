@@ -28,6 +28,7 @@ type Props = TransitionerProps & {
   renderHeader?: (props: SceneRendererProps) => ?React.Element<*>;
   renderFooter?: (props: SceneRendererProps) => ?React.Element<*>;
   lazy?: boolean;
+  containerStyle?: any;
 }
 
 type State = {
@@ -57,6 +58,7 @@ export default class TabViewAnimated extends PureComponent<DefaultProps, Props, 
     renderFooter: PropTypes.func,
     onChangePosition: PropTypes.func,
     lazy: PropTypes.bool,
+    containerStyle: View.propTypes.style,
   };
 
   static defaultProps = {
@@ -86,11 +88,11 @@ export default class TabViewAnimated extends PureComponent<DefaultProps, Props, 
   };
 
   _renderItems = (props: SceneRendererProps) => {
-    const { renderPager, renderHeader, renderFooter } = this.props;
+    const { renderPager, renderHeader, renderFooter, containerStyle } = this.props;
     const { navigationState } = props;
 
     return (
-      <View style={styles.container}>
+      <View style={[ styles.container, containerStyle ]}>
         {renderHeader && renderHeader(props)}
         {renderPager({
           ...props,
