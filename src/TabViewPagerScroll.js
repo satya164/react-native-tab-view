@@ -153,7 +153,7 @@ export default class TabViewPagerScroll extends PureComponent<void, Props, void>
             key={navigationState.routes[i].key}
             testID={navigationState.routes[i].testID}
             style={
-              layout.width ?
+              layout.width ? // eslint-disable-line no-nested-ternary
                 { width: layout.width, overflow: 'hidden' } :
                 i === navigationState.index ? styles.page : null
             }
