@@ -7,8 +7,8 @@ import {
   Platform,
   StyleSheet,
   View,
+  I18nManager,
 } from 'react-native';
-import TabViewStyleInterpolator from './TabViewStyleInterpolator';
 import { SceneRendererPropType } from './TabViewPropTypes';
 import type { SceneRendererProps } from './TabViewTypeDefinitions';
 import type { GestureEvent, GestureState } from './PanResponderTypes';
@@ -22,20 +22,21 @@ const styles = StyleSheet.create({
 });
 
 type DefaultProps = {
-  swipeDistanceThreshold: number;
-  swipeVelocityThreshold: number;
-}
+  swipeDistanceThreshold: number,
+  swipeVelocityThreshold: number,
+};
 
 type Props = SceneRendererProps & {
-  swipeEnabled?: boolean;
-  swipeDistanceThreshold: number;
-  swipeVelocityThreshold: number;
-  children?: any;
-}
+  swipeEnabled?: boolean,
+  swipeDistanceThreshold: number,
+  swipeVelocityThreshold: number,
+  children?: any,
+};
 
 const DEAD_ZONE = 12;
 
-export default class TabViewPagerPan extends PureComponent<DefaultProps, Props, void> {
+export default class TabViewPagerPan
+  extends PureComponent<DefaultProps, Props, void> {
   static propTypes = {
     ...SceneRendererPropType,
     swipeEnabled: PropTypes.bool,
@@ -68,13 +69,13 @@ export default class TabViewPagerPan extends PureComponent<DefaultProps, Props, 
 
   _isIndexInRange = (index: number) => {
     const { routes } = this.props.navigationState;
-    return (index >= 0 && index <= routes.length - 1);
+    return index >= 0 && index <= routes.length - 1;
   };
 
   _isMovingHorzontally = (evt: GestureEvent, gestureState: GestureState) => {
     return (
-      (Math.abs(gestureState.dx) > Math.abs(gestureState.dy * 3)) &&
-      (Math.abs(gestureState.vx) > Math.abs(gestureState.vy * 3))
+      Math.abs(gestureState.dx) > Math.abs(gestureState.dy * 3) &&
+      Math.abs(gestureState.vx) > Math.abs(gestureState.vy * 3)
     );
   };
 
@@ -101,7 +102,11 @@ export default class TabViewPagerPan extends PureComponent<DefaultProps, Props, 
       Math.abs(gestureState.dx) > this.props.swipeDistanceThreshold ||
       Math.abs(gestureState.vx) > swipeVelocityThreshold
     ) {
-      const nextIndex = index - (gestureState.dx / Math.abs(gestureState.dx));
+      const nextIndex =
+        index -
+        gestureState.dx /
+          Math.abs(gestureState.dx) *
+          (I18nManager.isRTL ? -1 : 1);
       if (this._isIndexInRange(nextIndex)) {
         return nextIndex;
       }
@@ -114,10 +119,10 @@ export default class TabViewPagerPan extends PureComponent<DefaultProps, Props, 
       return false;
     }
     const { navigationState: { routes, index } } = this.props;
-    const canMove = this._isMovingHorzontally(evt, gestureState) && (
-      (gestureState.dx >= DEAD_ZONE && index >= 0) ||
-      (gestureState.dx <= -DEAD_ZONE && index <= routes.length - 1)
-    );
+    const canMove =
+      this._isMovingHorzontally(evt, gestureState) &&
+      ((gestureState.dx >= DEAD_ZONE && index >= 0) ||
+        (gestureState.dx <= -DEAD_ZONE && index <= routes.length - 1));
     if (canMove) {
       this._startDirection = gestureState.dx;
     }
@@ -131,8 +136,11 @@ export default class TabViewPagerPan extends PureComponent<DefaultProps, Props, 
 
   _respondToGesture = (evt: GestureEvent, gestureState: GestureState) => {
     const { layout: { width } } = this.props;
-    const currentPosition = typeof this._lastValue === 'number' ? this._lastValue : this.props.navigationState.index;
-    const nextPosition = currentPosition - (gestureState.dx / width);
+    const currentPosition = typeof this._lastValue === 'number'
+      ? this._lastValue
+      : this.props.navigationState.index;
+    const nextPosition =
+      currentPosition - gestureState.dx / width * (I18nManager.isRTL ? -1 : 1);
     if (this._isMoving === null) {
       this._isMoving = this._isMovingHorzontally(evt, gestureState);
     }
@@ -157,20 +165,42 @@ export default class TabViewPagerPan extends PureComponent<DefaultProps, Props, 
   };
 
   render() {
-    const { navigationState, layout } = this.props;
+    const { layout, position, navigationState, children } = this.props;
+    const { width } = layout;
     const { routes } = navigationState;
 
-    const style = TabViewStyleInterpolator.forHorizontal(this.props);
+    // Prepend '-1', so there are always at least 2 items in inputRange
+    const inputRange = [-1, ...routes.map((x, i) => i)];
+    const outputRange = inputRange.map(
+      i => width * i * (I18nManager.isRTL ? 1 : -1),
+    );
+
+    const translateX = position.interpolate({
+      inputRange,
+      outputRange,
+    });
 
     return (
-      <Animated.View style={[ styles.sheet, style, { width: layout.width * routes.length } ]} {...this._panResponder.panHandlers}>
-        {Children.map(this.props.children, (child, i) => (
+      <Animated.View
+        style={[
+          styles.sheet,
+          width
+            ? { width: routes.length * width, transform: [{ translateX }] }
+            : null,
+        ]}
+        {...this._panResponder.panHandlers}
+      >
+        {Children.map(children, (child, i) => (
           <View
             key={navigationState.routes[i].key}
             testID={navigationState.routes[i].testID}
-            style={{ width: layout.width }}
+            style={
+              width
+                ? { width }
+                : i === navigationState.index ? StyleSheet.absoluteFill : null
+            }
           >
-            {child}
+            {i === navigationState.index || width ? child : null}
           </View>
         ))}
       </Animated.View>
