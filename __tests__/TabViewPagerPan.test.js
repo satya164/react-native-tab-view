@@ -11,7 +11,7 @@ import TabViewPagerPan from '../src/TabViewPagerPan';
 it('renders all children', () => {
   const component = shallow(
     <TabViewPagerPan
-      layout={{ height: 320, width: 240, measured: false }}
+      layout={{ height: 0, width: 0, measured: false }}
       navigationState={{
         index: 1,
         routes: [
@@ -31,8 +31,15 @@ it('renders all children', () => {
     </TabViewPagerPan>
   );
 
-  expect(component.children().length).toBe(3);
-  expect(component.find({ testID: 'first' }).length).toBe(1);
-  expect(component.find({ testID: 'second' }).length).toBe(1);
-  expect(component.find({ testID: 'third' }).length).toBe(1);
+  expect(component.find({ testID: 'first' }).first().props().children).toBe(null);
+  expect(component.find({ testID: 'second' }).first().props().children).not.toBe(null);
+  expect(component.find({ testID: 'third' }).first().props().children).toBe(null);
+
+  component.setProps({
+    layout: { height: 320, width: 240, measured: false },
+  });
+
+  expect(component.find({ testID: 'first' }).first().props().children).not.toBe(null);
+  expect(component.find({ testID: 'second' }).first().props().children).not.toBe(null);
+  expect(component.find({ testID: 'third' }).first().props().children).not.toBe(null);
 });
