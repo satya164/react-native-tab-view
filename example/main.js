@@ -19,6 +19,7 @@ import BottomBarIconTextExample from './src/BottomBarIconTextExample';
 import NoAnimationExample from './src/NoAnimationExample';
 import ScrollViewsExample from './src/ScrollViewsExample';
 import CoverflowExample from './src/CoverflowExample';
+import DynamicExample from './src/DynamicExample';
 
 const styles = StyleSheet.create({
   container: {
@@ -70,6 +71,7 @@ const EXAMPLE_COMPONENTS = [
   NoAnimationExample,
   ScrollViewsExample,
   CoverflowExample,
+  DynamicExample,
 ];
 
 export default class ExampleList extends Component {
