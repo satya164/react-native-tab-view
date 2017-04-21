@@ -2,14 +2,17 @@
   "name": "react-native-tab-view",
   "version": "0.0.59",
   "description": "Tab view component for React Native",
-  "main": "index.js",
+  "main": "lib/index.js",
   "files": [
-    "src/"
+    "lib/"
   ],
   "scripts": {
     "test": "jest",
     "lint": "eslint src/**/*.js",
-    "flow": "flow"
+    "flow": "flow .",
+    "prepublish": "npm run build && npm run build-flow",
+    "build": "BABEL_ENV=build babel src -d lib/",
+    "build-flow": "find ./src -name '*.js' -not -path '*/__tests__*' | while read filepath; do cp $filepath `echo $filepath | sed 's/\\/src\\//\\/lib\\//g'`.flow; done"
   },
   "keywords": [
     "react-native-component",
@@ -33,9 +36,11 @@
   },
   "homepage": "https://github.com/satya164/react-native-tabview#readme",
   "devDependencies": {
+    "babel-cli": "^6.23.0",
     "babel-eslint": "^7.1.1",
     "babel-jest": "^18.0.0",
     "babel-preset-react-native": "^1.9.1",
+    "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "enzyme": "^2.7.1",
     "enzyme-to-json": "^1.4.5",
     "eslint": "^3.19.0",

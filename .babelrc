@@ -1,3 +1,10 @@
 {
-  presets: ["react-native"]
+  presets: ["react-native"],
+  "env": {
+    "build": {
+      "plugins": [
+        "transform-flow-strip-types",
+      ]
+    }
+  }
 }
