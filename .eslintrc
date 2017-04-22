@@ -27,13 +27,16 @@
     "prettier",
   ],
 
+  "settings": {
+    "import/core-modules": [ "react-native-tab-view" ]
+  },
+
   "rules": {
     "prettier/prettier": [1, {"trailingComma": "all", "singleQuote": true}],
 
     "babel/new-cap": 0,
     "babel/object-curly-spacing": 0,
     "babel/arrow-parens": 0,
-    "babel/no-await-in-loop": 2,
 
     "flowtype/boolean-style": [2, "boolean"],
     "flowtype/define-flow-type": 2,
@@ -114,6 +117,6 @@
     "react/jsx-wrap-multilines": 2,
 
     "react-native/no-unused-styles": 2,
-    "react-native/split-platform-components": 2,
+    "react-native/split-platform-components": 0,
   }
 }
