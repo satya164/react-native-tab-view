@@ -48,6 +48,7 @@ export default class TabViewTransitioner
       width: PropTypes.number.isRequired,
     }),
     canJumpToTab: PropTypes.func,
+    swipeEnabled: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -136,6 +137,7 @@ export default class TabViewTransitioner
     return {
       layout: this.state.layout,
       navigationState: this.props.navigationState,
+      swipeEnabled: this.props.swipeEnabled,
       position: this.state.position,
       jumpToIndex: this._jumpToIndex,
       getLastPosition: this._getLastPosition,
