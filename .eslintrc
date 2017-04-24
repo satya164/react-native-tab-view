@@ -29,10 +29,6 @@
     "prettier",
   ],
 
-  "settings": {
-    "import/core-modules": [ "react-native-tab-view" ]
-  },
-
   "rules": {
     "constructor-super": "error",
     "no-case-declarations": "error",
