@@ -70,7 +70,7 @@ export default class TabViewPagerScroll
   _isMomentumScroll: boolean = false;
 
   _scrollTo = (x: number) => {
-    if (this._scrollView) {
+    if (this._scrollView && this._scrollView.scrollTo) {
       this._scrollView.scrollTo({
         x,
         animated: false,
