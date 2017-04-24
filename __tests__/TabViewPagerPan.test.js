@@ -2,10 +2,7 @@
 
 import React from 'react';
 import { shallow } from 'enzyme';
-import {
-  Animated,
-  View,
-} from 'react-native';
+import { Animated, View } from 'react-native';
 import TabViewPagerPan from '../src/TabViewPagerPan';
 
 it('renders all children', () => {
@@ -28,18 +25,30 @@ it('renders all children', () => {
       <View />
       <View />
       <View />
-    </TabViewPagerPan>
+    </TabViewPagerPan>,
   );
 
-  expect(component.find({ testID: 'first' }).first().props().children).toBe(null);
-  expect(component.find({ testID: 'second' }).first().props().children).not.toBe(null);
-  expect(component.find({ testID: 'third' }).first().props().children).toBe(null);
+  expect(component.find({ testID: 'first' }).first().props().children).toBe(
+    null,
+  );
+  expect(
+    component.find({ testID: 'second' }).first().props().children,
+  ).not.toBe(null);
+  expect(component.find({ testID: 'third' }).first().props().children).toBe(
+    null,
+  );
 
   component.setProps({
     layout: { height: 320, width: 240, measured: false },
   });
 
-  expect(component.find({ testID: 'first' }).first().props().children).not.toBe(null);
-  expect(component.find({ testID: 'second' }).first().props().children).not.toBe(null);
-  expect(component.find({ testID: 'third' }).first().props().children).not.toBe(null);
+  expect(component.find({ testID: 'first' }).first().props().children).not.toBe(
+    null,
+  );
+  expect(
+    component.find({ testID: 'second' }).first().props().children,
+  ).not.toBe(null);
+  expect(component.find({ testID: 'third' }).first().props().children).not.toBe(
+    null,
+  );
 });

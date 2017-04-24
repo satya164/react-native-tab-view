@@ -2,10 +2,7 @@
 
 import React from 'react';
 import { shallow } from 'enzyme';
-import {
-  Animated,
-  View,
-} from 'react-native';
+import { Animated, View } from 'react-native';
 import TabViewPagerScroll from '../src/TabViewPagerScroll';
 
 it('renders only focused child until layout', () => {
@@ -31,20 +28,32 @@ it('renders only focused child until layout', () => {
       <View />
       <View />
       <View />
-    </TabViewPagerScroll>
+    </TabViewPagerScroll>,
   );
 
-  expect(component.find({ testID: 'first' }).first().props().children).toBe(null);
-  expect(component.find({ testID: 'second' }).first().props().children).not.toBe(null);
-  expect(component.find({ testID: 'third' }).first().props().children).toBe(null);
+  expect(component.find({ testID: 'first' }).first().props().children).toBe(
+    null,
+  );
+  expect(
+    component.find({ testID: 'second' }).first().props().children,
+  ).not.toBe(null);
+  expect(component.find({ testID: 'third' }).first().props().children).toBe(
+    null,
+  );
 
   component.setProps({
     layout: { height: 320, width: 240, measured: false },
   });
 
-  expect(component.find({ testID: 'first' }).first().props().children).not.toBe(null);
-  expect(component.find({ testID: 'second' }).first().props().children).not.toBe(null);
-  expect(component.find({ testID: 'third' }).first().props().children).not.toBe(null);
+  expect(component.find({ testID: 'first' }).first().props().children).not.toBe(
+    null,
+  );
+  expect(
+    component.find({ testID: 'second' }).first().props().children,
+  ).not.toBe(null);
+  expect(component.find({ testID: 'third' }).first().props().children).not.toBe(
+    null,
+  );
 });
 
 it('sets initial scroll position according to navigation state index', () => {
@@ -70,7 +79,7 @@ it('sets initial scroll position according to navigation state index', () => {
       <View />
       <View />
       <View />
-    </TabViewPagerScroll>
+    </TabViewPagerScroll>,
   );
 
   /* $FlowFixMe */
