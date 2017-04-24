@@ -77,6 +77,7 @@ export default class TabViewPagerAndroid
   _viewPager: Object;
   _isDrag: boolean = false;
   _isIdle: boolean = true;
+  _isPageSelected: boolean = false;
   _currentIndex: number;
 
   _getPageIndex = (index: number) =>
@@ -116,8 +117,15 @@ export default class TabViewPagerAndroid
     if (e === 'dragging') {
       this._isDrag = true;
     } else if (e === 'idle') {
+      const { navigationState } = this.props;
+      const currentIndex: number = I18nManager.isRTL ?
+        (navigationState.routes.length - 1) - this._currentIndex :
+        this._currentIndex;
+
       this._isDrag = false;
-      if (this._currentIndex !== this.props.navigationState.index) {
+
+      if (this._isPageSelected && currentIndex !== this._getPageIndex(navigationState.index)) {
+        this._isPageSelected = false;
         this.props.jumpToIndex(this._currentIndex);
       }
     }
@@ -125,6 +133,7 @@ export default class TabViewPagerAndroid
 
   _handlePageSelected = (e: PageScrollEvent) => {
     this._currentIndex = this._getPageIndex(e.nativeEvent.position);
+    this._isPageSelected = true;
   };
 
   _setRef = (el: Object) => (this._viewPager = el);
