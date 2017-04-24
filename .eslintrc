@@ -146,6 +146,6 @@
     "react-native/no-unused-styles": "error",
     "react-native/split-platform-components": "off",
 
-    "prettier/prettier": ["warn", {"trailingComma": "all", "singleQuote": true}],
+    "prettier/prettier": ["error", {"trailingComma": "all", "singleQuote": true}],
   }
 }
