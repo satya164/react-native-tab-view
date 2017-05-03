@@ -1,6 +1,8 @@
 /* @flow */
 
-import type { StyleObj } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
+import type {
+  StyleObj,
+} from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
 
 import { Animated } from 'react-native';
 
