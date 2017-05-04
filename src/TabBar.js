@@ -464,7 +464,7 @@ export default class TabBar<T: Route<*>>
                     const { onTabPress, jumpToIndex } = this.props;
                     jumpToIndex(i);
                     if (onTabPress) {
-                      onTabPress(routes[i]);
+                      onTabPress(scene);
                     }
                   }}
                   style={tabContainerStyle}
