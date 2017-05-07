@@ -35,7 +35,6 @@ export default class TouchableItem
     pressColor: PropTypes.string,
     pressOpacity: PropTypes.number,
     children: PropTypes.node.isRequired,
-    style: View.propTypes.style,
   };
 
   static defaultProps = {
