@@ -263,7 +263,9 @@ export default class TabViewAnimated<T: Route<*>>
         loaded={this.state.loaded}
         style={[styles.container, this.props.style]}
       >
-        {renderHeader && renderHeader(props)}
+        <View style={styles.topBar}>
+          {renderHeader && renderHeader(props)}
+        </View>
         {renderPager({
           ...props,
           ...rest,
@@ -286,5 +288,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     overflow: 'hidden',
+  },
+  topBar: {
+    opacity: 1,
   },
 });
