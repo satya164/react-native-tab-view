@@ -1,7 +1,7 @@
 /* @flow */
 
 import React, { PureComponent } from 'react';
-import { Animated, View, Text, StyleSheet } from 'react-native';
+import { Animated, View, ViewPropTypes, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { TabViewAnimated, TabBar } from 'react-native-tab-view';
 import SimplePage from './SimplePage';
@@ -21,7 +21,7 @@ export default class TopBarIconExample extends PureComponent<void, *, State> {
   static appbarElevation = 4;
 
   static propTypes = {
-    style: View.propTypes.style,
+    style: ViewPropTypes.style,
   };
 
   state: State = {

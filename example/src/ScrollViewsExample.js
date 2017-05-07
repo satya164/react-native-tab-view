@@ -1,7 +1,7 @@
 /* @flow */
 
 import React, { PureComponent } from 'react';
-import { Animated, View, StyleSheet } from 'react-native';
+import { Animated, View, ViewPropTypes, StyleSheet } from 'react-native';
 import { TabViewAnimated, TabBar } from 'react-native-tab-view';
 import BasicListView from './BasicListView';
 
@@ -21,7 +21,7 @@ export default class TopBarTextExample extends PureComponent<void, *, State> {
   static appbarElevation = 0;
 
   static propTypes = {
-    style: View.propTypes.style,
+    style: ViewPropTypes.style,
   };
 
   state: State = {

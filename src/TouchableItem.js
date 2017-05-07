@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Platform,
   View,
+  ViewPropTypes,
 } from 'react-native';
 import type { Style } from './TabViewTypeDefinitions';
 
@@ -35,7 +36,7 @@ export default class TouchableItem
     pressColor: PropTypes.string,
     pressOpacity: PropTypes.number,
     children: PropTypes.node.isRequired,
-    style: View.propTypes.style,
+    style: ViewPropTypes.style,
   };
 
   static defaultProps = {

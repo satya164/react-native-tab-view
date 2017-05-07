@@ -7,6 +7,7 @@ import {
   View,
   Image,
   Text,
+  ViewPropTypes,
   Dimensions,
   StyleSheet,
 } from 'react-native';
@@ -41,7 +42,7 @@ export default class CoverflowExample extends PureComponent<void, *, State> {
   static appbarElevation = 0;
 
   static propTypes = {
-    style: View.propTypes.style,
+    style: ViewPropTypes.style,
   };
 
   state: State = {

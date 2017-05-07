@@ -4,6 +4,7 @@ import React, { PureComponent } from 'react';
 import {
   Animated,
   View,
+  ViewPropTypes,
   TouchableWithoutFeedback,
   StyleSheet,
 } from 'react-native';
@@ -30,7 +31,7 @@ export default class TopBarIconExample extends PureComponent<void, *, State> {
   static appbarElevation = 4;
 
   static propTypes = {
-    style: View.propTypes.style,
+    style: ViewPropTypes.style,
   };
 
   state: State = {
