@@ -2,7 +2,7 @@
 
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { Animated, Platform, View, StyleSheet } from 'react-native';
+import { Animated, Platform, View, ViewPropTypes, StyleSheet } from 'react-native';
 import { NavigationStatePropType } from './TabViewPropTypes';
 import type {
   Scene,
@@ -75,7 +75,7 @@ export default class TabViewAnimated<T: Route<*>>
     renderHeader: PropTypes.func,
     renderFooter: PropTypes.func,
     lazy: PropTypes.bool,
-    style: View.propTypes.style,
+    style: ViewPropTypes.style,
   };
 
   static defaultProps = {
