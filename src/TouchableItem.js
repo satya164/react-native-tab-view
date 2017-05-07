@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Platform,
   View,
-  ViewPropTypes
+  ViewPropTypes,
 } from 'react-native';
 import type { Style } from './TabViewTypeDefinitions';
 
