@@ -46,7 +46,9 @@ export default class TouchableItem
   };
 
   render() {
+    /* eslint-disable react/prop-types */
     const { style, pressOpacity, pressColor, borderless, ...rest } = this.props;
+    /* eslint-enable react/prop-types */
 
     if (Platform.OS === 'android' && Platform.Version >= LOLLIPOP) {
       return (
