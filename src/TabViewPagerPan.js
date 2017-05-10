@@ -235,10 +235,10 @@ export default class TabViewPagerPan<T: Route<*>>
       timing(this.props.position, {
         ...transitionConfig,
         toValue,
-      }).start(() => this.props.jumpToIndex(toValue));
+      }).start(() => this.props.jumpToIndex(toValue,false));
     } else {
       this.props.position.setValue(toValue);
-      this.props.jumpToIndex(toValue);
+      this.props.jumpToIndex(toValue,false);
     }
   };
 

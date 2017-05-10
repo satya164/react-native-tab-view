@@ -199,7 +199,7 @@ export default class TabViewAnimated<T: Route<*>>
     };
   };
 
-  _jumpToIndex = (index: number) => {
+  _jumpToIndex = (index: number,trigger:boolean = true) => {
     if (!this._mounted) {
       // We are no longer mounted, this is a no-op
       return;
@@ -212,7 +212,7 @@ export default class TabViewAnimated<T: Route<*>>
       return;
     }
 
-    if (index !== navigationState.index) {
+    if (trigger && index !== navigationState.index) {
       this.props.onRequestChangeTab(index);
     }
   };
