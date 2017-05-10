@@ -209,16 +209,16 @@ export default class TabViewPagerPan<T: Route<*>>
     if (currentValue !== currentIndex) {
       if (this._isMoving && !this._isReverseDirection(gestureState)) {
         const nextIndex = this._getNextIndex(evt, gestureState);
-        this._transitionTo(nextIndex);
+        this._transitionTo(nextIndex,true);
       } else {
-        this._transitionTo(currentIndex);
+        this._transitionTo(currentIndex,true);
       }
     }
     this._lastValue = null;
     this._isMoving = null;
   };
 
-  _transitionTo = (toValue: number) => {
+  _transitionTo = (toValue: number,trigger:boolean = false) => {
     const lastPosition = this.props.getLastPosition();
     const currentTransitionProps = {
       progress: lastPosition,
@@ -235,10 +235,10 @@ export default class TabViewPagerPan<T: Route<*>>
       timing(this.props.position, {
         ...transitionConfig,
         toValue,
-      }).start(() => this.props.jumpToIndex(toValue,false));
+      }).start(() => this.props.jumpToIndex(toValue,trigger));
     } else {
       this.props.position.setValue(toValue);
-      this.props.jumpToIndex(toValue,false);
+      this.props.jumpToIndex(toValue,trigger);
     }
   };
 
