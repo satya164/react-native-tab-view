@@ -131,19 +131,23 @@ export default class TabViewPagerScroll<T: Route<*>>
         contentContainerStyle={layout.width ? null : styles.container}
         ref={this._setRef}
       >
-        {Children.map(children, (child, i) => (
-          <View
-            key={navigationState.routes[i].key}
-            testID={navigationState.routes[i].testID}
-            style={
-              layout.width
-                ? { width: layout.width, overflow: 'hidden' }
-                : i === navigationState.index ? styles.page : null
-            }
-          >
-            {i === navigationState.index || layout.width ? child : null}
-          </View>
-        ))}
+        {Children.map(children, (child, i) => {
+          const isFocused = i === navigationState.index;
+          return (
+            <View
+              key={navigationState.routes[i].key}
+              testID={navigationState.routes[i].testID}
+              style={[
+                layout.width
+                  ? { width: layout.width, overflow: 'hidden' }
+                  : isFocused ? styles.page : null,
+                { zIndex: isFocused ? 1000 : 0 }, // set zIndex to a high number if route is focused
+              ]}
+            >
+              {isFocused || layout.width ? child : null}
+            </View>
+          );
+        })}
       </ScrollView>
     );
   }
