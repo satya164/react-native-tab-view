@@ -417,6 +417,8 @@ export default class TabBar<T: Route<*>>
               const tabStyle = {};
 
               tabStyle.opacity = opacity;
+              const { activeBackgroundColor } = this.props;
+              if( focused && activeBackgroundColor ) tabStyle.backgroundColor = activeBackgroundColor;
 
               if (icon) {
                 if (label) {
