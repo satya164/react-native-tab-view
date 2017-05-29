@@ -281,19 +281,21 @@ export default class TabViewPagerPan<T: Route<*>>
         ]}
         {...this._panResponder.panHandlers}
       >
-        {Children.map(children, (child, i) => (
-          <View
-            key={navigationState.routes[i].key}
-            testID={navigationState.routes[i].testID}
-            style={
-              width
-                ? { width }
-                : i === navigationState.index ? StyleSheet.absoluteFill : null
-            }
-          >
-            {i === navigationState.index || width ? child : null}
-          </View>
-        ))}
+        {Children.map(children, (child, i) => {
+          const isFocused = i === navigationState.index;
+          return (
+            <View
+              key={navigationState.routes[i].key}
+              testID={navigationState.routes[i].testID}
+              style={[
+                width ? { width } : isFocused ? StyleSheet.absoluteFill : null,
+                { zIndex: isFocused ? 1000 : 0 }, // set zIndex to a high number if route is focused
+              ]}
+            >
+              {isFocused || width ? child : null}
+            </View>
+          );
+        })}
       </Animated.View>
     );
   }
