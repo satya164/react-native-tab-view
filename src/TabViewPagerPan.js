@@ -301,7 +301,7 @@ export default class TabViewPagerPan<T: Route<*>>
 
 const styles = StyleSheet.create({
   sheet: {
-    flex: 1,
+    flexGrow: 1,
     flexDirection: 'row',
     alignItems: 'stretch',
   },
