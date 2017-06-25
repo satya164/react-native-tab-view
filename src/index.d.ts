@@ -6,9 +6,13 @@
 import React from 'react'
 import { ViewProperties, TextStyle, ViewStyle } from 'react-native'
 
+interface SceneMapStatic {
+  [key: string]: any
+}
+
 interface TabViewAnimatedProps extends ViewProperties {
   navigationState: any
-  renderScene(scene: any): JSX.Element
+  renderScene: SceneMapStatic
   renderHeader(props: any): JSX.Element
   onRequestChangeTab(index: number): void
 }
@@ -20,6 +24,8 @@ interface TabBarProps {
   renderLabel?(scene: any): JSX.Element
   style: object
 }
+
+export function SceneMap(map: SceneMapStatic): SceneMapStatic
 
 export class TabViewAnimated extends React.Component<TabViewAnimatedProps, any> { }
 export class TabBar extends React.Component<TabBarProps, any> { }
