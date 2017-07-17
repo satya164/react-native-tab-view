@@ -12,7 +12,7 @@ interface SceneMapStatic {
 
 interface TabViewAnimatedProps extends ViewProperties {
   navigationState: any
-  swipeEnabled: boolean
+  swipeEnabled?: boolean
   renderScene: SceneMapStatic
   renderHeader(props: any): JSX.Element
   onRequestChangeTab(index: number): void
