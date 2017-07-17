@@ -16,6 +16,11 @@ import type {
 } from './TabViewTypeDefinitions';
 
 type DefaultProps<T> = {
+  position: Animated.Value,
+  initialLayout: {
+    width: number,
+    height: number,
+  },
   renderPager: (
     props: SceneRendererProps<T> & PagerProps,
   ) => React.Element<any>,
@@ -35,6 +40,7 @@ type Props<T> = PagerProps & {
   renderFooter?: (props: SceneRendererProps<T>) => ?React.Element<any>,
   lazy?: boolean,
   style?: Style,
+  position: Animated.Value,
 };
 
 type State = {
@@ -79,6 +85,7 @@ export default class TabViewAnimated<T: Route<*>>
 
   static defaultProps = {
     renderPager: (props: SceneRendererProps<*>) => <TabViewPager {...props} />,
+    position: new Animated.Value(),
     initialLayout: {
       height: 0,
       width: 0,
@@ -88,13 +95,15 @@ export default class TabViewAnimated<T: Route<*>>
   constructor(props: Props<T>) {
     super(props);
 
+    props.position.setValue(this.props.navigationState.index);
+
     this.state = {
       loaded: [this.props.navigationState.index],
       layout: {
         ...this.props.initialLayout,
         measured: false,
       },
-      position: new Animated.Value(this.props.navigationState.index),
+      position: props.position,
     };
   }
 
