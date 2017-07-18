@@ -22,7 +22,7 @@ it('lazyloads pages on position change', () => {
       renderHeader={() => <View testID="header" />}
       renderFooter={() => <View testID="footer" />}
       renderScene={jest.fn()}
-    />,
+    />
   );
 
   expect(component.state('loaded')).toEqual([1]);
