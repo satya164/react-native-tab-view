@@ -25,7 +25,7 @@ it('renders all children', () => {
       <View />
       <View />
       <View />
-    </TabViewPagerAndroid>,
+    </TabViewPagerAndroid>
   );
 
   expect(component.children().length).toBe(3);
@@ -54,7 +54,7 @@ it('initial page is same as navigation state index', () => {
       <View />
       <View />
       <View />
-    </TabViewPagerAndroid>,
+    </TabViewPagerAndroid>
   );
 
   /* $FlowFixMe */

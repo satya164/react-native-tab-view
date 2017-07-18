@@ -28,17 +28,17 @@ it('renders only focused child until layout', () => {
       <View />
       <View />
       <View />
-    </TabViewPagerScroll>,
+    </TabViewPagerScroll>
   );
 
   expect(component.find({ testID: 'first' }).first().props().children).toBe(
-    null,
+    null
   );
   expect(
-    component.find({ testID: 'second' }).first().props().children,
+    component.find({ testID: 'second' }).first().props().children
   ).not.toBe(null);
   expect(component.find({ testID: 'third' }).first().props().children).toBe(
-    null,
+    null
   );
 
   component.setProps({
@@ -46,13 +46,13 @@ it('renders only focused child until layout', () => {
   });
 
   expect(component.find({ testID: 'first' }).first().props().children).not.toBe(
-    null,
+    null
   );
   expect(
-    component.find({ testID: 'second' }).first().props().children,
+    component.find({ testID: 'second' }).first().props().children
   ).not.toBe(null);
   expect(component.find({ testID: 'third' }).first().props().children).not.toBe(
-    null,
+    null
   );
 });
 
@@ -79,7 +79,7 @@ it('sets initial scroll position according to navigation state index', () => {
       <View />
       <View />
       <View />
-    </TabViewPagerScroll>,
+    </TabViewPagerScroll>
   );
 
   /* $FlowFixMe */
