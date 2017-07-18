@@ -44,6 +44,8 @@ type GestureState = {
   numberActiveTouches: number,
 };
 
+type GestureHandler = (event: GestureEvent, state: GestureState) => void;
+
 type DefaultProps = {
   configureTransition: TransitionConfigurator,
   swipeDistanceThreshold: number,
@@ -56,8 +58,8 @@ type Props<T> = SceneRendererProps<T> & {
   swipeEnabled?: boolean,
   swipeDistanceThreshold: number,
   swipeVelocityThreshold: number,
-  onSwipeStart?: Function,
-  onSwipeEnd?: Function,
+  onSwipeStart?: GestureHandler,
+  onSwipeEnd?: GestureHandler,
   children?: React.Element<any>,
 };
 
