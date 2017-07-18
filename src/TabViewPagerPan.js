@@ -56,6 +56,8 @@ type Props<T> = SceneRendererProps<T> & {
   swipeEnabled?: boolean,
   swipeDistanceThreshold: number,
   swipeVelocityThreshold: number,
+  onSwipeStart?: Function,
+  onSwipeEnd?: Function,
   children?: React.Element<any>,
 };
 
@@ -76,6 +78,8 @@ export default class TabViewPagerPan<T: Route<*>>
     swipeEnabled: PropTypes.bool,
     swipeDistanceThreshold: PropTypes.number.isRequired,
     swipeVelocityThreshold: PropTypes.number.isRequired,
+    onSwipeStart: PropTypes.func,
+    onSwipeEnd: PropTypes.func,
     children: PropTypes.node,
   };
 
@@ -186,7 +190,10 @@ export default class TabViewPagerPan<T: Route<*>>
     return canMove;
   };
 
-  _startGesture = () => {
+  _startGesture = (evt: GestureEvent, gestureState: GestureState) => {
+    if (typeof this.props.onSwipeStart === 'function') {
+      this.props.onSwipeStart(evt, gestureState);
+    }
     this._lastValue = this.props.getLastPosition();
     this.props.position.stopAnimation();
   };
@@ -207,6 +214,9 @@ export default class TabViewPagerPan<T: Route<*>>
   };
 
   _finishGesture = (evt: GestureEvent, gestureState: GestureState) => {
+    if (typeof this.props.onSwipeEnd === 'function') {
+      this.props.onSwipeEnd(evt, gestureState);
+    }
     const currentIndex = this.props.navigationState.index;
     const currentValue = this.props.getLastPosition();
     if (currentValue !== currentIndex) {
