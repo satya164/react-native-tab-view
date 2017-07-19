@@ -32,6 +32,8 @@ type ScrollEvent = {
   },
 };
 
+type WidthCache = { style: any, width: ?number };
+
 type DefaultProps<T> = {
   getLabelText: (scene: Scene<T>) => ?string,
 };
@@ -188,34 +190,70 @@ export default class TabBar<T: Route<*>> extends PureComponent<
     );
   };
 
-  _tabWidthCache: ?{ style: any, width: ?number };
+  _elementWidthCache: ?{
+    tab?: WidthCache,
+    tabBar?: WidthCache,
+  };
 
   _getTabWidthFromStyle = (style: any) => {
-    if (this._tabWidthCache && this._tabWidthCache.style === style) {
-      return this._tabWidthCache.width;
+    return this._getWidthFromStyle('tab', style);
+  };
+
+  _getTabBarWidthFromStyle = (style: any) => {
+    return this._getWidthFromStyle('tabBar', style);
+  };
+
+  _getWidthFromStyle = (element: string, style: any) => {
+    let passedElementStyle;
+
+    if (
+      this._elementWidthCache &&
+      this._elementWidthCache[element] &&
+      this._elementWidthCache[element].style === style
+    ) {
+      return this._elementWidthCache[element].width;
     }
-    const passedTabStyle = StyleSheet.flatten(this.props.tabStyle);
+    if (element === 'tab') {
+      passedElementStyle = StyleSheet.flatten(this.props.tabStyle);
+    } else if (element === 'tabBar') {
+      passedElementStyle = StyleSheet.flatten(this.props.style);
+    }
     const cache = {
       style,
-      width: passedTabStyle ? passedTabStyle.width : null,
+      width: passedElementStyle ? passedElementStyle.width : null,
     };
-    this._tabWidthCache = cache;
-    return cache;
+
+    this._elementWidthCache = { ...this._elementWidthCache, [element]: cache };
+
+    return cache.width;
+  };
+
+  _getFinalTabBarWidth = (props: Props<T>, screenWidth: number) => {
+    const layoutWidth = this._getTabBarWidthFromStyle(props.style);
+    if (typeof layoutWidth === 'number') {
+      return layoutWidth;
+    }
+    if (typeof layoutWidth === 'string' && layoutWidth.endsWith('%')) {
+      return screenWidth * (parseFloat(layoutWidth, 10) / 100);
+    }
+    return screenWidth;
   };
 
   _getFinalTabWidth = (props: Props<T>) => {
     const { layout, navigationState } = props;
     const tabWidth = this._getTabWidthFromStyle(props.tabStyle);
+    const finalTabBarWidth = this._getFinalTabBarWidth(props, layout.width);
+
     if (typeof tabWidth === 'number') {
       return tabWidth;
     }
     if (typeof tabWidth === 'string' && tabWidth.endsWith('%')) {
-      return layout.width * (parseFloat(tabWidth) / 100);
+      return finalTabBarWidth * (parseFloat(tabWidth) / 100);
     }
     if (props.scrollEnabled) {
-      return layout.width / 5 * 2;
+      return finalTabBarWidth / 5 * 2;
     }
-    return layout.width / navigationState.routes.length;
+    return finalTabBarWidth / navigationState.routes.length;
   };
 
   _getMaxScrollableDistance = (props: Props<T>) => {
