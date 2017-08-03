@@ -38,6 +38,7 @@ type DefaultProps<T> = {
 
 type Props<T> = SceneRendererProps<T> & {
   scrollEnabled?: boolean,
+  autofocusTabAfterSelection?: boolean,
   pressColor?: string,
   pressOpacity?: number,
   getLabelText: (scene: Scene<T>) => ?string,
@@ -66,6 +67,7 @@ export default class TabBar<T: Route<*>> extends PureComponent<
   static propTypes = {
     ...SceneRendererPropType,
     scrollEnabled: PropTypes.bool,
+    autofocusTabAfterSelection: PropTypes.bool,
     pressColor: TouchableItem.propTypes.pressColor,
     pressOpacity: TouchableItem.propTypes.pressOpacity,
     getLabelText: PropTypes.func,
@@ -243,7 +245,11 @@ export default class TabBar<T: Route<*>> extends PureComponent<
   };
 
   _resetScrollOffset = (props: Props<T>) => {
-    if (!props.scrollEnabled || !this._scrollView) {
+    if (
+      !props.scrollEnabled ||
+      !this._scrollView ||
+      !this.props.autofocusTabAfterSelection
+    ) {
       return;
     }
 
@@ -262,7 +268,11 @@ export default class TabBar<T: Route<*>> extends PureComponent<
   };
 
   _adjustScroll = (index: number) => {
-    if (!this.props.scrollEnabled || !this._scrollView) {
+    if (
+      !this.props.scrollEnabled ||
+      !this._scrollView ||
+      !this.props.autofocusTabAfterSelection
+    ) {
       return;
     }
 
@@ -274,7 +284,11 @@ export default class TabBar<T: Route<*>> extends PureComponent<
   };
 
   _adjustOffset = (value: number) => {
-    if (!this._isManualScroll || !this.props.scrollEnabled) {
+    if (
+      !this._isManualScroll ||
+      !this.props.scrollEnabled ||
+      !this.props.autofocusTabAfterSelection
+    ) {
       return;
     }
 
