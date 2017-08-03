@@ -156,6 +156,7 @@ Material design themed tab bar. Can be used as both top and bottom tab bar.
 - `pressColor` - color for material ripple (Android >= 5.0 only)
 - `pressOpacity` - opacity for pressed tab (iOS and Android < 5.0 only)
 - `scrollEnabled` - whether to enable scrollable tabs
+- `scrollViewBounces` - wether to enable bounce on tab bar ScrollView
 - `tabStyle` - style object for the individual tabs in the tab bar
 - `indicatorStyle` - style object for the active indicator
 - `labelStyle` - style object for the tab item label

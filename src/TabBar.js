@@ -38,6 +38,7 @@ type DefaultProps<T> = {
 
 type Props<T> = SceneRendererProps<T> & {
   scrollEnabled?: boolean,
+  scrollViewBounces?: boolean,
   pressColor?: string,
   pressOpacity?: number,
   getLabelText: (scene: Scene<T>) => ?string,
@@ -66,6 +67,7 @@ export default class TabBar<T: Route<*>> extends PureComponent<
   static propTypes = {
     ...SceneRendererPropType,
     scrollEnabled: PropTypes.bool,
+    scrollViewBounces: PropTypes.bool,
     pressColor: TouchableItem.propTypes.pressColor,
     pressOpacity: TouchableItem.propTypes.pressOpacity,
     getLabelText: PropTypes.func,
@@ -80,6 +82,7 @@ export default class TabBar<T: Route<*>> extends PureComponent<
   static defaultProps = {
     getLabelText: ({ route }) =>
       route.title ? route.title.toUpperCase() : null,
+    scrollViewBounces: false,
   };
 
   constructor(props: Props<T>) {
@@ -375,7 +378,7 @@ export default class TabBar<T: Route<*>> extends PureComponent<
           <ScrollView
             horizontal
             scrollEnabled={scrollEnabled}
-            bounces={false}
+            bounces={this.props.scrollViewBounces}
             alwaysBounceHorizontal={false}
             scrollsToTop={false}
             showsHorizontalScrollIndicator={false}
