@@ -49,6 +49,7 @@ type Props<T> = SceneRendererProps<T> & {
   tabStyle?: Style,
   indicatorStyle?: Style,
   labelStyle?: Style,
+  focusedLabelStyle?: Style,
   style?: Style,
 };
 
@@ -161,8 +162,15 @@ export default class TabBar<T: Route<*>> extends PureComponent<
     if (typeof label !== 'string') {
       return null;
     }
+
     return (
-      <Text style={[styles.tabLabel, this.props.labelStyle]}>
+      <Text
+        style={[
+          styles.tabLabel,
+          this.props.labelStyle,
+          scene.focused ? this.props.focusedLabelStyle : null,
+        ]}
+      >
         {label}
       </Text>
     );

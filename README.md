@@ -159,6 +159,7 @@ Material design themed tab bar. Can be used as both top and bottom tab bar.
 - `tabStyle` - style object for the individual tabs in the tab bar
 - `indicatorStyle` - style object for the active indicator
 - `labelStyle` - style object for the tab item label
+- `focusedLabelStyle` - style object for the focused tab item label
 - `style` - style object for the tab bar
 
 
