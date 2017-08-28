@@ -254,12 +254,12 @@ export default class TabBar<T: Route<*>> extends PureComponent<
     this._scrollView.scrollTo({
       x: scrollAmount,
       animated: true,
-      useNativeDriver: true
+      useNativeDriver: true,
     });
     Animated.timing(this.state.offset, {
       toValue: 0,
       duration: 150,
-      useNativeDriver: true
+      useNativeDriver: true,
     }).start();
   };
 
@@ -291,7 +291,7 @@ export default class TabBar<T: Route<*>> extends PureComponent<
         toValue: -scrollOffset,
         tension: 300,
         friction: 35,
-        useNativeDriver: true
+        useNativeDriver: true,
       }).start();
     } else {
       this.state.offset.setValue(-scrollOffset);
@@ -350,14 +350,14 @@ export default class TabBar<T: Route<*>> extends PureComponent<
       position.interpolate({
         inputRange,
         outputRange: translateOutputRange,
-        useNativeDriver: true
+        useNativeDriver: true,
       }),
       this.state.offset
     ).interpolate({
       inputRange: [-maxDistance, 0],
       outputRange: [-maxDistance, 0],
       extrapolate: 'clamp',
-      useNativeDriver: true
+      useNativeDriver: true,
     });
 
     return (
@@ -409,7 +409,7 @@ export default class TabBar<T: Route<*>> extends PureComponent<
                 position.interpolate({
                   inputRange,
                   outputRange,
-                  useNativeDriver: true
+                  useNativeDriver: true,
                 })
               );
               const scene = {
