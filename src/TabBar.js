@@ -42,6 +42,7 @@ type Props<T> = SceneRendererProps<T> & {
   pressOpacity?: number,
   getLabelText: (scene: Scene<T>) => ?string,
   renderLabel?: (scene: Scene<T>) => ?React.Element<any>,
+  getAccessibilityLabel?: (scene: Scene<T>) => ?string,
   renderIcon?: (scene: Scene<T>) => ?React.Element<any>,
   renderBadge?: (scene: Scene<T>) => ?React.Element<any>,
   renderIndicator?: (props: IndicatorProps<T>) => ?React.Element<any>,
@@ -162,6 +163,12 @@ export default class TabBar<T: Route<*>>
       <Text style={[styles.tabLabel, this.props.labelStyle]}>{label}</Text>
     );
   };
+
+  _getAccessibility = (scene: Scene<*>) => {
+    if (typeof this.props.getAccessibilityLabel !== 'undefined') {
+      return this.props.getAccessibilityLabel(scene);
+    }
+  }
 
   _renderIndicator = (props: IndicatorProps<T>) => {
     if (typeof this.props.renderIndicator !== 'undefined') {
@@ -443,8 +450,9 @@ export default class TabBar<T: Route<*>>
                 tabContainerStyle.flex = 1;
               }
 
-              const accessibilityLabel =
-                route.accessibilityLabel || route.title;
+              const accessibilityLabel = route.accessibilityLabel
+                || route.title
+                || this._getAccessibility(scene);
 
               return (
                 <TouchableItem
