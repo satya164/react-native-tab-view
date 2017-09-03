@@ -3,9 +3,8 @@
   "version": "0.0.69",
   "description": "Tab view component for React Native",
   "main": "src/index.js",
-  "files": [
-    "src/"
-  ],
+  "types": "src/index.d.ts",
+  "files": ["src/"],
   "scripts": {
     "test": "jest",
     "flow": "flow",
@@ -24,14 +23,18 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/react-native-community/react-native-tab-view.git"
+    "url":
+      "git+https://github.com/react-native-community/react-native-tab-view.git"
   },
-  "author": "Satyajit Sahoo <satyajit.happy@gmail.com> (https://github.com/satya164/)",
+  "author":
+    "Satyajit Sahoo <satyajit.happy@gmail.com> (https://github.com/satya164/)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/react-native-community/react-native-tab-view/issues"
+    "url":
+      "https://github.com/react-native-community/react-native-tab-view/issues"
   },
-  "homepage": "https://github.com/react-native-community/react-native-tab-view#readme",
+  "homepage":
+    "https://github.com/react-native-community/react-native-tab-view#readme",
   "devDependencies": {
     "@expo/vector-icons": "^4.0.0",
     "babel-eslint": "^7.2.3",
@@ -61,12 +64,8 @@
   },
   "jest": {
     "preset": "react-native",
-    "setupFiles": [
-      "<rootDir>/__setup__/enzyme.js"
-    ],
-    "modulePathIgnorePatterns": [
-      "<rootDir>/example/node_modules"
-    ]
+    "setupFiles": ["<rootDir>/__setup__/enzyme.js"],
+    "modulePathIgnorePatterns": ["<rootDir>/example/node_modules"]
   },
   "dependencies": {
     "prop-types": "^15.5.8"
