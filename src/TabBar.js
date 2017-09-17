@@ -77,7 +77,7 @@ export default class TabBar<T: Route<*>> extends PureComponent<
     onTabPress: PropTypes.func,
     labelStyle: Text.propTypes.style,
     focusedLabelStyle: Text.propTypes.style,
-    focusedTabContainerStyle: Text.any,
+    focusedTabContainerStyle: PropTypes.any,
     style: PropTypes.any,
   };
 
