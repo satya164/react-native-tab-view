@@ -49,6 +49,8 @@ type Props<T> = SceneRendererProps<T> & {
   tabStyle?: Style,
   indicatorStyle?: Style,
   labelStyle?: Style,
+  focusedLabelStyle?: Style,
+  focusedTabContainerStyle?: Style,
   style?: Style,
 };
 
@@ -162,7 +164,11 @@ export default class TabBar<T: Route<*>> extends PureComponent<
       return null;
     }
     return (
-      <Text style={[styles.tabLabel, this.props.labelStyle]}>
+      <Text style={[
+        styles.tabLabel,
+        this.props.labelStyle,
+        scene.focused ? this.props.focusedLabelStyle : null,
+      ]}>
         {label}
       </Text>
     );
@@ -470,7 +476,10 @@ export default class TabBar<T: Route<*>> extends PureComponent<
                       onTabPress(scene);
                     }
                   }}
-                  style={tabContainerStyle}
+                  style={[
+                    tabContainerStyle,
+                    focused ? this.props.focusedTabContainerStyle: null,
+                  ]}
                 >
                   <View style={styles.container}>
                     <Animated.View
