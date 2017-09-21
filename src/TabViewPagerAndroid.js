@@ -133,7 +133,7 @@ export default class TabViewPagerAndroid<T: Route<*>> extends PureComponent<
 
   render() {
     const { children, navigationState, swipeEnabled } = this.props;
-    const content = Children.map(children, (child, i) =>
+    const content = Children.map(children, (child, i) => (
       <View
         key={navigationState.routes[i].key}
         testID={navigationState.routes[i].testID}
@@ -141,7 +141,7 @@ export default class TabViewPagerAndroid<T: Route<*>> extends PureComponent<
       >
         {child}
       </View>
-    );
+    ));
 
     if (I18nManager.isRTL) {
       content.reverse();

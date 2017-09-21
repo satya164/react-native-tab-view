@@ -59,9 +59,7 @@ export default class TouchableItem extends PureComponent<
           onPress={this._handlePress}
           background={TouchableNativeFeedback.Ripple(pressColor, borderless)}
         >
-          <View style={style}>
-            {Children.only(this.props.children)}
-          </View>
+          <View style={style}>{Children.only(this.props.children)}</View>
         </TouchableNativeFeedback>
       );
     } else {

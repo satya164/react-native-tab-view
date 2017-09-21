@@ -117,10 +117,6 @@ export default class TabBar<T: Route<*>> extends PureComponent<
   }
 
   componentWillReceiveProps(nextProps: Props<T>) {
-    if (this.props.navigationState !== nextProps.navigationState) {
-      this._resetScrollOffset(nextProps);
-    }
-
     const nextTabWidth = this._getTabWidthFromStyle(nextProps.tabStyle);
 
     if (
@@ -162,9 +158,7 @@ export default class TabBar<T: Route<*>> extends PureComponent<
       return null;
     }
     return (
-      <Text style={[styles.tabLabel, this.props.labelStyle]}>
-        {label}
-      </Text>
+      <Text style={[styles.tabLabel, this.props.labelStyle]}>{label}</Text>
     );
   };
 
@@ -240,25 +234,6 @@ export default class TabBar<T: Route<*>> extends PureComponent<
     const centerDistance = finalTabWidth * i + finalTabWidth / 2;
     const scrollAmount = centerDistance - layout.width / 2;
     return this._normalizeScrollValue(props, scrollAmount);
-  };
-
-  _resetScrollOffset = (props: Props<T>) => {
-    if (!props.scrollEnabled || !this._scrollView) {
-      return;
-    }
-
-    const scrollAmount = this._getScrollAmount(
-      props,
-      props.navigationState.index
-    );
-    this._scrollView.scrollTo({
-      x: scrollAmount,
-      animated: true,
-    });
-    Animated.timing(this.state.offset, {
-      toValue: 0,
-      duration: 150,
-    }).start();
   };
 
   _adjustScroll = (index: number) => {
@@ -484,16 +459,16 @@ export default class TabBar<T: Route<*>> extends PureComponent<
                       {icon}
                       {label}
                     </Animated.View>
-                    {badge
-                      ? <Animated.View
-                          style={[
-                            styles.badge,
-                            { opacity: this.state.visibility },
-                          ]}
-                        >
-                          {badge}
-                        </Animated.View>
-                      : null}
+                    {badge ? (
+                      <Animated.View
+                        style={[
+                          styles.badge,
+                          { opacity: this.state.visibility },
+                        ]}
+                      >
+                        {badge}
+                      </Animated.View>
+                    ) : null}
                   </View>
                 </TouchableItem>
               );
