@@ -298,7 +298,7 @@ export default class TabViewPagerPan<T: Route<*>> extends PureComponent<
         ]}
         {...this._panResponder.panHandlers}
       >
-        {Children.map(children, (child, i) =>
+        {Children.map(children, (child, i) => (
           <View
             key={navigationState.routes[i].key}
             testID={navigationState.routes[i].testID}
@@ -310,7 +310,7 @@ export default class TabViewPagerPan<T: Route<*>> extends PureComponent<
           >
             {i === navigationState.index || width ? child : null}
           </View>
-        )}
+        ))}
       </Animated.View>
     );
   }

@@ -117,7 +117,6 @@ export default class TabBar<T: Route<*>> extends PureComponent<
   }
 
   componentWillReceiveProps(nextProps: Props<T>) {
-
     const nextTabWidth = this._getTabWidthFromStyle(nextProps.tabStyle);
 
     if (
@@ -159,9 +158,7 @@ export default class TabBar<T: Route<*>> extends PureComponent<
       return null;
     }
     return (
-      <Text style={[styles.tabLabel, this.props.labelStyle]}>
-        {label}
-      </Text>
+      <Text style={[styles.tabLabel, this.props.labelStyle]}>{label}</Text>
     );
   };
 
@@ -462,16 +459,16 @@ export default class TabBar<T: Route<*>> extends PureComponent<
                       {icon}
                       {label}
                     </Animated.View>
-                    {badge
-                      ? <Animated.View
-                          style={[
-                            styles.badge,
-                            { opacity: this.state.visibility },
-                          ]}
-                        >
-                          {badge}
-                        </Animated.View>
-                      : null}
+                    {badge ? (
+                      <Animated.View
+                        style={[
+                          styles.badge,
+                          { opacity: this.state.visibility },
+                        ]}
+                      >
+                        {badge}
+                      </Animated.View>
+                    ) : null}
                   </View>
                 </TouchableItem>
               );
