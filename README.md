@@ -1,13 +1,15 @@
-# React Native Tab View [![npm version](https://img.shields.io/npm/v/react-native-tab-view.svg?style=flat)](https://www.npmjs.com/package/react-native-tab-view)
+# React Native Tab View
+
+[![npm version](https://img.shields.io/npm/v/react-native-tab-view.svg)](https://www.npmjs.com/package/react-native-tab-view)
+[![travis](https://img.shields.io/travis/react-native-community/react-native-tab-view.svg)](https://travis-ci.org/react-native-community/react-native-tab-view)
+[![license](https://img.shields.io/github/license/react-native-community/react-native-tab-view.svg)](https://opensource.org/licenses/MIT)
 
 A cross-platform Tab View component for React Native.
 
 This is a JavaScript-only implementation of swipeable tab views. It's super customizable, allowing you to do things like coverflow.
 
-- [Run the example app to see it in action](https://getexponent.com/@satya164/react-native-tab-view-demos).
+- [Run the example app to see it in action](https://expo.io/@satya164/react-native-tab-view-demos).
 - Checkout the [example/](https://github.com/react-native-community/react-native-tab-view/tree/master/example) folder for source code.
-
-Requires React Native version >= 0.36.
 
 
 ## Features
@@ -51,7 +53,7 @@ export default class TabViewExample extends PureComponent {
     ],
   };
 
-  _handleChangeTab = index => this.setState({ index });
+  _handleIndexChange = index => this.setState({ index });
 
   _renderHeader = props => <TabBar {...props} />;
 
@@ -67,7 +69,7 @@ export default class TabViewExample extends PureComponent {
         navigationState={this.state}
         renderScene={this._renderScene}
         renderHeader={this._renderHeader}
-        onRequestChangeTab={this._handleChangeTab}
+        onIndexChange={this._handleIndexChange}
       />
     );
   }
@@ -92,8 +94,8 @@ Container component responsible for managing tab transitions.
 #### Props
 
 - `navigationState` - the current navigation state
-- `onRequestChangeTab` - callback for when the current tab changes, should do the `setState`
-- `onChangePosition` - callback called with position value as it changes (e.g. - on swipe or tab change), avoid doing anything expensive here
+- `onIndexChange` - callback for when the current tab index changes, should do the `setState`
+- `onPositionChange` - callback called with position value as it changes (e.g. - on swipe or tab change), avoid doing anything expensive here
 - `canJumpToTab` - optional callback which accepts a route, and returns a boolean indicating whether jumping to the tab is allowed
 - `lazy` - whether to load tabs lazily when you start switching
 - `initialLayout` - optional object containing the initial `height` and `width`, can be passed to prevent the one frame delay in rendering
@@ -115,6 +117,8 @@ Pager component based on `PanResponder`.
 - `swipeEnabled` - whether to enable swipe gestures
 - `swipeDistanceThreshold` - minimum swipe distance to trigger page switch
 - `swipeVelocityThreshold` - minimum swipe velocity to trigger page switch
+- `onSwipeStart` - optional callback when a swipe gesture starts
+- `onSwipeEnd` - optional callback when a swipe gesture ends
 - `children` - React Element(s) to render
 
 ### `<TabViewPagerScroll />`
@@ -185,7 +189,7 @@ Then pass `this.state` as the `navigationState` prop to `<TabViewAnimated />` or
   navigationState={this.state}
   renderScene={this._renderPage}
   renderHeader={this._renderHeader}
-  onRequestChangeTab={this._handleChangeTab}
+  onIndexChange={this._handleIndexChange}
 />
 ```
 
@@ -262,3 +266,24 @@ renderScene = ({ route }) => {
   return <MySceneComponent route={route} />;
 };
 ```
+
+
+## Contributing
+
+While developing, you can run the [example app](/example/README.md) to test your changes.
+
+Make sure the tests still pass, and your code passes Flow and ESLint. Run the following to verify:
+
+```sh
+yarn test
+yarn run flow
+yarn run lint
+```
+
+To fix formatting errors, run the following:
+
+```
+yarn run lint -- --fix
+```
+
+Remember to add tests for your change if possible.

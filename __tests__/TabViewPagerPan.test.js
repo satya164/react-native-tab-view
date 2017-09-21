@@ -25,17 +25,17 @@ it('renders all children', () => {
       <View />
       <View />
       <View />
-    </TabViewPagerPan>,
+    </TabViewPagerPan>
   );
 
   expect(component.find({ testID: 'first' }).first().props().children).toBe(
-    null,
+    null
   );
   expect(
-    component.find({ testID: 'second' }).first().props().children,
+    component.find({ testID: 'second' }).first().props().children
   ).not.toBe(null);
   expect(component.find({ testID: 'third' }).first().props().children).toBe(
-    null,
+    null
   );
 
   component.setProps({
@@ -43,12 +43,12 @@ it('renders all children', () => {
   });
 
   expect(component.find({ testID: 'first' }).first().props().children).not.toBe(
-    null,
+    null
   );
   expect(
-    component.find({ testID: 'second' }).first().props().children,
+    component.find({ testID: 'second' }).first().props().children
   ).not.toBe(null);
   expect(component.find({ testID: 'third' }).first().props().children).not.toBe(
-    null,
+    null
   );
 });

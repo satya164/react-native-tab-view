@@ -40,7 +40,7 @@ export default class TopBarIconExample extends PureComponent<void, *, State> {
     ],
   };
 
-  _handleChangeTab = index => {
+  _handleIndexChange = index => {
     this.setState({
       index,
     });
@@ -49,7 +49,7 @@ export default class TopBarIconExample extends PureComponent<void, *, State> {
   _renderLabel = ({ position, navigationState }) => ({ route, index }) => {
     const inputRange = navigationState.routes.map((x, i) => i);
     const outputRange = inputRange.map(
-      inputIndex => (inputIndex === index ? '#2196f3' : '#939393'),
+      inputIndex => (inputIndex === index ? '#2196f3' : '#939393')
     );
     const color = position.interpolate({
       inputRange,
@@ -65,7 +65,10 @@ export default class TopBarIconExample extends PureComponent<void, *, State> {
   _renderIcon = ({ navigationState, position }) => ({
     route,
     index,
-  }: { route: Route, index: number }) => {
+  }: {
+    route: Route,
+    index: number,
+  }) => {
     const inputRange = navigationState.routes.map((x, i) => i);
     const filledOpacity = position.interpolate({
       inputRange,
@@ -155,7 +158,7 @@ export default class TopBarIconExample extends PureComponent<void, *, State> {
         navigationState={this.state}
         renderScene={this._renderScene}
         renderFooter={this._renderFooter}
-        onRequestChangeTab={this._handleChangeTab}
+        onIndexChange={this._handleIndexChange}
         animationEnabled={false}
         swipeEnabled={false}
       />

@@ -21,8 +21,11 @@ type Props<T> = SceneRendererProps<T> & {
   children?: React.Element<any>,
 };
 
-export default class TabViewPagerAndroid<T: Route<*>>
-  extends PureComponent<void, Props<T>, void> {
+export default class TabViewPagerAndroid<T: Route<*>> extends PureComponent<
+  void,
+  Props<T>,
+  void
+> {
   static propTypes = {
     ...SceneRendererPropType,
     animationEnabled: PropTypes.bool,
@@ -44,7 +47,7 @@ export default class TabViewPagerAndroid<T: Route<*>>
       this.props.layout !== nextProps.layout ||
       Children.count(this.props.children) !== Children.count(nextProps.children)
     ) {
-      global.requestAnimationFrame(() => {
+      this._animationFrameCallback = () => {
         if (this._viewPager) {
           const { navigationState } = nextProps;
           const page = I18nManager.isRTL
@@ -53,7 +56,19 @@ export default class TabViewPagerAndroid<T: Route<*>>
 
           this._viewPager.setPageWithoutAnimation(page);
         }
-      });
+      };
+
+      if (!this._isRequestingAnimationFrame) {
+        this._isRequestingAnimationFrame = true;
+
+        global.requestAnimationFrame(() => {
+          this._isRequestingAnimationFrame = false;
+
+          if (this._animationFrameCallback) {
+            this._animationFrameCallback();
+          }
+        });
+      }
     }
   }
 
@@ -65,6 +80,8 @@ export default class TabViewPagerAndroid<T: Route<*>>
     this._resetListener.remove();
   }
 
+  _animationFrameCallback: ?() => void;
+  _isRequestingAnimationFrame: boolean = false;
   _resetListener: Object;
   _viewPager: Object;
   _isIdle: boolean = true;
@@ -77,6 +94,8 @@ export default class TabViewPagerAndroid<T: Route<*>>
 
   _setPage = (index: number) => {
     if (this._viewPager) {
+      this._animationFrameCallback = null;
+
       const page = this._getPageIndex(index);
       if (this.props.animationEnabled !== false) {
         this._viewPager.setPage(page);
@@ -96,7 +115,7 @@ export default class TabViewPagerAndroid<T: Route<*>>
   _handlePageScroll = (e: PageScrollEvent) => {
     this.props.position.setValue(
       this._getPageIndex(e.nativeEvent.position) +
-        e.nativeEvent.offset * (I18nManager.isRTL ? -1 : 1),
+        e.nativeEvent.offset * (I18nManager.isRTL ? -1 : 1)
     );
   };
 
@@ -114,7 +133,7 @@ export default class TabViewPagerAndroid<T: Route<*>>
 
   render() {
     const { children, navigationState, swipeEnabled } = this.props;
-    const content = Children.map(children, (child, i) => (
+    const content = Children.map(children, (child, i) =>
       <View
         key={navigationState.routes[i].key}
         testID={navigationState.routes[i].testID}
@@ -122,7 +141,7 @@ export default class TabViewPagerAndroid<T: Route<*>>
       >
         {child}
       </View>
-    ));
+    );
 
     if (I18nManager.isRTL) {
       content.reverse();

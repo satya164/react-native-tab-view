@@ -88,7 +88,7 @@ export default class CoverflowExample extends PureComponent<void, *, State> {
     };
   };
 
-  _handleChangeTab = index => {
+  _handleIndexChange = index => {
     this.setState({
       index,
     });
@@ -100,7 +100,9 @@ export default class CoverflowExample extends PureComponent<void, *, State> {
         <View style={styles.album}>
           <Image source={ALBUMS[props.route.key]} style={styles.cover} />
         </View>
-        <Text style={styles.label}>{props.route.key}</Text>
+        <Text style={styles.label}>
+          {props.route.key}
+        </Text>
       </Animated.View>
     );
   };
@@ -116,7 +118,7 @@ export default class CoverflowExample extends PureComponent<void, *, State> {
         navigationState={this.state}
         renderPager={this._renderPager}
         renderScene={this._renderScene}
-        onRequestChangeTab={this._handleChangeTab}
+        onIndexChange={this._handleIndexChange}
         initialLayout={initialLayout}
       />
     );

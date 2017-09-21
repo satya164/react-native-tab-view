@@ -44,6 +44,8 @@ type GestureState = {
   numberActiveTouches: number,
 };
 
+type GestureHandler = (event: GestureEvent, state: GestureState) => void;
+
 type DefaultProps = {
   configureTransition: TransitionConfigurator,
   swipeDistanceThreshold: number,
@@ -56,6 +58,8 @@ type Props<T> = SceneRendererProps<T> & {
   swipeEnabled?: boolean,
   swipeDistanceThreshold: number,
   swipeVelocityThreshold: number,
+  onSwipeStart?: GestureHandler,
+  onSwipeEnd?: GestureHandler,
   children?: React.Element<any>,
 };
 
@@ -67,8 +71,11 @@ const DefaultTransitionSpec = {
   friction: 35,
 };
 
-export default class TabViewPagerPan<T: Route<*>>
-  extends PureComponent<DefaultProps, Props<T>, void> {
+export default class TabViewPagerPan<T: Route<*>> extends PureComponent<
+  DefaultProps,
+  Props<T>,
+  void
+> {
   static propTypes = {
     ...SceneRendererPropType,
     configureTransition: PropTypes.func.isRequired,
@@ -76,6 +83,8 @@ export default class TabViewPagerPan<T: Route<*>>
     swipeEnabled: PropTypes.bool,
     swipeDistanceThreshold: PropTypes.number.isRequired,
     swipeVelocityThreshold: PropTypes.number.isRequired,
+    onSwipeStart: PropTypes.func,
+    onSwipeEnd: PropTypes.func,
     children: PropTypes.node,
   };
 
@@ -143,9 +152,10 @@ export default class TabViewPagerPan<T: Route<*>>
   };
 
   _getNextIndex = (evt: GestureEvent, gestureState: GestureState) => {
-    const currentIndex = typeof this._pendingIndex === 'number'
-      ? this._pendingIndex
-      : this.props.navigationState.index;
+    const currentIndex =
+      typeof this._pendingIndex === 'number'
+        ? this._pendingIndex
+        : this.props.navigationState.index;
 
     let swipeVelocityThreshold = this.props.swipeVelocityThreshold;
 
@@ -186,16 +196,20 @@ export default class TabViewPagerPan<T: Route<*>>
     return canMove;
   };
 
-  _startGesture = () => {
+  _startGesture = (evt: GestureEvent, gestureState: GestureState) => {
+    if (typeof this.props.onSwipeStart === 'function') {
+      this.props.onSwipeStart(evt, gestureState);
+    }
     this._lastValue = this.props.getLastPosition();
     this.props.position.stopAnimation();
   };
 
   _respondToGesture = (evt: GestureEvent, gestureState: GestureState) => {
     const { layout: { width } } = this.props;
-    const currentPosition = typeof this._lastValue === 'number'
-      ? this._lastValue
-      : this.props.navigationState.index;
+    const currentPosition =
+      typeof this._lastValue === 'number'
+        ? this._lastValue
+        : this.props.navigationState.index;
     const nextPosition =
       currentPosition - gestureState.dx / width * (I18nManager.isRTL ? -1 : 1);
     if (this._isMoving === null) {
@@ -207,6 +221,9 @@ export default class TabViewPagerPan<T: Route<*>>
   };
 
   _finishGesture = (evt: GestureEvent, gestureState: GestureState) => {
+    if (typeof this.props.onSwipeEnd === 'function') {
+      this.props.onSwipeEnd(evt, gestureState);
+    }
     const currentIndex = this.props.navigationState.index;
     const currentValue = this.props.getLastPosition();
     if (currentValue !== currentIndex) {
@@ -235,7 +252,7 @@ export default class TabViewPagerPan<T: Route<*>>
     if (this.props.animationEnabled !== false) {
       const transitionSpec = this.props.configureTransition(
         currentTransitionProps,
-        nextTransitionProps,
+        nextTransitionProps
       );
       const { timing, ...transitionConfig } = transitionSpec;
 
@@ -263,7 +280,7 @@ export default class TabViewPagerPan<T: Route<*>>
     // Prepend '-1', so there are always at least 2 items in inputRange
     const inputRange = [-1, ...routes.map((x, i) => i)];
     const outputRange = inputRange.map(
-      i => width * i * (I18nManager.isRTL ? 1 : -1),
+      i => width * i * (I18nManager.isRTL ? 1 : -1)
     );
 
     const translateX = position.interpolate({
@@ -281,7 +298,7 @@ export default class TabViewPagerPan<T: Route<*>>
         ]}
         {...this._panResponder.panHandlers}
       >
-        {Children.map(children, (child, i) => (
+        {Children.map(children, (child, i) =>
           <View
             key={navigationState.routes[i].key}
             testID={navigationState.routes[i].testID}
@@ -293,7 +310,7 @@ export default class TabViewPagerPan<T: Route<*>>
           >
             {i === navigationState.index || width ? child : null}
           </View>
-        ))}
+        )}
       </Animated.View>
     );
   }

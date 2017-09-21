@@ -17,23 +17,23 @@ it('lazyloads pages on position change', () => {
           { key: 'third', testID: 'third' },
         ],
       }}
-      onRequestChangeTab={jest.fn()}
+      onIndexChange={jest.fn()}
       renderPager={() => <View testID="pager" />}
       renderHeader={() => <View testID="header" />}
       renderFooter={() => <View testID="footer" />}
       renderScene={jest.fn()}
-    />,
+    />
   );
 
   expect(component.state('loaded')).toEqual([1]);
 
   /* $FlowFixMe */
-  component.instance()._handleChangePosition(1.3);
+  component.instance()._handlePositionChange(1.3);
 
   expect(component.state('loaded')).toEqual([1, 2]);
 
   /* $FlowFixMe */
-  component.instance()._handleChangePosition(0.1);
+  component.instance()._handlePositionChange(0.1);
 
   expect(component.state('loaded')).toEqual([1, 2, 0]);
 });

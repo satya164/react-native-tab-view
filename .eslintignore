@@ -1,1 +1,2 @@
-/flow_typed/
+node_modules/
+flow-typed/
