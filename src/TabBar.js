@@ -132,18 +132,6 @@ export default class TabBar<T: Route<*>> extends PureComponent<
     }
   }
 
-  componentDidUpdate(prevProps: Props<T>) {
-    if (
-      this.props.scrollEnabled &&
-      (prevProps.layout !== this.props.layout ||
-        prevProps.tabStyle !== this.props.tabStyle)
-    ) {
-      global.requestAnimationFrame(() =>
-        this._adjustScroll(this.props.navigationState.index)
-      );
-    }
-  }
-
   componentWillUnmount() {
     this._positionListener.remove();
   }
