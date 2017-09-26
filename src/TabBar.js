@@ -42,6 +42,7 @@ type Props<T> = SceneRendererProps<T> & {
   pressOpacity?: number,
   getLabelText: (scene: Scene<T>) => ?string,
   renderLabel?: (scene: Scene<T>) => ?React.Element<any>,
+  getAccessibilityLabel?: (scene: Scene<T>) => ?string,
   renderIcon?: (scene: Scene<T>) => ?React.Element<any>,
   renderBadge?: (scene: Scene<T>) => ?React.Element<any>,
   renderIndicator?: (props: IndicatorProps<T>) => ?React.Element<any>,
@@ -58,11 +59,8 @@ type State = {
   initialOffset: { x: number, y: number },
 };
 
-export default class TabBar<T: Route<*>> extends PureComponent<
-  DefaultProps<T>,
-  Props<T>,
-  State
-> {
+export default class TabBar<T: Route<*>>
+  extends PureComponent<DefaultProps<T>, Props<T>, State> {
   static propTypes = {
     ...SceneRendererPropType,
     scrollEnabled: PropTypes.bool,
@@ -112,7 +110,7 @@ export default class TabBar<T: Route<*>> extends PureComponent<
     this._adjustScroll(this.props.navigationState.index);
     this._positionListener = this.props.subscribe(
       'position',
-      this._adjustScroll
+      this._adjustScroll,
     );
   }
 
@@ -126,7 +124,7 @@ export default class TabBar<T: Route<*>> extends PureComponent<
     if (
       (this.props.tabStyle !== nextProps.tabStyle && nextTabWidth) ||
       (this.props.layout.width !== nextProps.layout.width &&
-        nextProps.layout.width)
+      nextProps.layout.width)
     ) {
       this.state.visibility.setValue(1);
     }
@@ -136,10 +134,10 @@ export default class TabBar<T: Route<*>> extends PureComponent<
     if (
       this.props.scrollEnabled &&
       (prevProps.layout !== this.props.layout ||
-        prevProps.tabStyle !== this.props.tabStyle)
+      prevProps.tabStyle !== this.props.tabStyle)
     ) {
       global.requestAnimationFrame(() =>
-        this._adjustScroll(this.props.navigationState.index)
+        this._adjustScroll(this.props.navigationState.index),
       );
     }
   }
@@ -162,11 +160,15 @@ export default class TabBar<T: Route<*>> extends PureComponent<
       return null;
     }
     return (
-      <Text style={[styles.tabLabel, this.props.labelStyle]}>
-        {label}
-      </Text>
+      <Text style={[styles.tabLabel, this.props.labelStyle]}>{label}</Text>
     );
   };
+
+  _getAccessibility = (scene: Scene<*>) => {
+    if (typeof this.props.getAccessibilityLabel !== 'undefined') {
+      return this.props.getAccessibilityLabel(scene);
+    }
+  }
 
   _renderIndicator = (props: IndicatorProps<T>) => {
     if (typeof this.props.renderIndicator !== 'undefined') {
@@ -175,7 +177,7 @@ export default class TabBar<T: Route<*>> extends PureComponent<
     const { width, position } = props;
     const translateX = Animated.multiply(
       Animated.multiply(position, width),
-      I18nManager.isRTL ? -1 : 1
+      I18nManager.isRTL ? -1 : 1,
     );
     return (
       <Animated.View
@@ -249,7 +251,7 @@ export default class TabBar<T: Route<*>> extends PureComponent<
 
     const scrollAmount = this._getScrollAmount(
       props,
-      props.navigationState.index
+      props.navigationState.index,
     );
     this._scrollView.scrollTo({
       x: scrollAmount,
@@ -280,7 +282,7 @@ export default class TabBar<T: Route<*>> extends PureComponent<
 
     const scrollAmount = this._getScrollAmount(
       this.props,
-      this.props.navigationState.index
+      this.props.navigationState.index,
     );
     const scrollOffset = value - scrollAmount;
 
@@ -340,7 +342,7 @@ export default class TabBar<T: Route<*>> extends PureComponent<
     // Prepend '-1', so there are always at least 2 items in inputRange
     const inputRange = [-1, ...routes.map((x, i) => i)];
     const translateOutputRange = inputRange.map(
-      i => this._getScrollAmount(this.props, i) * -1
+      i => this._getScrollAmount(this.props, i) * -1,
     );
 
     const translateX = Animated.add(
@@ -348,7 +350,7 @@ export default class TabBar<T: Route<*>> extends PureComponent<
         inputRange,
         outputRange: translateOutputRange,
       }),
-      this.state.offset
+      this.state.offset,
     ).interpolate({
       inputRange: [-maxDistance, 0],
       outputRange: [-maxDistance, 0],
@@ -397,14 +399,14 @@ export default class TabBar<T: Route<*>> extends PureComponent<
             {routes.map((route, i) => {
               const focused = index === i;
               const outputRange = inputRange.map(
-                inputIndex => (inputIndex === i ? 1 : 0.7)
+                inputIndex => (inputIndex === i ? 1 : 0.7),
               );
               const opacity = Animated.multiply(
                 this.state.visibility,
                 position.interpolate({
                   inputRange,
                   outputRange,
-                })
+                }),
               );
               const scene = {
                 route,
@@ -434,7 +436,7 @@ export default class TabBar<T: Route<*>> extends PureComponent<
               const passedTabStyle = StyleSheet.flatten(this.props.tabStyle);
               const isWidthSet =
                 (passedTabStyle &&
-                  typeof passedTabStyle.width !== 'undefined') ||
+                typeof passedTabStyle.width !== 'undefined') ||
                 scrollEnabled === true;
               const tabContainerStyle = {};
 
@@ -448,8 +450,9 @@ export default class TabBar<T: Route<*>> extends PureComponent<
                 tabContainerStyle.flex = 1;
               }
 
-              const accessibilityLabel =
-                route.accessibilityLabel || route.title;
+              const accessibilityLabel = route.accessibilityLabel
+                || route.title
+                || this._getAccessibility(scene);
 
               return (
                 <TouchableItem
@@ -486,13 +489,13 @@ export default class TabBar<T: Route<*>> extends PureComponent<
                     </Animated.View>
                     {badge
                       ? <Animated.View
-                          style={[
-                            styles.badge,
-                            { opacity: this.state.visibility },
-                          ]}
-                        >
-                          {badge}
-                        </Animated.View>
+                        style={[
+                          styles.badge,
+                          { opacity: this.state.visibility },
+                        ]}
+                      >
+                        {badge}
+                      </Animated.View>
                       : null}
                   </View>
                 </TouchableItem>
