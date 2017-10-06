@@ -4,6 +4,7 @@ import React, { PureComponent, Children } from 'react';
 import PropTypes from 'prop-types';
 import { View, ViewPagerAndroid, StyleSheet, I18nManager } from 'react-native';
 import { SceneRendererPropType } from './TabViewPropTypes';
+import type { Node } from 'react';
 import type { SceneRendererProps, Route } from './TabViewTypeDefinitions';
 
 type PageScrollEvent = {
@@ -18,11 +19,10 @@ type PageScrollState = 'dragging' | 'settling' | 'idle';
 type Props<T> = SceneRendererProps<T> & {
   animationEnabled?: boolean,
   swipeEnabled?: boolean,
-  children?: React.Element<any>,
+  children?: Node,
 };
 
 export default class TabViewPagerAndroid<T: Route<*>> extends PureComponent<
-  void,
   Props<T>,
   void
 > {
@@ -83,7 +83,7 @@ export default class TabViewPagerAndroid<T: Route<*>> extends PureComponent<
   _animationFrameCallback: ?() => void;
   _isRequestingAnimationFrame: boolean = false;
   _resetListener: Object;
-  _viewPager: Object;
+  _viewPager: ?ViewPagerAndroid;
   _isIdle: boolean = true;
   _currentIndex = 0;
 
@@ -94,13 +94,14 @@ export default class TabViewPagerAndroid<T: Route<*>> extends PureComponent<
 
   _setPage = (index: number) => {
     if (this._viewPager) {
+      // in spite of this check, flow 0.53.0 still reports errors if `this._viewPager &&` is omitted below
       this._animationFrameCallback = null;
 
       const page = this._getPageIndex(index);
       if (this.props.animationEnabled !== false) {
-        this._viewPager.setPage(page);
+        this._viewPager && this._viewPager.setPage(page);
       } else {
-        this._viewPager.setPageWithoutAnimation(page);
+        this._viewPager && this._viewPager.setPageWithoutAnimation(page);
       }
     }
   };
@@ -129,7 +130,7 @@ export default class TabViewPagerAndroid<T: Route<*>> extends PureComponent<
     this._currentIndex = index;
   };
 
-  _setRef = (el: Object) => (this._viewPager = el);
+  _setRef = (el: ?ViewPagerAndroid) => (this._viewPager = el);
 
   render() {
     const { children, navigationState, swipeEnabled } = this.props;

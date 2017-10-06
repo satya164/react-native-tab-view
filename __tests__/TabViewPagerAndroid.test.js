@@ -57,6 +57,5 @@ it('initial page is same as navigation state index', () => {
     </TabViewPagerAndroid>
   );
 
-  /* $FlowFixMe */
   expect(component.dive().instance().props.initialPage).toBe(2);
 });
