@@ -23,7 +23,7 @@ type Props = {
   style?: Style,
 };
 
-export default class TouchableItem extends PureComponent<Props, void> {
+export default class TouchableItem extends PureComponent<Props> {
   static propTypes = {
     onPress: PropTypes.func.isRequired,
     delayPressIn: PropTypes.number,

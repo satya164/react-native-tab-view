@@ -23,8 +23,7 @@ type Props<T> = SceneRendererProps<T> & {
 };
 
 export default class TabViewPagerAndroid<T: Route<*>> extends PureComponent<
-  Props<T>,
-  void
+  Props<T>
 > {
   static propTypes = {
     ...SceneRendererPropType,
@@ -93,15 +92,15 @@ export default class TabViewPagerAndroid<T: Route<*>> extends PureComponent<
       : index;
 
   _setPage = (index: number) => {
-    if (this._viewPager) {
-      // in spite of this check, flow 0.53.0 still reports errors if `this._viewPager &&` is omitted below
+    const { _viewPager } = this;
+    if (_viewPager) {
       this._animationFrameCallback = null;
 
       const page = this._getPageIndex(index);
       if (this.props.animationEnabled !== false) {
-        this._viewPager && this._viewPager.setPage(page);
+        _viewPager.setPage(page);
       } else {
-        this._viewPager && this._viewPager.setPageWithoutAnimation(page);
+        _viewPager.setPageWithoutAnimation(page);
       }
     }
   };

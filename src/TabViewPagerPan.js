@@ -67,8 +67,7 @@ const DefaultTransitionSpec = {
 };
 
 export default class TabViewPagerPan<T: Route<*>> extends PureComponent<
-  Props<T>,
-  void
+  Props<T>
 > {
   static propTypes = {
     ...SceneRendererPropType,
