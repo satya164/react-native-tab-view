@@ -121,7 +121,7 @@ export default class TabViewPagerPan<T: Route<*>> extends PureComponent<
   }
 
   componentWillUnmount() {
-    this._resetListener.remove();
+    this._resetListener && this._resetListener.remove();
   }
 
   _panResponder: Object;
