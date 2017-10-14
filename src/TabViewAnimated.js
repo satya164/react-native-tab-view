@@ -22,9 +22,7 @@ type Props<T> = PagerProps & {
   onPositionChange?: ({ value: number }) => void,
   initialLayout?: Layout,
   canJumpToTab?: (route: T) => boolean,
-  renderPager: (
-    props: SceneRendererProps<T> & PagerProps
-  ) => Element<any>,
+  renderPager: (props: SceneRendererProps<T> & PagerProps) => Element<any>,
   renderScene: (props: SceneRendererProps<T> & Scene<T>) => ?Element<any>,
   renderHeader?: (props: SceneRendererProps<T>) => ?Element<any>,
   renderFooter?: (props: SceneRendererProps<T>) => ?Element<any>,
