@@ -2,7 +2,13 @@
 
 import React, { PureComponent, Children } from 'react';
 import PropTypes from 'prop-types';
-import { View, ViewPagerAndroid, StyleSheet, I18nManager } from 'react-native';
+import { 
+  View, 
+  ViewPagerAndroid, 
+  StyleSheet, 
+  I18nManager,
+  Keyboard
+} from 'react-native';
 import { SceneRendererPropType } from './TabViewPropTypes';
 import type { SceneRendererProps, Route } from './TabViewTypeDefinitions';
 
@@ -113,6 +119,10 @@ export default class TabViewPagerAndroid<T: Route<*>> extends PureComponent<
   };
 
   _handlePageScroll = (e: PageScrollEvent) => {
+    if (this._currentIndex !== e.nativeEvent.position) {
+      Keyboard.dismiss();
+    }
+
     this.props.position.setValue(
       this._getPageIndex(e.nativeEvent.position) +
         e.nativeEvent.offset * (I18nManager.isRTL ? -1 : 1)
@@ -152,7 +162,7 @@ export default class TabViewPagerAndroid<T: Route<*>> extends PureComponent<
     return (
       <ViewPagerAndroid
         key={navigationState.routes.length}
-        keyboardDismissMode="on-drag"
+        keyboardDismissMode="none"
         initialPage={initialPage}
         scrollEnabled={swipeEnabled !== false}
         onPageScroll={this._handlePageScroll}
