@@ -2,13 +2,7 @@
 
 import React, { PureComponent, Children } from 'react';
 import PropTypes from 'prop-types';
-import { 
-  View, 
-  ViewPagerAndroid, 
-  StyleSheet, 
-  I18nManager,
-  Keyboard
-} from 'react-native';
+import { View, ViewPagerAndroid, StyleSheet, I18nManager, Keyboard } from 'react-native';
 import { SceneRendererPropType } from './TabViewPropTypes';
 import type { SceneRendererProps, Route } from './TabViewTypeDefinitions';
 
