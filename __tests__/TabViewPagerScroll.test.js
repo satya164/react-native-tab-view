@@ -31,29 +31,47 @@ it('renders only focused child until layout', () => {
     </TabViewPagerScroll>
   );
 
-  expect(component.find({ testID: 'first' }).first().props().children).toBe(
-    null
-  );
   expect(
-    component.find({ testID: 'second' }).first().props().children
+    component
+      .find({ testID: 'first' })
+      .first()
+      .props().children
+  ).toBe(null);
+  expect(
+    component
+      .find({ testID: 'second' })
+      .first()
+      .props().children
   ).not.toBe(null);
-  expect(component.find({ testID: 'third' }).first().props().children).toBe(
-    null
-  );
+  expect(
+    component
+      .find({ testID: 'third' })
+      .first()
+      .props().children
+  ).toBe(null);
 
   component.setProps({
     layout: { height: 320, width: 240, measured: false },
   });
 
-  expect(component.find({ testID: 'first' }).first().props().children).not.toBe(
-    null
-  );
   expect(
-    component.find({ testID: 'second' }).first().props().children
+    component
+      .find({ testID: 'first' })
+      .first()
+      .props().children
   ).not.toBe(null);
-  expect(component.find({ testID: 'third' }).first().props().children).not.toBe(
-    null
-  );
+  expect(
+    component
+      .find({ testID: 'second' })
+      .first()
+      .props().children
+  ).not.toBe(null);
+  expect(
+    component
+      .find({ testID: 'third' })
+      .first()
+      .props().children
+  ).not.toBe(null);
 });
 
 it('sets initial scroll position according to navigation state index', () => {
