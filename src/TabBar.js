@@ -149,7 +149,7 @@ export default class TabBar<T: Route<*>> extends PureComponent<
   _isManualScroll: boolean = false;
   _isMomentumScroll: boolean = false;
 
-  _renderLabel = (scene: Scene<*>) => {
+  _renderLabel = (scene: Scene<*>, width: any) => {
     if (typeof this.props.renderLabel !== 'undefined') {
       return this.props.renderLabel(scene);
     }
@@ -157,8 +157,15 @@ export default class TabBar<T: Route<*>> extends PureComponent<
     if (typeof label !== 'string') {
       return null;
     }
+    let defaultStyle = [styles.tabLabel, this.props.labelStyle]
+    
+    if (width){
+      defaultStyle = this.props.labelStyle
+      defaultStyle.width = width
+    }
+
     return (
-      <Text style={[styles.tabLabel, this.props.labelStyle]}>
+      <Text style={defaultStyle}>
         {label}
       </Text>
     );
@@ -219,7 +226,15 @@ export default class TabBar<T: Route<*>> extends PureComponent<
     if (layout.width === 0) {
       return 0;
     }
-    const finalTabWidth = this._getFinalTabWidth(props);
+    let finalTabWidth = this._getFinalTabWidth(props);
+    if (this.props.tabWidths){
+      if (Array.isArray(this.props.tabWidths)){
+        finalTabWidth =  0
+        this.props.tabWidths.forEach((item)=>{
+          finalTabWidth += item
+        })
+      }
+    }
     const tabBarWidth = finalTabWidth * navigationState.routes.length;
     const maxDistance = tabBarWidth - layout.width;
     return Math.max(maxDistance, 0);
@@ -409,7 +424,15 @@ export default class TabBar<T: Route<*>> extends PureComponent<
                 focused,
                 index: i,
               };
-              const label = this._renderLabel(scene);
+              let customWidth = null
+              if (this.props.tabWidths){
+                if (Array.isArray(this.props.tabWidths)){
+                  if (this.props.tabWidths[i]){
+                    customWidth = this.props.tabWidths[i]
+                  }
+                }
+              }
+              const label = this._renderLabel(scene, customWidth);
               const icon = this.props.renderIcon
                 ? this.props.renderIcon(scene)
                 : null;
