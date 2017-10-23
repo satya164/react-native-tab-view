@@ -472,7 +472,7 @@ export default class TabBar<T: Route<*>> extends PureComponent<
                   }}
                   style={tabContainerStyle}
                 >
-                  <View pointerEvents={'none'} style={styles.container}>
+                  <View pointerEvents="none" style={styles.container}>
                     <Animated.View
                       style={[
                         styles.tabItem,
