@@ -82,7 +82,6 @@ it('sets initial scroll position according to navigation state index', () => {
     </TabViewPagerScroll>
   );
 
-  /* $FlowFixMe */
   expect(component.dive().instance().props.contentOffset).toEqual({
     x: 240 * 2,
     y: 0,
