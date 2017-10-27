@@ -1,6 +1,6 @@
 /* @flow */
 
-import React, { PureComponent } from 'react';
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import {
   Animated,
@@ -32,10 +32,6 @@ type ScrollEvent = {
   },
 };
 
-type DefaultProps<T> = {
-  getLabelText: (scene: Scene<T>) => ?string,
-};
-
 type Props<T> = SceneRendererProps<T> & {
   scrollEnabled?: boolean,
   pressColor?: string,
@@ -58,8 +54,7 @@ type State = {
   initialOffset: { x: number, y: number },
 };
 
-export default class TabBar<T: Route<*>> extends PureComponent<
-  DefaultProps<T>,
+export default class TabBar<T: Route<*>> extends React.PureComponent<
   Props<T>,
   State
 > {
@@ -149,7 +144,7 @@ export default class TabBar<T: Route<*>> extends PureComponent<
   }
 
   _positionListener: Object;
-  _scrollView: Object;
+  _scrollView: ?ScrollView;
   _isManualScroll: boolean = false;
   _isMomentumScroll: boolean = false;
 
@@ -162,9 +157,7 @@ export default class TabBar<T: Route<*>> extends PureComponent<
       return null;
     }
     return (
-      <Text style={[styles.tabLabel, this.props.labelStyle]}>
-        {label}
-      </Text>
+      <Text style={[styles.tabLabel, this.props.labelStyle]}>{label}</Text>
     );
   };
 
@@ -251,10 +244,11 @@ export default class TabBar<T: Route<*>> extends PureComponent<
       props,
       props.navigationState.index
     );
-    this._scrollView.scrollTo({
-      x: scrollAmount,
-      animated: true,
-    });
+    this._scrollView &&
+      this._scrollView.scrollTo({
+        x: scrollAmount,
+        animated: true,
+      });
     Animated.timing(this.state.offset, {
       toValue: 0,
       duration: 150,
@@ -267,10 +261,11 @@ export default class TabBar<T: Route<*>> extends PureComponent<
     }
 
     const scrollAmount = this._getScrollAmount(this.props, index);
-    this._scrollView.scrollTo({
-      x: scrollAmount,
-      animated: false,
-    });
+    this._scrollView &&
+      this._scrollView.scrollTo({
+        x: scrollAmount,
+        animated: false,
+      });
   };
 
   _adjustOffset = (value: number) => {
@@ -328,7 +323,7 @@ export default class TabBar<T: Route<*>> extends PureComponent<
     this._isManualScroll = false;
   };
 
-  _setRef = (el: Object) => (this._scrollView = el);
+  _setRef = (el: ?ScrollView) => (this._scrollView = el);
 
   render() {
     const { position, navigationState, scrollEnabled } = this.props;
@@ -374,6 +369,7 @@ export default class TabBar<T: Route<*>> extends PureComponent<
         <View style={styles.scroll}>
           <ScrollView
             horizontal
+            keyboardShouldPersistTaps="always"
             scrollEnabled={scrollEnabled}
             bounces={false}
             alwaysBounceHorizontal={false}
@@ -472,7 +468,7 @@ export default class TabBar<T: Route<*>> extends PureComponent<
                   }}
                   style={tabContainerStyle}
                 >
-                  <View style={styles.container}>
+                  <View pointerEvents="none" style={styles.container}>
                     <Animated.View
                       style={[
                         styles.tabItem,
@@ -484,16 +480,16 @@ export default class TabBar<T: Route<*>> extends PureComponent<
                       {icon}
                       {label}
                     </Animated.View>
-                    {badge
-                      ? <Animated.View
-                          style={[
-                            styles.badge,
-                            { opacity: this.state.visibility },
-                          ]}
-                        >
-                          {badge}
-                        </Animated.View>
-                      : null}
+                    {badge ? (
+                      <Animated.View
+                        style={[
+                          styles.badge,
+                          { opacity: this.state.visibility },
+                        ]}
+                      >
+                        {badge}
+                      </Animated.View>
+                    ) : null}
                   </View>
                 </TouchableItem>
               );

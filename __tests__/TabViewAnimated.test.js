@@ -27,12 +27,10 @@ it('lazyloads pages on position change', () => {
 
   expect(component.state('loaded')).toEqual([1]);
 
-  /* $FlowFixMe */
   component.instance()._handlePositionChange(1.3);
 
   expect(component.state('loaded')).toEqual([1, 2]);
 
-  /* $FlowFixMe */
   component.instance()._handlePositionChange(0.1);
 
   expect(component.state('loaded')).toEqual([1, 2, 0]);
