@@ -148,7 +148,7 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
   _isManualScroll: boolean = false;
   _isMomentumScroll: boolean = false;
 
-  _renderLabel = (scene: Scene<*>) => {
+  _renderLabel = (scene: Scene<*>,focused) => {
     if (typeof this.props.renderLabel !== 'undefined') {
       return this.props.renderLabel(scene);
     }
@@ -157,7 +157,7 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
       return null;
     }
     return (
-      <Text style={[styles.tabLabel, this.props.labelStyle]}>{label}</Text>
+      <Text style={[styles.tabLabel, this.props.labelStyle, focused ? this.props.activeLabelStyle : null]}>{label}</Text>
     );
   };
 
@@ -407,7 +407,7 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
                 focused,
                 index: i,
               };
-              const label = this._renderLabel(scene);
+              const label = this._renderLabel(scene,focused);
               const icon = this.props.renderIcon
                 ? this.props.renderIcon(scene)
                 : null;
