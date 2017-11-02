@@ -160,6 +160,7 @@ Material design themed tab bar. Can be used as both top and bottom tab bar.
 - `indicatorStyle` - style object for the active indicator
 - `labelStyle` - style object for the tab item label
 - `style` - style object for the tab bar
+- `activeLabelStyle` - style object for the label of the active tab bar
 
 
 Check the [type definitions](src/TabViewTypeDefinitions.js) for details on shape of different objects.
