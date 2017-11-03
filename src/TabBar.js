@@ -499,7 +499,6 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
     );
   }
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
