@@ -1,3 +1,5 @@
+import {StyleSheet, Platform} from 'react-native';
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -6,7 +8,7 @@ const styles = StyleSheet.create({
     overflow: Platform.OS === 'web' ? 'auto' : 'scroll',
   },
   tabBar: {
-    backgroundColor: '#191919',
+    backgroundColor: '#181818',
     elevation: 4,
     shadowColor: 'black',
     shadowOpacity: 0.1,
@@ -14,8 +16,10 @@ const styles = StyleSheet.create({
     shadowOffset: {
       height: StyleSheet.hairlineWidth,
     },
-    // We don't need zIndex on Android, disable it since it's buggy
+    
     zIndex: Platform.OS === 'android' ? 0 : 1,
+    borderTopWidth: 2,
+    borderTopColor: '#000',
   },
   tabContent: {
     flexDirection: 'row',
@@ -32,7 +36,6 @@ const styles = StyleSheet.create({
     padding: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth:1,borderColor:'gray'
   },
   badge: {
     position: 'absolute',
