@@ -8,7 +8,7 @@ export default StyleSheet.create({
     overflow: Platform.OS === 'web' ? 'auto' : 'scroll',
   },
   tabBar: {
-    backgroundColor: '#181818',
+    backgroundColor: '#2196f3',
     elevation: 4,
     shadowColor: 'black',
     shadowOpacity: 0.1,
@@ -16,10 +16,8 @@ export default StyleSheet.create({
     shadowOffset: {
       height: StyleSheet.hairlineWidth,
     },
-    
+    // We don't need zIndex on Android, disable it since it's buggy
     zIndex: Platform.OS === 'android' ? 0 : 1,
-    borderTopWidth: 2,
-    borderTopColor: '#000',
   },
   tabContent: {
     flexDirection: 'row',
@@ -28,7 +26,6 @@ export default StyleSheet.create({
   tabLabel: {
     backgroundColor: 'transparent',
     color: 'white',
-    fontWeight: 'bold',
     margin: 8,
   },
   tabItem: {
@@ -50,12 +47,11 @@ export default StyleSheet.create({
     bottom: 0,
   },
   indicator: {
-    backgroundColor: '#E50913',
+    backgroundColor: '#ffeb3b',
     position: 'absolute',
-    top: 0,
     left: 0,
     bottom: 0,
     right: 0,
-    height: 4,
+    height: 2,
   },
 });
