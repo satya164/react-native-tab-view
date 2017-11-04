@@ -1,6 +1,6 @@
 import {StyleSheet, Platform} from 'react-native';
 
-StyleSheet.create({
+export default StyleSheet.create({
   container: {
     flex: 1,
   },
