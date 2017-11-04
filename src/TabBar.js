@@ -19,6 +19,7 @@ import type {
   Route,
   Style,
 } from './TabViewTypeDefinitions';
+import default_styles from './tabBarStyles'
 
 type IndicatorProps<T> = SceneRendererProps<T> & {
   width: Animated.Value,
@@ -75,6 +76,7 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
   static defaultProps = {
     getLabelText: ({ route }) =>
       route.title ? route.title.toUpperCase() : null,
+      style: default_styles,
   };
 
   constructor(props: Props<T>) {
@@ -149,6 +151,8 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
   _isMomentumScroll: boolean = false;
 
   _renderLabel = (scene: Scene<*>) => {
+    const { style } = this.props;
+
     if (typeof this.props.renderLabel !== 'undefined') {
       return this.props.renderLabel(scene);
     }
@@ -157,11 +161,13 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
       return null;
     }
     return (
-      <Text style={[styles.tabLabel, this.props.labelStyle]}>{label}</Text>
+      <Text style={[style.tabLabel, this.props.labelStyle]}>{label}</Text>
     );
   };
 
   _renderIndicator = (props: IndicatorProps<T>) => {
+    const { style } = this.props;
+
     if (typeof this.props.renderIndicator !== 'undefined') {
       return this.props.renderIndicator(props);
     }
@@ -173,7 +179,7 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
     return (
       <Animated.View
         style={[
-          styles.indicator,
+          style.indicator,
           { width, transform: [{ translateX }] },
           this.props.indicatorStyle,
         ]}
@@ -326,7 +332,7 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
   _setRef = (el: ?ScrollView) => (this._scrollView = el);
 
   render() {
-    const { position, navigationState, scrollEnabled } = this.props;
+    const { position, navigationState, scrollEnabled, style } = this.props;
     const { routes, index } = navigationState;
     const maxDistance = this._getMaxScrollableDistance(this.props);
     const finalTabWidth = this._getFinalTabWidth(this.props);
@@ -351,11 +357,11 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
     });
 
     return (
-      <Animated.View style={[styles.tabBar, this.props.style]}>
+      <Animated.View style={[style.tabBar, this.props.style]}>
         <Animated.View
           pointerEvents="none"
           style={[
-            styles.indicatorContainer,
+            style.indicatorContainer,
             scrollEnabled
               ? { width: tabBarWidth, transform: [{ translateX }] }
               : null,
@@ -366,7 +372,7 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
             width: new Animated.Value(finalTabWidth),
           })}
         </Animated.View>
-        <View style={styles.scroll}>
+        <View style={style.scroll}>
           <ScrollView
             horizontal
             keyboardShouldPersistTaps="always"
@@ -378,8 +384,8 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
             automaticallyAdjustContentInsets={false}
             overScrollMode="never"
             contentContainerStyle={[
-              styles.tabContent,
-              scrollEnabled ? null : styles.container,
+              style.tabContent,
+              scrollEnabled ? null : style.container,
             ]}
             scrollEventThrottle={16}
             onScroll={this._handleScroll}
@@ -467,13 +473,13 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
                   }}
                   style={tabContainerStyle}
                 >
-                  <View pointerEvents="none" style={styles.container}>
+                  <View pointerEvents="none" style={style.container}>
                     <Animated.View
                       style={[
-                        styles.tabItem,
+                        style.tabItem,
                         tabStyle,
                         passedTabStyle,
-                        styles.container,
+                        style.container,
                       ]}
                     >
                       {icon}
@@ -482,7 +488,7 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
                     {badge ? (
                       <Animated.View
                         style={[
-                          styles.badge,
+                          style.badge,
                           { opacity: this.state.visibility },
                         ]}
                       >
@@ -499,59 +505,3 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scroll: {
-    overflow: Platform.OS === 'web' ? 'auto' : 'scroll',
-  },
-  tabBar: {
-    backgroundColor: '#2196f3',
-    elevation: 4,
-    shadowColor: 'black',
-    shadowOpacity: 0.1,
-    shadowRadius: StyleSheet.hairlineWidth,
-    shadowOffset: {
-      height: StyleSheet.hairlineWidth,
-    },
-    // We don't need zIndex on Android, disable it since it's buggy
-    zIndex: Platform.OS === 'android' ? 0 : 1,
-  },
-  tabContent: {
-    flexDirection: 'row',
-    flexWrap: 'nowrap',
-  },
-  tabLabel: {
-    backgroundColor: 'transparent',
-    color: 'white',
-    margin: 8,
-  },
-  tabItem: {
-    flexGrow: 1,
-    padding: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  badge: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-  },
-  indicatorContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  indicator: {
-    backgroundColor: '#ffeb3b',
-    position: 'absolute',
-    left: 0,
-    bottom: 0,
-    right: 0,
-    height: 2,
-  },
-});
