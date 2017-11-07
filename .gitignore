@@ -39,6 +39,12 @@ local.properties
 #
 node_modules/
 npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# VSCode
+#
+jsconfig.json
 
 # BUCK
 buck-out/

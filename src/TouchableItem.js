@@ -1,6 +1,6 @@
 /* @flow */
 
-import React, { PureComponent, Children } from 'react';
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import {
   TouchableNativeFeedback,
@@ -18,19 +18,11 @@ type Props = {
   borderless?: boolean,
   pressColor?: string,
   pressOpacity?: number,
-  children?: React.Element<any>,
+  children?: React.Node,
   style?: Style,
 };
 
-type DefaultProps = {
-  pressColor: string,
-};
-
-export default class TouchableItem extends PureComponent<
-  DefaultProps,
-  Props,
-  void
-> {
+export default class TouchableItem extends React.Component<Props> {
   static propTypes = {
     onPress: PropTypes.func.isRequired,
     delayPressIn: PropTypes.number,
@@ -49,7 +41,6 @@ export default class TouchableItem extends PureComponent<
   };
 
   render() {
-    // eslint-disable-next-line react/prop-types
     const { style, pressOpacity, pressColor, borderless, ...rest } = this.props;
 
     if (Platform.OS === 'android' && Platform.Version >= LOLLIPOP) {
@@ -59,9 +50,7 @@ export default class TouchableItem extends PureComponent<
           onPress={this._handlePress}
           background={TouchableNativeFeedback.Ripple(pressColor, borderless)}
         >
-          <View style={style}>
-            {Children.only(this.props.children)}
-          </View>
+          <View style={style}>{React.Children.only(this.props.children)}</View>
         </TouchableNativeFeedback>
       );
     } else {

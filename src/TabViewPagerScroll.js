@@ -1,6 +1,6 @@
 /* @flow */
 
-import React, { PureComponent, Children } from 'react';
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import { Platform, View, ScrollView, StyleSheet } from 'react-native';
 import { SceneRendererPropType } from './TabViewPropTypes';
@@ -22,11 +22,10 @@ type State = {
 type Props<T> = SceneRendererProps<T> & {
   animationEnabled?: boolean,
   swipeEnabled?: boolean,
-  children?: React.Element<any>,
+  children?: React.Node,
 };
 
-export default class TabViewPagerScroll<T: Route<*>> extends PureComponent<
-  void,
+export default class TabViewPagerScroll<T: Route<*>> extends React.Component<
   Props<T>,
   State
 > {
@@ -79,7 +78,7 @@ export default class TabViewPagerScroll<T: Route<*>> extends PureComponent<
   }
 
   _resetListener: Object;
-  _scrollView: Object;
+  _scrollView: ?ScrollView;
   _nextOffset = 0;
   _isIdle: boolean = true;
 
@@ -110,7 +109,7 @@ export default class TabViewPagerScroll<T: Route<*>> extends PureComponent<
     );
   };
 
-  _setRef = (el: Object) => (this._scrollView = el);
+  _setRef = (el: ?ScrollView) => (this._scrollView = el);
 
   render() {
     const { children, layout, navigationState } = this.props;
@@ -135,7 +134,7 @@ export default class TabViewPagerScroll<T: Route<*>> extends PureComponent<
         contentContainerStyle={layout.width ? null : styles.container}
         ref={this._setRef}
       >
-        {Children.map(children, (child, i) =>
+        {React.Children.map(children, (child, i) => (
           <View
             key={navigationState.routes[i].key}
             testID={navigationState.routes[i].testID}
@@ -147,7 +146,7 @@ export default class TabViewPagerScroll<T: Route<*>> extends PureComponent<
           >
             {i === navigationState.index || layout.width ? child : null}
           </View>
-        )}
+        ))}
       </ScrollView>
     );
   }

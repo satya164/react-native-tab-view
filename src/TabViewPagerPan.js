@@ -1,6 +1,6 @@
 /* @flow */
 
-import React, { PureComponent, Children } from 'react';
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import {
   Animated,
@@ -46,12 +46,6 @@ type GestureState = {
 
 type GestureHandler = (event: GestureEvent, state: GestureState) => void;
 
-type DefaultProps = {
-  configureTransition: TransitionConfigurator,
-  swipeDistanceThreshold: number,
-  swipeVelocityThreshold: number,
-};
-
 type Props<T> = SceneRendererProps<T> & {
   configureTransition: TransitionConfigurator,
   animationEnabled?: boolean,
@@ -60,7 +54,7 @@ type Props<T> = SceneRendererProps<T> & {
   swipeVelocityThreshold: number,
   onSwipeStart?: GestureHandler,
   onSwipeEnd?: GestureHandler,
-  children?: React.Element<any>,
+  children?: React.Node,
 };
 
 const DEAD_ZONE = 12;
@@ -71,10 +65,8 @@ const DefaultTransitionSpec = {
   friction: 35,
 };
 
-export default class TabViewPagerPan<T: Route<*>> extends PureComponent<
-  DefaultProps,
-  Props<T>,
-  void
+export default class TabViewPagerPan<T: Route<*>> extends React.Component<
+  Props<T>
 > {
   static propTypes = {
     ...SceneRendererPropType,
@@ -121,7 +113,7 @@ export default class TabViewPagerPan<T: Route<*>> extends PureComponent<
   }
 
   componentWillUnmount() {
-    this._resetListener.remove();
+    this._resetListener && this._resetListener.remove();
   }
 
   _panResponder: Object;
@@ -298,7 +290,7 @@ export default class TabViewPagerPan<T: Route<*>> extends PureComponent<
         ]}
         {...this._panResponder.panHandlers}
       >
-        {Children.map(children, (child, i) =>
+        {React.Children.map(children, (child, i) => (
           <View
             key={navigationState.routes[i].key}
             testID={navigationState.routes[i].testID}
@@ -310,7 +302,7 @@ export default class TabViewPagerPan<T: Route<*>> extends PureComponent<
           >
             {i === navigationState.index || width ? child : null}
           </View>
-        )}
+        ))}
       </Animated.View>
     );
   }

@@ -1,6 +1,6 @@
 /* @flow */
 
-import React, { PureComponent } from 'react';
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import { Animated, Platform, View, StyleSheet } from 'react-native';
 import { NavigationStatePropType } from './TabViewPropTypes';
@@ -14,12 +14,6 @@ import type {
   PagerProps,
   Style,
 } from './TabViewTypeDefinitions';
-
-type DefaultProps<T> = {
-  renderPager: (
-    props: SceneRendererProps<T> & PagerProps
-  ) => React.Element<any>,
-};
 
 type Props<T> = PagerProps & {
   navigationState: NavigationState<T>,
@@ -59,8 +53,7 @@ switch (Platform.OS) {
     break;
 }
 
-export default class TabViewAnimated<T: Route<*>> extends PureComponent<
-  DefaultProps<T>,
+export default class TabViewAnimated<T: Route<*>> extends React.Component<
   Props<T>,
   State
 > {
@@ -135,19 +128,7 @@ export default class TabViewAnimated<T: Route<*>> extends PureComponent<
   };
 
   _handlePositionChange = (value: number) => {
-    const {
-      /* $FlowFixMe */
-      onChangePosition,
-      onPositionChange,
-      navigationState,
-      lazy,
-    } = this.props;
-    if (onChangePosition) {
-      console.warn(
-        '`onChangePosition` is deprecated. Use `onPositionChange` instead.'
-      );
-      onChangePosition(value);
-    }
+    const { onPositionChange, navigationState, lazy } = this.props;
     if (onPositionChange) {
       onPositionChange({ value });
     }
@@ -224,14 +205,6 @@ export default class TabViewAnimated<T: Route<*>> extends PureComponent<
     }
 
     if (index !== navigationState.index) {
-      /* $FlowFixMe */
-      if (this.props.onRequestChangeTab) {
-        console.warn(
-          '`onRequestChangeTab` is deprecated. Use `onIndexChange` instead.'
-        );
-        /* $FlowFixMe */
-        this.props.onRequestChangeTab(index);
-      }
       this.props.onIndexChange(index);
     }
   };
