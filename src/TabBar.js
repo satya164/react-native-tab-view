@@ -189,7 +189,8 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
   _tabWidthCache: ?{ style: any, width: ?number };
 
   _getTabWidthFromStyle = (style: any) => {
-    if (this._tabWidthCache && this._tabWidthCache.style === style) {
+    if (this._tabWidthCache && this._tabWidthCache.style &&
+       this._tabWidthCache.style.width === style.width) {
       return this._tabWidthCache.width;
     }
     const passedTabStyle = StyleSheet.flatten(this.props.tabStyle);
