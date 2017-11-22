@@ -6,6 +6,7 @@ import {
   Animated,
   StyleSheet,
   View,
+  Text,
   ScrollView,
   Platform,
   I18nManager,
@@ -20,7 +21,7 @@ import type {
 } from './TabViewTypeDefinitions';
 
 type IndicatorProps<T> = SceneRendererProps<T> & {
-  width: number,
+  width: Animated.Value,
 };
 
 type ScrollEvent = {
@@ -42,16 +43,17 @@ type Props<T> = SceneRendererProps<T> & {
   renderIndicator?: (props: IndicatorProps<T>) => ?React.Element<any>,
   onTabPress?: (scene: Scene<T>) => void,
   tabStyle?: Style,
+  upperCase: boolean,
   indicatorStyle?: Style,
   labelStyle?: Style,
   style?: Style,
 };
 
-type State = {|
+type State = {
   offset: Animated.Value,
   visibility: Animated.Value,
-  initialOffset: {| x: number, y: number |},
-|};
+  initialOffset: { x: number, y: number },
+};
 
 export default class TabBar<T: Route<*>> extends React.PureComponent<
   Props<T>,
@@ -66,26 +68,29 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
     renderIcon: PropTypes.func,
     renderLabel: PropTypes.func,
     renderIndicator: PropTypes.func,
+    upperCase: PropTypes.bool,
     onTabPress: PropTypes.func,
-    labelStyle: PropTypes.any,
+    labelStyle: Text.propTypes.style,
     style: PropTypes.any,
   };
 
   static defaultProps = {
-    getLabelText: ({ route }) =>
-      route.title ? route.title.toUpperCase() : null,
+    getLabelText: ({ route }, upperCase) =>
+      (route.title) ? ((upperCase) ? route.title.toUpperCase() : route.title) : null,
   };
 
   constructor(props: Props<T>) {
     super(props);
 
-    let initialVisibility = 1;
+    let initialVisibility = 0;
 
-    if (this.props.scrollEnabled) {
-      const tabWidth = this._getTabWidth(this.props);
-      if (!tabWidth) {
-        initialVisibility = 0;
+    if (this.props.scrollEnabled === true) {
+      const tabWidth = this._getTabWidthFromStyle(this.props.tabStyle);
+      if (this.props.layout.width || tabWidth) {
+        initialVisibility = 1;
       }
+    } else {
+      initialVisibility = 1;
     }
 
     this.state = {
@@ -98,6 +103,8 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
     };
   }
 
+  state: State;
+
   componentDidMount() {
     this._adjustScroll(this.props.navigationState.index);
     this._positionListener = this.props.subscribe(
@@ -106,23 +113,31 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
     );
   }
 
-  componentDidUpdate(prevProps: Props<T>) {
-    const prevTabWidth = this._getTabWidth(prevProps);
-    const currentTabWidth = this._getTabWidth(this.props);
-
-    if (prevTabWidth !== currentTabWidth && currentTabWidth) {
-      this.state.visibility.setValue(1);
+  componentWillReceiveProps(nextProps: Props<T>) {
+    if (this.props.navigationState !== nextProps.navigationState) {
+      this._resetScrollOffset(nextProps);
     }
 
-    if (this.props.scrollEnabled) {
-      if (prevProps.navigationState !== this.props.navigationState) {
-        this._resetScrollOffset(this.props);
-      } else if (
-        prevProps.layout !== this.props.layout ||
-        prevTabWidth !== currentTabWidth
-      ) {
-        this._adjustScroll(this.props.navigationState.index);
-      }
+    const nextTabWidth = this._getTabWidthFromStyle(nextProps.tabStyle);
+
+    if (
+      (this.props.tabStyle !== nextProps.tabStyle && nextTabWidth) ||
+      (this.props.layout.width !== nextProps.layout.width &&
+        nextProps.layout.width)
+    ) {
+      this.state.visibility.setValue(1);
+    }
+  }
+
+  componentDidUpdate(prevProps: Props<T>) {
+    if (
+      this.props.scrollEnabled &&
+      (prevProps.layout !== this.props.layout ||
+        prevProps.tabStyle !== this.props.tabStyle)
+    ) {
+      global.requestAnimationFrame(() =>
+        this._adjustScroll(this.props.navigationState.index)
+      );
     }
   }
 
@@ -134,20 +149,17 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
   _scrollView: ?ScrollView;
   _isManualScroll: boolean = false;
   _isMomentumScroll: boolean = false;
-  _scrollOffset: number = 0;
 
   _renderLabel = (scene: Scene<*>) => {
     if (typeof this.props.renderLabel !== 'undefined') {
       return this.props.renderLabel(scene);
     }
-    const label = this.props.getLabelText(scene);
+    const label = this.props.getLabelText(scene, this.props.upperCase);
     if (typeof label !== 'string') {
       return null;
     }
     return (
-      <Animated.Text style={[styles.tabLabel, this.props.labelStyle]}>
-        {label}
-      </Animated.Text>
+      <Text style={[styles.tabLabel, this.props.labelStyle]}>{label}</Text>
     );
   };
 
@@ -155,16 +167,9 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
     if (typeof this.props.renderIndicator !== 'undefined') {
       return this.props.renderIndicator(props);
     }
-    const { width, position, navigationState } = props;
+    const { width, position } = props;
     const translateX = Animated.multiply(
-      Animated.multiply(
-        position.interpolate({
-          inputRange: [0, navigationState.routes.length - 1],
-          outputRange: [0, navigationState.routes.length - 1],
-          extrapolate: 'clamp',
-        }),
-        width
-      ),
+      Animated.multiply(position, width),
       I18nManager.isRTL ? -1 : 1
     );
     return (
@@ -178,28 +183,33 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
     );
   };
 
-  _getTabWidth = (props: Props<T>) => {
-    const { layout, navigationState, tabStyle } = props;
-    const flattened = StyleSheet.flatten(tabStyle);
+  _tabWidthCache: ?{ style: any, width: ?number };
 
-    if (flattened) {
-      switch (typeof flattened.width) {
-        case 'number':
-          return flattened.width;
-        case 'string':
-          if (flattened.width.endsWith('%')) {
-            const width = parseFloat(flattened.width);
-            if (Number.isFinite(width)) {
-              return layout.width * (width / 100);
-            }
-          }
-      }
+  _getTabWidthFromStyle = (style: any) => {
+    if (this._tabWidthCache && this._tabWidthCache.style === style) {
+      return this._tabWidthCache.width;
     }
+    const passedTabStyle = StyleSheet.flatten(this.props.tabStyle);
+    const cache = {
+      style,
+      width: passedTabStyle ? passedTabStyle.width : null,
+    };
+    this._tabWidthCache = cache;
+    return cache;
+  };
 
+  _getFinalTabWidth = (props: Props<T>) => {
+    const { layout, navigationState } = props;
+    const tabWidth = this._getTabWidthFromStyle(props.tabStyle);
+    if (typeof tabWidth === 'number') {
+      return tabWidth;
+    }
+    if (typeof tabWidth === 'string' && tabWidth.endsWith('%')) {
+      return layout.width * (parseFloat(tabWidth) / 100);
+    }
     if (props.scrollEnabled) {
       return layout.width / 5 * 2;
     }
-
     return layout.width / navigationState.routes.length;
   };
 
@@ -208,8 +218,8 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
     if (layout.width === 0) {
       return 0;
     }
-    const tabWidth = this._getTabWidth(props);
-    const tabBarWidth = tabWidth * navigationState.routes.length;
+    const finalTabWidth = this._getFinalTabWidth(props);
+    const tabBarWidth = finalTabWidth * navigationState.routes.length;
     const maxDistance = tabBarWidth - layout.width;
     return Math.max(maxDistance, 0);
   };
@@ -221,8 +231,8 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
 
   _getScrollAmount = (props: Props<T>, i: number) => {
     const { layout } = props;
-    const tabWidth = this._getTabWidth(props);
-    const centerDistance = tabWidth * (i + 1 / 2);
+    const finalTabWidth = this._getFinalTabWidth(props);
+    const centerDistance = finalTabWidth * i + finalTabWidth / 2;
     const scrollAmount = centerDistance - layout.width / 2;
     return this._normalizeScrollValue(props, scrollAmount);
   };
@@ -244,7 +254,6 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
     Animated.timing(this.state.offset, {
       toValue: 0,
       duration: 150,
-      useNativeDriver: this.props.useNativeDriver,
     }).start();
   };
 
@@ -254,10 +263,9 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
     }
 
     const scrollAmount = this._getScrollAmount(this.props, index);
-
     this._scrollView &&
       this._scrollView.scrollTo({
-        x: scrollAmount + this._scrollOffset,
+        x: scrollAmount,
         animated: false,
       });
   };
@@ -278,13 +286,10 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
         toValue: -scrollOffset,
         tension: 300,
         friction: 35,
-        useNativeDriver: this.props.useNativeDriver,
       }).start();
     } else {
       this.state.offset.setValue(-scrollOffset);
     }
-
-    this._scrollOffset = scrollOffset;
   };
 
   _handleScroll = (e: ScrollEvent) => {
@@ -326,8 +331,8 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
     const { position, navigationState, scrollEnabled } = this.props;
     const { routes, index } = navigationState;
     const maxDistance = this._getMaxScrollableDistance(this.props);
-    const tabWidth = this._getTabWidth(this.props);
-    const tabBarWidth = tabWidth * routes.length;
+    const finalTabWidth = this._getFinalTabWidth(this.props);
+    const tabBarWidth = finalTabWidth * routes.length;
 
     // Prepend '-1', so there are always at least 2 items in inputRange
     const inputRange = [-1, ...routes.map((x, i) => i)];
@@ -360,13 +365,13 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
         >
           {this._renderIndicator({
             ...this.props,
-            width: tabWidth,
+            width: new Animated.Value(finalTabWidth),
           })}
         </Animated.View>
         <View style={styles.scroll}>
           <ScrollView
             horizontal
-            keyboardShouldPersistTaps="handled"
+            keyboardShouldPersistTaps="always"
             scrollEnabled={scrollEnabled}
             bounces={false}
             alwaysBounceHorizontal={false}
@@ -432,7 +437,7 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
               const tabContainerStyle = {};
 
               if (isWidthSet) {
-                tabStyle.width = tabWidth;
+                tabStyle.width = finalTabWidth;
               }
 
               if (passedTabStyle && typeof passedTabStyle.flex === 'number') {
@@ -456,6 +461,7 @@ export default class TabBar<T: Route<*>> extends React.PureComponent<
                   pressOpacity={this.props.pressOpacity}
                   delayPressIn={0}
                   onPress={() => {
+                    // eslint-disable-line react/jsx-no-bind
                     const { onTabPress, jumpToIndex } = this.props;
                     jumpToIndex(i);
                     if (onTabPress) {
