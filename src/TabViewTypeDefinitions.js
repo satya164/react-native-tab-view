@@ -67,6 +67,7 @@ export type PagerProps<T> = {
   configureTransition?: TransitionConfigurator,
   animationEnabled?: boolean,
   swipeEnabled?: boolean,
+  bounces?: boolean,
   swipeDistanceThreshold?: number,
   swipeVelocityThreshold?: number,
 };

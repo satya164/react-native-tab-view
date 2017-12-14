@@ -123,7 +123,7 @@ export default class TabViewPagerScroll<T: *> extends React.Component<
   };
 
   render() {
-    const { children, layout, navigationState } = this.props;
+    const { children, layout, navigationState, bounces } = this.props;
     return (
       <ScrollView
         horizontal
@@ -134,7 +134,7 @@ export default class TabViewPagerScroll<T: *> extends React.Component<
         overScrollMode="never"
         scrollEnabled={this.props.swipeEnabled}
         automaticallyAdjustContentInsets={false}
-        bounces={false}
+        bounces={bounces ? bounces : false}
         alwaysBounceHorizontal={false}
         scrollsToTop={false}
         showsHorizontalScrollIndicator={false}
