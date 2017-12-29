@@ -23,15 +23,18 @@ type Props<T> = PagerProps<T> & {
   renderFooter?: (props: SceneRendererProps<T>) => ?React.Element<any>,
   useNativeDriver?: boolean,
   style?: Style,
+  vertical?: boolean,
 };
 
 type State = {|
   loaded: Array<number>,
   layout: Layout & { measured: boolean },
+  sceneLayout: Layout & { measured: boolean },
   layoutXY: Animated.ValueXY,
   panX: Animated.Value,
   offsetX: Animated.Value,
   position: any,
+  vertical: boolean,
 |};
 
 let TabViewPager;
@@ -64,6 +67,7 @@ export default class TabViewAnimated<T: *> extends React.Component<
     renderScene: PropTypes.func.isRequired,
     renderHeader: PropTypes.func,
     renderFooter: PropTypes.func,
+    vertical: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -104,6 +108,8 @@ export default class TabViewAnimated<T: *> extends React.Component<
       panX,
       offsetX,
       position,
+      vertical: !!props.vertical,
+      sceneLayout: { ...layout },
     };
   }
 
@@ -132,12 +138,6 @@ export default class TabViewAnimated<T: *> extends React.Component<
       return;
     }
 
-    this.state.offsetX.setValue(-this.props.navigationState.index * width);
-    this.state.layoutXY.setValue({
-      // This is hacky, but we need to make sure that the value is never 0
-      x: width || 0.001,
-      y: height || 0.001,
-    });
     this.setState({
       layout: {
         measured: true,
@@ -151,11 +151,35 @@ export default class TabViewAnimated<T: *> extends React.Component<
     panX: this.state.panX,
     offsetX: this.state.offsetX,
     position: this.state.position,
-    layout: this.state.layout,
+    layout: this.state.sceneLayout,
     navigationState: this.props.navigationState,
     jumpToIndex: this._jumpToIndex,
     useNativeDriver: this.props.useNativeDriver === true,
   });
+
+  _handleSceneLayout = (e: any) => {
+    const { height, width } = e.nativeEvent.layout;
+
+    if (
+      this.state.sceneLayout.width === width &&
+      this.state.sceneLayout.height === height
+    ) {
+      return;
+    }
+
+    this.state.layoutXY.setValue({
+      x: width,
+      y: height,
+    });
+
+    this.setState({
+      sceneLayout: {
+        measured: true,
+        height,
+        width,
+      },
+    });
+  };
 
   _jumpToIndex = (index: number) => {
     if (!this._mounted) {
@@ -185,38 +209,45 @@ export default class TabViewAnimated<T: *> extends React.Component<
       renderPager,
       renderHeader,
       renderFooter,
+      vertical,
       ...rest
     } = this.props;
 
-    const props = this._buildSceneRendererProps();
+    const props = { ...this._buildSceneRendererProps(), vertical };
 
     return (
       <View
         onLayout={this._handleLayout}
         loaded={this.state.loaded}
-        style={[styles.container, this.props.style]}
+        style={[
+          styles.container,
+          this.props.style,
+          vertical ? styles.vertical : null,
+        ]}
       >
         {renderHeader && renderHeader(props)}
-        {renderPager({
-          ...props,
-          ...rest,
-          panX: this.state.panX,
-          offsetX: this.state.offsetX,
-          children: navigationState.routes.map((route, index) => {
-            const scene = this._renderScene({
-              ...props,
-              route,
-              index,
-              focused: index === navigationState.index,
-            });
+        <View onLayout={this._handleSceneLayout} style={styles.container}>
+          {renderPager({
+            ...props,
+            ...rest,
+            panX: this.state.panX,
+            offsetX: this.state.offsetX,
+            children: navigationState.routes.map((route, index) => {
+              const scene = this._renderScene({
+                ...props,
+                route,
+                index,
+                focused: index === navigationState.index,
+              });
 
-            if (scene) {
-              return React.cloneElement(scene, { key: route.key });
-            }
+              if (scene) {
+                return React.cloneElement(scene, { key: route.key });
+              }
 
-            return scene;
-          }),
-        })}
+              return scene;
+            }),
+          })}
+        </View>
         {renderFooter && renderFooter(props)}
       </View>
     );
@@ -227,5 +258,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     overflow: 'hidden',
+  },
+  vertical: {
+    flexDirection: 'row',
   },
 });

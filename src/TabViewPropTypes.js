@@ -42,4 +42,5 @@ export const PagerRendererPropType = {
   swipeEnabled: PropTypes.bool,
   useNativeDriver: PropTypes.bool,
   children: PropTypes.node.isRequired,
+  setSceneLayout: PropTypes.func,
 };

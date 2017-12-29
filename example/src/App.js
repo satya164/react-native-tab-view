@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import TopBarTextExample from './TopBarTextExample';
+import VerticalExample from './VerticalExample';
 import TopBarIconExample from './TopBarIconExample';
 import BottomBarIconTextExample from './BottomBarIconTextExample';
 import NoAnimationExample from './NoAnimationExample';
@@ -25,6 +26,7 @@ const PERSISTENCE_KEY = 'index_persistence';
 
 const EXAMPLE_COMPONENTS = [
   TopBarTextExample,
+  VerticalExample,
   TopBarIconExample,
   BottomBarIconTextExample,
   NoAnimationExample,
