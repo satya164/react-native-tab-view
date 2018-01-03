@@ -49,7 +49,6 @@ export type PagerRendererProps<T> = {
   swipeEnabled?: boolean,
   children: Node,
   vertical?: boolean,
-  setSceneLayout?: Function,
 };
 
 export type TransitionProps = {
