@@ -155,6 +155,7 @@ export default class TabViewAnimated<T: *> extends React.Component<
     navigationState: this.props.navigationState,
     jumpToIndex: this._jumpToIndex,
     useNativeDriver: this.props.useNativeDriver === true,
+    vertical: this.props.vertical === true,
   });
 
   _handleSceneLayout = (e: any) => {
@@ -213,7 +214,7 @@ export default class TabViewAnimated<T: *> extends React.Component<
       ...rest
     } = this.props;
 
-    const props = { ...this._buildSceneRendererProps(), vertical };
+    const props = this._buildSceneRendererProps();
 
     return (
       <View
