@@ -231,6 +231,7 @@ export default class TabBar<T: *> extends React.PureComponent<Props<T>, State> {
         style={[
           styles.indicator,
           { width, transform: [transform] },
+          vertical ? { top: 0, bottom: undefined } : null,
           this.props.indicatorStyle,
         ]}
       />
@@ -438,7 +439,7 @@ export default class TabBar<T: *> extends React.PureComponent<Props<T>, State> {
     const tabBarWidth = tabWidth * routes.length;
     const tabBarLayout = {
       width: vertical ? tabWidth : layout.width,
-      height: vertical ? '100%' : undefined,
+      height: vertical ? layout.height : undefined,
     };
     // Prepend '-1', so there are always at least 2 items in inputRange
     const inputRange = [-1, ...routes.map((x, i) => i)];
@@ -456,8 +457,6 @@ export default class TabBar<T: *> extends React.PureComponent<Props<T>, State> {
               : null,
             vertical && scrollEnabled
               ? {
-                  top: tabHeight,
-                  bottom: undefined,
                   transform: [{ translateY }],
                 }
               : null,
