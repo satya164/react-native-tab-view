@@ -366,7 +366,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
           animated: false,
         };
       }
-      this._scrollView && scrollHash && this._scrollView.scrollTo(scrollHash);
+      this._scrollView && scrollHash && this._scrollView.scrollTo && this._scrollView.scrollTo(scrollHash);
     }
   };
 
@@ -388,7 +388,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
             animated,
           };
         }
-        this._scrollView && scrollHash && this._scrollView.scrollTo(scrollHash);
+        this._scrollView && scrollHash && this._scrollView.scrollTo && this._scrollView.scrollTo(scrollHash);
       });
     }
   };
@@ -469,7 +469,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
             vertical,
           })}
         </Animated.View>
-        <View style={styles.scroll}>
+        <View style={Platform.OS === 'web' ? { overflow: 'auto' } : styles.scroll}>
           <Animated.ScrollView
             horizontal={!vertical}
             keyboardShouldPersistTaps="handled"
@@ -630,7 +630,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   scroll: {
-    overflow: Platform.OS === 'web' ? 'auto' : 'scroll',
+    overflow: 'scroll',
   },
   tabBar: {
     backgroundColor: '#2196f3',
