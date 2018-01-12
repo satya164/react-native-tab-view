@@ -259,11 +259,15 @@ export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
           <View
             key={navigationState.routes[i].key}
             testID={navigationState.routes[i].testID}
-            style={
+            style={[
               width
                 ? { width }
-                : i === navigationState.index ? StyleSheet.absoluteFill : null
-            }
+                : i === navigationState.index ? StyleSheet.absoluteFill : null,
+              // prevent keyboard navigation to off-screen pages
+              i !== navigationState.index && Platform.OS === 'web'
+                ? { visibility: 'hidden' }
+                : null,
+            ]}
           >
             {i === navigationState.index || width ? child : null}
           </View>
