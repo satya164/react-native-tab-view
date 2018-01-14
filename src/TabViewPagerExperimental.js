@@ -37,7 +37,15 @@ export default class TabViewPagerExperimental<T: *> extends React.Component<
   };
 
   componentDidUpdate(prevProps: Props<T>) {
-    if (prevProps.navigationState.index !== this.props.navigationState.index) {
+    if (
+      this.props.vertical !== prevProps.vertical &&
+      this.props.navigationState.index !== 0
+    ) {
+      // we need to recalibrate the position tracker if not on index 0 and switching to/from vertical
+      this._transitionTo(this.props.navigationState.index);
+    } else if (
+      prevProps.navigationState.index !== this.props.navigationState.index
+    ) {
       this._transitionTo(this.props.navigationState.index);
     }
   }

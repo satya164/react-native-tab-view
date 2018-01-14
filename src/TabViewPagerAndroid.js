@@ -32,6 +32,14 @@ export default class TabViewPagerAndroid<T: *> extends React.Component<
 
   componentDidUpdate(prevProps: Props<T>) {
     if (
+      this.props.vertical !== prevProps.vertical &&
+      this.props.navigationState.index !== 0
+    ) {
+      // we need to recalibrate the position tracker if not on index 0 and switching to/from vertical
+      this._setPage(0, false);
+      this._setPage(this.props.navigationState.index, false);
+    }
+    if (
       this.props.layout !== prevProps.layout ||
       this.props.navigationState.routes.length !==
         prevProps.navigationState.routes.length ||

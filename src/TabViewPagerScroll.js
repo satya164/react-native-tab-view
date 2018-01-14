@@ -48,6 +48,9 @@ export default class TabViewPagerScroll<T: *> extends React.Component<
   }
 
   componentDidUpdate(prevProps: Props<T>) {
+    if (prevProps.vertical !== this.props.vertical) {
+      return this._setInitialPage();
+    }
     if (
       prevProps.layout.width !== this.props.layout.width ||
       prevProps.navigationState !== this.props.navigationState

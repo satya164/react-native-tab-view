@@ -20,6 +20,7 @@ import type {
 
 type IndicatorProps<T> = SceneRendererProps<T> & {
   width: number,
+  height: number,
 };
 
 type Props<T> = SceneRendererProps<T> & {
@@ -36,11 +37,13 @@ type Props<T> = SceneRendererProps<T> & {
   indicatorStyle?: Style,
   labelStyle?: Style,
   style?: Style,
+  vertical?: boolean,
 };
 
 type State = {|
   visibility: Animated.Value,
-  scrollAmount: Animated.Value,
+  scrollAmountX: Animated.Value,
+  scrollAmountY: Animated.Value,
   initialOffset: ?{| x: number, y: number |},
 |};
 
@@ -57,6 +60,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
     onTabPress: PropTypes.func,
     labelStyle: PropTypes.any,
     style: PropTypes.any,
+    vertical: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -66,7 +70,6 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
 
   constructor(props: Props<T>) {
     super(props);
-
     let initialVisibility = 1;
 
     if (this.props.scrollEnabled) {
@@ -76,20 +79,35 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
       }
     }
 
-    const initialOffset =
-      this.props.scrollEnabled && this.props.layout.width
-        ? {
-            x: this._getScrollAmount(
-              this.props,
-              this.props.navigationState.index
-            ),
-            y: 0,
-          }
-        : undefined;
+    let initialOffset;
+    if (props.vertical) {
+      initialOffset =
+        this.props.scrollEnabled && this.props.layout.height
+          ? {
+              y: this._getscrollAmountY(
+                this.props,
+                this.props.navigationState.index
+              ),
+              x: 0,
+            }
+          : undefined;
+    } else {
+      initialOffset =
+        this.props.scrollEnabled && this.props.layout.width
+          ? {
+              x: this._getscrollAmountX(
+                this.props,
+                this.props.navigationState.index
+              ),
+              y: 0,
+            }
+          : undefined;
+    }
 
     this.state = {
       visibility: new Animated.Value(initialVisibility),
-      scrollAmount: new Animated.Value(0),
+      scrollAmountX: new Animated.Value(0),
+      scrollAmountY: new Animated.Value(0),
       initialOffset,
     };
   }
@@ -102,7 +120,6 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
   componentDidUpdate(prevProps: Props<T>) {
     const prevTabWidth = this._getTabWidth(prevProps);
     const currentTabWidth = this._getTabWidth(this.props);
-
     if (prevTabWidth !== currentTabWidth && currentTabWidth) {
       this.state.visibility.setValue(1);
     }
@@ -160,9 +177,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
         ? this._lastOffsetX
         : -navigationState.index * layout.width;
 
-    const value = (panX + offsetX) / -(layout.width || 0.001);
-
-    this._adjustScroll(value);
+    this._adjustScroll((panX + offsetX) / -(layout.width || 0.001));
   };
 
   _renderLabel = (scene: Scene<*>) => {
@@ -184,23 +199,39 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
     if (typeof this.props.renderIndicator !== 'undefined') {
       return this.props.renderIndicator(props);
     }
-    const { width, position, navigationState } = props;
-    const translateX = Animated.multiply(
-      Animated.multiply(
+    const { width, height, position, navigationState, vertical } = props;
+    let transform;
+
+    if (vertical) {
+      const translateY = Animated.multiply(
         position.interpolate({
           inputRange: [0, navigationState.routes.length - 1],
           outputRange: [0, navigationState.routes.length - 1],
           extrapolate: 'clamp',
         }),
-        width
-      ),
-      I18nManager.isRTL ? -1 : 1
-    );
+        height
+      );
+      transform = { translateY };
+    } else {
+      const translateX = Animated.multiply(
+        Animated.multiply(
+          position.interpolate({
+            inputRange: [0, navigationState.routes.length - 1],
+            outputRange: [0, navigationState.routes.length - 1],
+            extrapolate: 'clamp',
+          }),
+          width
+        ),
+        I18nManager.isRTL ? -1 : 1
+      );
+      transform = { translateX };
+    }
     return (
       <Animated.View
         style={[
           styles.indicator,
-          { width, transform: [{ translateX }] },
+          { width, transform: [transform] },
+          vertical ? { top: 0, bottom: undefined } : null,
           this.props.indicatorStyle,
         ]}
       />
@@ -232,6 +263,26 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
     return layout.width / navigationState.routes.length;
   };
 
+  _getTabHeight = props => {
+    const { layout, tabStyle } = props;
+    const flattened = StyleSheet.flatten(tabStyle);
+
+    if (flattened) {
+      switch (typeof flattened.height) {
+        case 'number':
+          return flattened.height;
+        case 'string':
+          if (flattened.height.endsWith('%')) {
+            const height = parseFloat(flattened.height);
+            if (Number.isFinite(height)) {
+              return layout.height * (height / 100);
+            }
+          }
+      }
+    }
+    return layout.height;
+  };
+
   _handleTabPress = (scene: Scene<*>) => {
     this._pendingIndex = scene.index;
     this.props.jumpToIndex(scene.index);
@@ -242,13 +293,19 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
 
   _handleScroll = event => {
     if (this._isManualScroll) {
-      this._scrollDelta =
-        this._getScrollAmount(this.props, this.props.navigationState.index) -
-        event.nativeEvent.contentOffset.x;
+      if (this.props.vertical) {
+        this._scrollDelta =
+          this._getscrollAmountY(this.props, this.props.navigationState.index) -
+          event.nativeEvent.contentOffset.y;
+      } else {
+        this._scrollDelta =
+          this._getscrollAmountX(this.props, this.props.navigationState.index) -
+          event.nativeEvent.contentOffset.x;
+      }
     }
   };
 
-  _normalizeScrollValue = (props, value) => {
+  _normalizeScrollValueX = (props, value) => {
     const { layout, navigationState } = props;
     const tabWidth = this._getTabWidth(props);
     const tabBarWidth = Math.max(
@@ -260,39 +317,84 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
     return Math.max(Math.min(value, maxDistance), 0);
   };
 
-  _getScrollAmount = (props, i) => {
+  _normalizeScrollValueY = (props, value) => {
+    const { layout, navigationState } = props;
+    const tabHeight = this._getTabHeight(props);
+    const tabBarHeight = Math.max(
+      tabHeight * navigationState.routes.length,
+      layout.height
+    );
+    const maxDistance = tabBarHeight - layout.height;
+    return Math.max(Math.min(value, maxDistance), 0);
+  };
+
+  _getscrollAmountX = (props, i) => {
     const { layout } = props;
     const tabWidth = this._getTabWidth(props);
     const centerDistance = tabWidth * (i + 1 / 2);
-    const scrollAmount = centerDistance - layout.width / 2;
+    const scrollAmountX = centerDistance - layout.width / 2;
 
-    return this._normalizeScrollValue(props, scrollAmount);
+    return this._normalizeScrollValueX(props, scrollAmountX);
+  };
+
+  _getscrollAmountY = (props, i) => {
+    const { layout } = props;
+    const tabHeight = this._getTabHeight(props);
+    const centerDistance = tabHeight * (i + 1 / 2);
+    const scrollAmountY = centerDistance - layout.height / 2;
+    return this._normalizeScrollValueY(props, scrollAmountY);
   };
 
   _adjustScroll = (value: number) => {
     if (this.props.scrollEnabled) {
       global.cancelAnimationFrame(this._scrollResetCallback);
-      this._scrollView &&
-        this._scrollView.scrollTo({
-          x: this._normalizeScrollValue(
+      let scrollHash;
+      if (this.props.vertical) {
+        scrollHash = {
+          y: this._normalizeScrollValueY(
             this.props,
-            this._getScrollAmount(this.props, value) - this._scrollDelta
+            this._getscrollAmountY(this.props, value) - this._scrollDelta
           ),
           animated: false,
-        });
+        };
+      } else {
+        scrollHash = {
+          x: this._normalizeScrollValueX(
+            this.props,
+            this._getscrollAmountX(this.props, value) - this._scrollDelta
+          ),
+          animated: false,
+        };
+      }
+      this._scrollView &&
+        scrollHash &&
+        this._scrollView.scrollTo &&
+        this._scrollView.scrollTo(scrollHash);
     }
   };
 
   _resetScroll = (value: number, animated = true) => {
     if (this.props.scrollEnabled) {
       global.cancelAnimationFrame(this._scrollResetCallback);
+
       this._scrollResetCallback = global.requestAnimationFrame(() => {
         this._scrollDelta = 0;
-        this._scrollView &&
-          this._scrollView.scrollTo({
-            x: this._getScrollAmount(this.props, value),
+        let scrollHash;
+        if (this.props.vertical) {
+          scrollHash = {
+            y: this._getscrollAmountY(this.props, value),
             animated,
-          });
+          };
+        } else {
+          scrollHash = {
+            x: this._getscrollAmountX(this.props, value),
+            animated,
+          };
+        }
+        this._scrollView &&
+          scrollHash &&
+          this._scrollView.scrollTo &&
+          this._scrollView.scrollTo(scrollHash);
       });
     }
   };
@@ -330,57 +432,92 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
     (this._scrollView = el && el._component);
 
   render() {
-    const { position, navigationState, scrollEnabled } = this.props;
+    const {
+      position,
+      navigationState,
+      scrollEnabled,
+      layout,
+      vertical,
+    } = this.props;
     const { routes, index } = navigationState;
     const tabWidth = this._getTabWidth(this.props);
+    const tabHeight = this._getTabHeight(this.props);
     const tabBarWidth = tabWidth * routes.length;
-
+    const tabBarLayout = {
+      width: vertical ? tabWidth : layout.width,
+      height: vertical ? layout.height : undefined,
+    };
     // Prepend '-1', so there are always at least 2 items in inputRange
     const inputRange = [-1, ...routes.map((x, i) => i)];
-    const translateX = Animated.multiply(this.state.scrollAmount, -1);
+    const translateX = Animated.multiply(this.state.scrollAmountX, -1);
+    const translateY = Animated.multiply(this.state.scrollAmountY, -1);
 
     return (
-      <Animated.View style={[styles.tabBar, this.props.style]}>
+      <Animated.View style={[styles.tabBar, this.props.style, tabBarLayout]}>
         <Animated.View
           pointerEvents="none"
           style={[
             styles.indicatorContainer,
-            scrollEnabled
+            !vertical && scrollEnabled
               ? { width: tabBarWidth, transform: [{ translateX }] }
+              : null,
+            vertical && scrollEnabled
+              ? {
+                  transform: [{ translateY }],
+                }
               : null,
           ]}
         >
           {this._renderIndicator({
             ...this.props,
             width: tabWidth,
+            height: tabHeight,
+            vertical,
           })}
         </Animated.View>
-        <View style={styles.scroll}>
+        <View
+          style={Platform.OS === 'web' ? { overflow: 'auto' } : styles.scroll}
+        >
           <Animated.ScrollView
-            horizontal
+            horizontal={!vertical}
             keyboardShouldPersistTaps="handled"
             scrollEnabled={scrollEnabled}
             bounces={false}
             alwaysBounceHorizontal={false}
             scrollsToTop={false}
             showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
             automaticallyAdjustContentInsets={false}
             overScrollMode="never"
             contentContainerStyle={[
               styles.tabContent,
               scrollEnabled ? null : styles.container,
+              vertical ? styles.vertical : null,
             ]}
             scrollEventThrottle={1}
-            onScroll={Animated.event(
-              [
-                {
-                  nativeEvent: {
-                    contentOffset: { x: this.state.scrollAmount },
-                  },
-                },
-              ],
-              { useNativeDriver: true, listener: this._handleScroll }
-            )}
+            onScroll={
+              vertical
+                ? Animated.event(
+                    [
+                      {
+                        nativeEvent: {
+                          contentOffset: { y: this.state.scrollAmountY },
+                        },
+                      },
+                    ],
+                    { useNativeDriver: true, listener: this._handleScroll }
+                  )
+                : Animated.event(
+                    [
+                      {
+                        nativeEvent: {
+                          contentOffset: { x: this.state.scrollAmountX },
+                        },
+                      },
+                    ],
+                    { useNativeDriver: true, listener: this._handleScroll }
+                  )
+            }
             onScrollBeginDrag={this._handleBeginDrag}
             onScrollEndDrag={this._handleEndDrag}
             onMomentumScrollBegin={this._handleMomentumScrollBegin}
@@ -466,6 +603,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
                         tabStyle,
                         passedTabStyle,
                         styles.container,
+                        vertical ? { height: tabHeight } : null,
                       ]}
                     >
                       {icon}
@@ -496,8 +634,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  vertical: {
+    flexDirection: 'column',
+  },
   scroll: {
-    overflow: Platform.OS === 'web' ? 'auto' : 'scroll',
+    overflow: 'scroll',
   },
   tabBar: {
     backgroundColor: '#2196f3',

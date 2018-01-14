@@ -32,6 +32,7 @@ export type SceneRendererProps<T> = {
   position: any,
   jumpToIndex: (index: number) => void,
   useNativeDriver: boolean,
+  vertical?: boolean,
 };
 
 export type PagerRendererProps<T> = {
@@ -47,6 +48,7 @@ export type PagerRendererProps<T> = {
   animationEnabled?: boolean,
   swipeEnabled?: boolean,
   children: Node,
+  vertical?: boolean,
 };
 
 export type TransitionProps = {
