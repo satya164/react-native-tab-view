@@ -18,9 +18,7 @@ it('renders all children', () => {
         ],
       }}
       position={new Animated.Value(1)}
-      jumpToIndex={jest.fn()}
-      getLastPosition={jest.fn()}
-      subscribe={jest.fn()}
+      jumpTo={jest.fn()}
       panX={new Animated.Value(0)}
       offsetX={new Animated.Value(0)}
       useNativeDriver={false}
@@ -50,9 +48,7 @@ it('initial page is same as navigation state index', () => {
         ],
       }}
       position={new Animated.Value(1)}
-      jumpToIndex={jest.fn()}
-      getLastPosition={jest.fn()}
-      subscribe={jest.fn()}
+      jumpTo={jest.fn()}
       panX={new Animated.Value(0)}
       offsetX={new Animated.Value(0)}
       useNativeDriver={false}
