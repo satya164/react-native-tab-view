@@ -108,7 +108,7 @@ export default class TabViewPagerAndroid<T: *> extends React.Component<
   _setRef = (el: ?ViewPagerAndroid) => (this._viewPager = el);
 
   render() {
-    const { children, navigationState, swipeEnabled } = this.props;
+    const { children, navigationState, swipeEnabled, keyboardDismissMode } = this.props;
     const content = React.Children.map(children, (child, i) => (
       <View
         key={navigationState.routes[i].key}
@@ -128,7 +128,7 @@ export default class TabViewPagerAndroid<T: *> extends React.Component<
     return (
       <ViewPagerAndroid
         key={navigationState.routes.length}
-        keyboardDismissMode="on-drag"
+        keyboardDismissMode={keyboardDismissMode}
         initialPage={initialPage}
         scrollEnabled={swipeEnabled !== false}
         onPageScroll={this._handlePageScroll}
