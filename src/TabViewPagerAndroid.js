@@ -112,7 +112,7 @@ export default class TabViewPagerAndroid<T: *> extends React.Component<
       children,
       navigationState,
       swipeEnabled,
-      keyboardDismissMode
+      keyboardDismissMode,
     } = this.props;
     const content = React.Children.map(children, (child, i) => (
       <View
