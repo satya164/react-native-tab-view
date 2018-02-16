@@ -155,6 +155,7 @@ export default class TabViewAnimated<T: *> extends React.Component<
     navigationState: this.props.navigationState,
     jumpTo: this._jumpTo,
     useNativeDriver: this.props.useNativeDriver === true,
+    keyboardDismissMode: this.props.keyboardDismissMode || 'on-drag',
   });
 
   _jumpTo = (key: string) => {
