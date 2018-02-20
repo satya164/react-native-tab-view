@@ -47,7 +47,6 @@ export type PagerRendererProps<T> = {
   animationEnabled?: boolean,
   swipeEnabled?: boolean,
   children: Node,
-  keyboardDismissMode?: string,
 };
 
 export type TransitionProps = {
@@ -70,7 +69,6 @@ export type PagerProps<T> = {
   swipeEnabled?: boolean,
   swipeDistanceThreshold?: number,
   swipeVelocityThreshold?: number,
-  keyboardDismissMode?: string,
 };
 
 export type Style = StyleObj;

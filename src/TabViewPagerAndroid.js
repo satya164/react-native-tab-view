@@ -14,7 +14,9 @@ type PageScrollEvent = {
 
 type PageScrollState = 'dragging' | 'settling' | 'idle';
 
-type Props<T> = PagerRendererProps<T>;
+type Props<T> = PagerRendererProps<T> & {
+  keyboardDismissMode:'none' | 'on-drag',
+};
 
 export default class TabViewPagerAndroid<T: *> extends React.Component<
   Props<T>
@@ -23,6 +25,7 @@ export default class TabViewPagerAndroid<T: *> extends React.Component<
 
   static defaultProps = {
     canJumpToTab: () => true,
+    keyboardDismissMode: 'on-drag'
   };
 
   constructor(props: Props<T>) {
