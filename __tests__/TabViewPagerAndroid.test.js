@@ -22,7 +22,6 @@ it('renders all children', () => {
       panX={new Animated.Value(0)}
       offsetX={new Animated.Value(0)}
       useNativeDriver={false}
-      keyboardDismissMode={'on-drag'}
     >
       <View />
       <View />
