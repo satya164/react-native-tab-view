@@ -169,6 +169,7 @@ Android only pager based on `ViewPagerAndroid` (default on Android).
 - `animationEnabled` - whether to enable page change animation
 - `swipeEnabled` - whether to enable swipe gestures
 - `children` - React Element(s) to render
+- `keyboardDismissMode` - optional keyboardDismissMode prop for ViewPagerAndroid (Default: `on-drag`)
 
 ### `<TabViewPagerExperimental />`
 
