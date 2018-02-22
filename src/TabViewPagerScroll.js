@@ -18,7 +18,10 @@ type State = {|
   initialOffset: {| x: number, y: number |},
 |};
 
-type Props<T> = PagerRendererProps<T>;
+type Props<T> = PagerRendererProps<T> & {
+  onSwipeStart: Function,
+  onSwipeEnd: Function,
+};
 
 export default class TabViewPagerScroll<T: *> extends React.Component<
   Props<T>,
@@ -28,6 +31,8 @@ export default class TabViewPagerScroll<T: *> extends React.Component<
 
   static defaultProps = {
     canJumpToTab: () => true,
+    onSwipeStart: () => null,
+    onSwipeEnd: () => null,
   };
 
   constructor(props: Props<T>) {
@@ -125,7 +130,14 @@ export default class TabViewPagerScroll<T: *> extends React.Component<
   };
 
   render() {
-    const { children, layout, navigationState } = this.props;
+    const {
+      children,
+      layout,
+      navigationState,
+      onSwipeEnd,
+      onSwipeStart,
+    } = this.props;
+
     return (
       <ScrollView
         horizontal
@@ -142,6 +154,8 @@ export default class TabViewPagerScroll<T: *> extends React.Component<
         showsHorizontalScrollIndicator={false}
         scrollEventThrottle={1}
         onScroll={this._handleScroll}
+        onScrollBeginDrag={onSwipeStart}
+        onScrollEndDrag={onSwipeEnd}
         onMomentumScrollEnd={this._handleMomentumScrollEnd}
         contentOffset={this.state.initialOffset}
         style={styles.container}
