@@ -93,6 +93,8 @@ export default class TabViewPagerScroll<T: *> extends React.Component<
   };
 
   _handleMomentumScrollEnd = (e: ScrollEvent) => {
+    this.props.onSwipeEnd();
+
     let nextIndex = Math.round(
       e.nativeEvent.contentOffset.x / this.props.layout.width
     );
@@ -130,13 +132,7 @@ export default class TabViewPagerScroll<T: *> extends React.Component<
   };
 
   render() {
-    const {
-      children,
-      layout,
-      navigationState,
-      onSwipeEnd,
-      onSwipeStart,
-    } = this.props;
+    const { children, layout, navigationState, onSwipeStart } = this.props;
 
     return (
       <ScrollView
@@ -155,7 +151,6 @@ export default class TabViewPagerScroll<T: *> extends React.Component<
         scrollEventThrottle={1}
         onScroll={this._handleScroll}
         onScrollBeginDrag={onSwipeStart}
-        onScrollEndDrag={onSwipeEnd}
         onMomentumScrollEnd={this._handleMomentumScrollEnd}
         contentOffset={this.state.initialOffset}
         style={styles.container}
