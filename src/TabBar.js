@@ -4,12 +4,15 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import {
   Animated,
+  NativeModules,
   StyleSheet,
   View,
   ScrollView,
   Platform,
   I18nManager,
 } from 'react-native';
+const NativeAnimatedModule = NativeModules.NativeAnimatedModule;
+
 import TouchableItem from './TouchableItem';
 import { SceneRendererPropType } from './TabViewPropTypes';
 import type {
@@ -379,7 +382,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
                   },
                 },
               ],
-              { useNativeDriver: true, listener: this._handleScroll }
+              { useNativeDriver: !!NativeAnimatedModule, listener: this._handleScroll }
             )}
             onScrollBeginDrag={this._handleBeginDrag}
             onScrollEndDrag={this._handleEndDrag}
