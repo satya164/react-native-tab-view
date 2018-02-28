@@ -40,6 +40,7 @@ export const PagerRendererPropType = {
   jumpTo: PropTypes.func.isRequired,
   animationEnabled: PropTypes.bool,
   swipeEnabled: PropTypes.bool,
+  bounces: PropTypes.bool,
   useNativeDriver: PropTypes.bool,
   children: PropTypes.node.isRequired,
 };
