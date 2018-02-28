@@ -11,7 +11,6 @@ import {
   Platform,
   I18nManager,
 } from 'react-native';
-const NativeAnimatedModule = NativeModules.NativeAnimatedModule;
 
 import TouchableItem from './TouchableItem';
 import { SceneRendererPropType } from './TabViewPropTypes';
@@ -46,6 +45,8 @@ type State = {|
   scrollAmount: Animated.Value,
   initialOffset: ?{| x: number, y: number |},
 |};
+
+const useNativeDriver = Boolean(NativeModules.NativeAnimatedModule);
 
 export default class TabBar<T: *> extends React.Component<Props<T>, State> {
   static propTypes = {
@@ -382,7 +383,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
                   },
                 },
               ],
-              { useNativeDriver: !!NativeAnimatedModule, listener: this._handleScroll }
+              { useNativeDriver, listener: this._handleScroll }
             )}
             onScrollBeginDrag={this._handleBeginDrag}
             onScrollEndDrag={this._handleEndDrag}
