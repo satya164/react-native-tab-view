@@ -139,7 +139,6 @@ Cross-platform pager based on the [`PanResponder`](https://facebook.github.io/re
 
 #### Props
 
-- `configureTransition` - optional callback which returns a configuration for the transition
 - `animationEnabled` - whether to enable page change animation
 - `swipeEnabled` - whether to enable swipe gestures
 - `swipeDistanceThreshold` - minimum swipe distance to trigger page switch
@@ -172,6 +171,7 @@ Android only pager based on `ViewPagerAndroid` (default on Android).
 - `swipeEnabled` - whether to enable swipe gestures
 - `onSwipeStart` - optional callback when a swipe gesture starts
 - `onSwipeEnd` - optional callback when a swipe gesture ends
+- `keyboardDismissMode` - whether the keyboard gets dismissed in response to a drag in [ViewPagerAndroid](https://facebook.github.io/react-native/docs/viewpagerandroid.html#keyboarddismissmode) (Default: `on-drag`)
 - `children` - React Element(s) to render
 
 ### `<TabViewPagerExperimental />`
@@ -210,7 +210,7 @@ renderScene = SceneMap({
 Each scene receives the following props:
 
 - `route` - the current route rendered by the component
-- `jumpTo` - method to jump to other tabs, it receives `route.key` as it's argument
+- `jumpTo` - method to jump to other tabs, takes a `route.key` as it's argument
 
 All the scenes rendered with `SceneMap` are optimized using `React.PureComponent` and don't re-render when parent's props or states change. If you don't want this behaviour, or want to pass additional props to your scene components, use `renderScene` directly instead of using `SceneMap`.
 
