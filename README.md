@@ -1,8 +1,8 @@
 # React Native Tab View
 
-[![Build Status][build-badge]][build]
-[![Version][version-badge]][package]
-[![MIT License][license-badge]][license]
+This is a React Navigation specific temporary fork of React Native Tab View.
+
+<hr />
 
 A cross-platform Tab View component for React Native.
 
