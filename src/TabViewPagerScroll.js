@@ -75,7 +75,7 @@ export default class TabViewPagerScroll<T: *> extends React.Component<
 
     setTimeout(() => {
       this._isInitial = false;
-    }, 50);
+    }, 250);
   };
 
   _scrollTo = (x: number, animated) => {
