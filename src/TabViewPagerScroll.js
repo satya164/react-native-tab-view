@@ -75,7 +75,7 @@ export default class TabViewPagerScroll<T: *> extends React.Component<
 
     setTimeout(() => {
       this._isInitial = false;
-    }, 500);
+    }, 50);
   };
 
   _scrollTo = (x: number, animated) => {
@@ -106,7 +106,7 @@ export default class TabViewPagerScroll<T: *> extends React.Component<
   };
 
   _handleScroll = (e: ScrollEvent) => {
-    if (this._isInitial) {
+    if (this._isInitial || e.nativeEvent.contentSize.width === 0){
       return;
     }
 
