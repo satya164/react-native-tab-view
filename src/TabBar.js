@@ -281,7 +281,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
             this.props,
             this._getScrollAmount(this.props, value)
           ),
-          animated: true,
+          animated: false,
         });
     }
   };
