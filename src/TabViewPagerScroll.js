@@ -52,9 +52,10 @@ export default class TabViewPagerScroll<T: *> extends React.Component<
       prevProps.layout.width !== this.props.layout.width ||
       prevProps.navigationState !== this.props.navigationState
     ) {
+      const animated = Math.abs(prevProps.navigationState.index - this.props.navigationState.index) <= 2; //We don't expect a long animation if jumping too far
       this._scrollTo(
         this.props.navigationState.index * this.props.layout.width,
-        prevProps.layout.width === this.props.layout.width
+        animated
       );
     }
   }
