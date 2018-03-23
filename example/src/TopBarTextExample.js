@@ -33,31 +33,7 @@ export default class TopBarTextExample extends React.Component<*, State> {
       { key: 'article', title: 'Article' },
       { key: 'contacts', title: 'Contacts' },
       { key: 'albums', title: 'Albums' },
-      { key: 'chat1', title: 'Chat' },
-      { key: 'article2', title: 'Article' },
-      { key: 'contacts3', title: 'Contacts' },
-      { key: 'albums4', title: 'Albums' },
-      { key: 'chat5', title: 'Chat' },
-      { key: 'article6', title: 'Article' },
-      { key: 'contacts7', title: 'Contacts' },
-      { key: 'albums8', title: 'Albums' },
-      { key: 'chat9', title: 'Chat' },
-      { key: 'article11', title: 'Article' },
-      { key: 'contacts12', title: 'Contacts' },
-      { key: 'albums13', title: 'Albums' },
-      { key: 'chat14', title: 'Chat' },
-      { key: 'article15', title: 'Article' },
-      { key: 'contacts21', title: 'Contacts' },
-      { key: 'albums22', title: 'Albums' },
-      { key: 'chat222', title: 'Chat' },
-      { key: 'article23', title: 'Article' },
-      { key: 'contacts24', title: 'Contacts' },
-      { key: 'albums25', title: 'Albums' },
-      { key: 'chat26', title: 'Chat' },
-      { key: 'article27', title: 'Article' },
-      { key: 'contacts233', title: 'Contacts' },
-      { key: 'albums23322', title: 'Albums' },
-      { key: 'chat222222', title: 'Chat' },
+      { key: 'chat', title: 'Chat' },
     ],
   };
 
@@ -77,20 +53,12 @@ export default class TopBarTextExample extends React.Component<*, State> {
     />
   );
 
-  _renderScene = ({ route }: any) => {
-    if (Math.abs(this.state.index - this.state.routes.indexOf(route)) > 2) {
-      return null;
-    }
-
-    if (this.state.index == 0) {
-    return (<Albums></Albums>);
-    } else if (this.state.index == 1) {
-    return (<Article></Article>);
-    } else {
-    return (<Chat></Chat>);
-    }
-
-  }
+  _renderScene = SceneMap({
+    albums: Albums,
+    contacts: Contacts,
+    article: Article,
+    chat: Chat,
+  });
 
   render() {
     return (
@@ -100,6 +68,7 @@ export default class TopBarTextExample extends React.Component<*, State> {
         renderScene={this._renderScene}
         renderHeader={this._renderHeader}
         onIndexChange={this._handleIndexChange}
+        initialLayout={initialLayout}
       />
     );
   }
