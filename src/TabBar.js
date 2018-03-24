@@ -177,7 +177,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
       return null;
     }
     return (
-      <Animated.Text style={[styles.tabLabel, this.props.labelStyle]}>
+      <Animated.Text style={[styles.tabLabel, this.props.labelStyle]} numberOfLines={this.props.numberOfLines}>
         {label}
       </Animated.Text>
     );
