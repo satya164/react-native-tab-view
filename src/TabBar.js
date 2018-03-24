@@ -98,7 +98,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
   }
 
   componentDidMount() {
-    this._adjustScroll(this.props.navigationState.index);
+    //this._adjustScroll(this.props.navigationState.index);  //needless
     this.props.scrollEnabled && this._startTrackingPosition();
   }
 
@@ -130,6 +130,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
 
   _scrollView: ?ScrollView;
   _isManualScroll: boolean = false;
+  _isTabPressed: boolean = false;  //set true once tab press action happens,
   _isMomentumScroll: boolean = false;
   _pendingIndex: ?number;
   _scrollDelta: number = 0;
@@ -157,6 +158,11 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
 
   _handlePosition = () => {
     const { navigationState, layout } = this.props;
+    if (layout.width === 0) {
+      //This could happen on initial rendering
+      return;
+    }
+
     const panX = typeof this._lastPanX === 'number' ? this._lastPanX : 0;
     const offsetX =
       typeof this._lastOffsetX === 'number'
@@ -164,7 +170,6 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
         : -navigationState.index * layout.width;
 
     const value = (panX + offsetX) / -(layout.width || 0.001);
-
     this._adjustScroll(value);
   };
 
@@ -236,6 +241,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
   };
 
   _handleTabPress = (scene: Scene<*>) => {
+    this._isTabPressed = true;
     this._pendingIndex = scene.index;
     this.props.jumpTo(scene.route.key);
     if (this.props.onTabPress) {
@@ -279,10 +285,10 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
         this._scrollView.scrollTo({
           x: this._normalizeScrollValue(
             this.props,
-            this._getScrollAmount(this.props, value) - this._scrollDelta
+            this._getScrollAmount(this.props, value)
           ),
-          animated: false,
-        });
+          animated: this._isTabPressed,
+        });  //// For first rendering, we hope to be fast by disabling animated
     }
   };
 
