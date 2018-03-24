@@ -62,7 +62,7 @@ export default class TabViewPagerScroll<T: *> extends React.Component<
       prevProps.navigationState !== this.props.navigationState
     ) {
       let animated = prevProps.layout.width === this.props.layout.width;
-      if (Math.abs(prevProps.navigationState.index - this.props.navigationState.index) > 3) {
+      if (Math.abs(prevProps.navigationState.index - this.props.navigationState.index) > 0) { //totally disable tab scene switching animation
         animated = false;
       }
       this._scrollTo(
