@@ -262,7 +262,7 @@ export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
               width
                 ? {
                     width,
-                    transform: [{ translateX }]
+                    transform: [{ translateX }],
                   }
                 : i === navigationState.index ? StyleSheet.absoluteFill : null
             }
