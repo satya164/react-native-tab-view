@@ -250,32 +250,27 @@ export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
     });
 
     return (
-      <Animated.View
-        style={[
-          styles.sheet,
-          width
-            ? {
-                width: routes.length * width,
-                transform: [{ translateX }],
-              }
-            : null,
-        ]}
+      <View
+        style={[styles.sheet, width ? { width } : null]}
         {...this._panResponder.panHandlers}
       >
         {React.Children.map(children, (child, i) => (
-          <View
+          <Animated.View
             key={navigationState.routes[i].key}
             testID={navigationState.routes[i].testID}
             style={
               width
-                ? { width }
+                ? {
+                    width,
+                    transform: [{ translateX }]
+                  }
                 : i === navigationState.index ? StyleSheet.absoluteFill : null
             }
           >
             {i === navigationState.index || width ? child : null}
-          </View>
+          </Animated.View>
         ))}
-      </Animated.View>
+      </View>
     );
   }
 }
