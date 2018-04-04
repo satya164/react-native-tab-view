@@ -10,6 +10,7 @@ import type {
   NavigationState,
   Layout,
   PagerCommonProps,
+  PagerRendererProps,
   PagerExtraProps,
   Style,
 } from './TabViewTypeDefinitions';
@@ -71,7 +72,7 @@ export default class TabViewAnimated<T: *> extends React.Component<
 
   static defaultProps = {
     canJumpToTab: () => true,
-    renderPager: props => <TabViewPager {...props} />,
+    renderPager: (props: PagerRendererProps<T>) => <TabViewPager {...props} />,
     initialLayout: {
       height: 0,
       width: 0,

@@ -3,10 +3,7 @@
   "version": "0.0.77",
   "description": "Tab view component for React Native",
   "main": "src/index.js",
-  "files": [
-    "src/",
-    "types.js"
-  ],
+  "files": ["src/", "types.js"],
   "scripts": {
     "test": "jest",
     "flow": "flow",
@@ -26,14 +23,18 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/react-native-community/react-native-tab-view.git"
+    "url":
+      "git+https://github.com/react-native-community/react-native-tab-view.git"
   },
-  "author": "Satyajit Sahoo <satyajit.happy@gmail.com> (https://github.com/satya164/)",
+  "author":
+    "Satyajit Sahoo <satyajit.happy@gmail.com> (https://github.com/satya164/)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/react-native-community/react-native-tab-view/issues"
+    "url":
+      "https://github.com/react-native-community/react-native-tab-view/issues"
   },
-  "homepage": "https://github.com/react-native-community/react-native-tab-view#readme",
+  "homepage":
+    "https://github.com/react-native-community/react-native-tab-view#readme",
   "dependencies": {
     "prop-types": "^15.6.0"
   },
@@ -47,13 +48,13 @@
     "eslint": "^4.12.1",
     "eslint-config-satya164": "^1.0.1",
     "eslint-plugin-react-native-globals": "^0.1.0",
-    "flow-bin": "~0.56.0",
+    "flow-bin": "^0.67.0",
     "husky": "^0.14.3",
     "jest": "^21.2.1",
     "prettier": "^1.8.2",
-    "react": "16.0.0",
+    "react": "16.3.0",
     "react-dom": "16.0.0",
-    "react-native": "~0.50.4",
+    "react-native": "~0.55.0",
     "react-test-renderer": "16.2.0"
   },
   "peerDependencies": {
@@ -62,14 +63,8 @@
   },
   "jest": {
     "preset": "react-native",
-    "setupFiles": [
-      "<rootDir>/__setup__/enzyme.js"
-    ],
-    "modulePathIgnorePatterns": [
-      "<rootDir>/example/node_modules"
-    ],
-    "snapshotSerializers": [
-      "enzyme-to-json/serializer"
-    ]
+    "setupFiles": ["<rootDir>/__setup__/enzyme.js"],
+    "modulePathIgnorePatterns": ["<rootDir>/example/node_modules"],
+    "snapshotSerializers": ["enzyme-to-json/serializer"]
   }
 }

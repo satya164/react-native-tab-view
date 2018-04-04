@@ -65,7 +65,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
   };
 
   static defaultProps = {
-    getLabelText: ({ route }) =>
+    getLabelText: ({ route }: Scene<T>): string =>
       typeof route.title === 'string' ? route.title.toUpperCase() : route.title,
   };
 
@@ -502,7 +502,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scroll: {
-    overflow: Platform.OS === 'web' ? 'auto' : 'scroll',
+    overflow: 'scroll',
   },
   tabBar: {
     backgroundColor: '#2196f3',
