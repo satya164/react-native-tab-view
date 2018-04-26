@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Animated, Platform, View, StyleSheet } from 'react-native';
+import { Animated, Platform, ScrollView, View, StyleSheet } from 'react-native';
 import { NavigationStatePropType } from './TabViewPropTypes';
 import type {
   Scene,
@@ -25,6 +25,7 @@ type Props<T> = PagerCommonProps<T> &
     ) => ?React.Element<any>,
     renderHeader?: (props: SceneRendererProps<T>) => ?React.Element<any>,
     renderFooter?: (props: SceneRendererProps<T>) => ?React.Element<any>,
+    scrollable?: boolean,
     useNativeDriver?: boolean,
     style?: Style,
   };
@@ -200,13 +201,15 @@ export default class TabViewAnimated<T: *> extends React.Component<
       renderPager,
       renderHeader,
       renderFooter,
+      scrollable,
       ...rest
     } = this.props;
 
     const props = this._buildSceneRendererProps();
+    const Wrapper = scrollable ? ScrollView : View
 
     return (
-      <View collapsable={false} style={[styles.container, this.props.style]}>
+      <Wrapper collapsable={false} style={[styles.container, this.props.style]}>
         {renderHeader && renderHeader(props)}
         <View onLayout={this._handleLayout} style={styles.pager}>
           {renderPager({
@@ -231,7 +234,7 @@ export default class TabViewAnimated<T: *> extends React.Component<
           })}
         </View>
         {renderFooter && renderFooter(props)}
-      </View>
+      </Wrapper>
     );
   }
 }
