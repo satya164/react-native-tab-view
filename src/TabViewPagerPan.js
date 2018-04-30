@@ -10,10 +10,7 @@ import {
   Platform,
 } from 'react-native';
 import { PagerRendererPropType } from './TabViewPropTypes';
-import type {
-  PagerRendererProps,
-  TransitionConfigurator,
-} from './TabViewTypeDefinitions';
+import type { PagerRendererProps } from './TabViewTypeDefinitions';
 
 type GestureEvent = {
   nativeEvent: {
@@ -42,14 +39,9 @@ type GestureState = {
   numberActiveTouches: number,
 };
 
-type GestureHandler = (event: GestureEvent, state: GestureState) => void;
-
 type Props<T> = PagerRendererProps<T> & {
-  configureTransition?: TransitionConfigurator,
   swipeDistanceThreshold?: number,
   swipeVelocityThreshold?: number,
-  onSwipeStart?: GestureHandler,
-  onSwipeEnd?: GestureHandler,
 };
 
 const DEAD_ZONE = 12;
@@ -63,47 +55,35 @@ const DefaultTransitionSpec = {
 export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
   static propTypes = {
     ...PagerRendererPropType,
-    configureTransition: PropTypes.func.isRequired,
     swipeDistanceThreshold: PropTypes.number,
     swipeVelocityThreshold: PropTypes.number,
-    onSwipeStart: PropTypes.func,
-    onSwipeEnd: PropTypes.func,
   };
 
   static defaultProps = {
     canJumpToTab: () => true,
-    configureTransition: () => DefaultTransitionSpec,
     initialLayout: {
       height: 0,
       width: 0,
     },
   };
 
-  constructor(props: Props<T>) {
-    super(props);
-    this._currentIndex = this.props.navigationState.index;
-  }
-
-  componentWillMount() {
-    this._panResponder = PanResponder.create({
-      onMoveShouldSetPanResponder: this._canMoveScreen,
-      onMoveShouldSetPanResponderCapture: this._canMoveScreen,
-      onPanResponderGrant: this._startGesture,
-      onPanResponderMove: this._respondToGesture,
-      onPanResponderTerminate: this._finishGesture,
-      onPanResponderRelease: this._finishGesture,
-      onPanResponderTerminationRequest: () => true,
-    });
-  }
-
   componentDidUpdate(prevProps: Props<T>) {
-    if (prevProps.navigationState.index !== this.props.navigationState.index) {
-      this._currentIndex = this.props.navigationState.index;
+    this._currentIndex = this.props.navigationState.index;
+
+    if (
+      prevProps.navigationState.routes !== this.props.navigationState.routes ||
+      prevProps.layout.width !== this.props.layout.width
+    ) {
+      this._transitionTo(this.props.navigationState.index, false);
+    } else if (
+      prevProps.navigationState.index !== this.props.navigationState.index
+    ) {
       this._transitionTo(this.props.navigationState.index);
     }
   }
 
-  _currentIndex: number;
+  _currentIndex = this.props.navigationState.index;
+  _pendingIndex: ?number;
 
   _isMovingHorizontally = (evt: GestureEvent, gestureState: GestureState) => {
     return (
@@ -127,11 +107,8 @@ export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
     );
   };
 
-  _startGesture = (evt: GestureEvent, gestureState: GestureState) => {
-    if (typeof this.props.onSwipeStart === 'function') {
-      this.props.onSwipeStart(evt, gestureState);
-    }
-
+  _startGesture = () => {
+    this.props.onSwipeStart && this.props.onSwipeStart();
     this.props.panX.stopAnimation();
   };
 
@@ -159,9 +136,7 @@ export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
 
     let { swipeVelocityThreshold = 0.15 } = this.props;
 
-    if (typeof this.props.onSwipeEnd === 'function') {
-      this.props.onSwipeEnd(evt, gestureState);
-    }
+    this.props.onSwipeEnd && this.props.onSwipeEnd();
 
     if (Platform.OS === 'android') {
       // on Android, velocity is way lower due to timestamp being in nanosecond
@@ -191,6 +166,7 @@ export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
           navigationState.routes.length - 1
         )
       );
+
       this._currentIndex = nextIndex;
     }
 
@@ -204,10 +180,10 @@ export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
     this._transitionTo(nextIndex);
   };
 
-  _transitionTo = (index: number) => {
+  _transitionTo = (index: number, animated: boolean = true) => {
     const offset = -index * this.props.layout.width;
 
-    if (this.props.animationEnabled === false) {
+    if (this.props.animationEnabled === false || animated === false) {
       this.props.panX.setValue(0);
       this.props.offsetX.setValue(offset);
       return;
@@ -228,6 +204,7 @@ export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
       if (finished) {
         const route = this.props.navigationState.routes[index];
         this.props.jumpTo(route.key);
+        this.props.onAnimationEnd && this.props.onAnimationEnd();
         this._pendingIndex = null;
       }
     });
@@ -235,8 +212,15 @@ export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
     this._pendingIndex = index;
   };
 
-  _panResponder: any;
-  _pendingIndex: ?number;
+  _panResponder = PanResponder.create({
+    onMoveShouldSetPanResponder: this._canMoveScreen,
+    onMoveShouldSetPanResponderCapture: this._canMoveScreen,
+    onPanResponderGrant: this._startGesture,
+    onPanResponderMove: this._respondToGesture,
+    onPanResponderTerminate: this._finishGesture,
+    onPanResponderRelease: this._finishGesture,
+    onPanResponderTerminationRequest: () => true,
+  });
 
   render() {
     const { panX, offsetX, navigationState, layout, children } = this.props;
