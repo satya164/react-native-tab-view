@@ -24,6 +24,7 @@ type IndicatorProps<T> = SceneRendererProps<T> & {
 };
 
 type Props<T> = SceneRendererProps<T> & {
+  borderless?: boolean,
   scrollEnabled?: boolean,
   bounces?: boolean,
   pressColor?: string,
@@ -454,7 +455,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
 
               return (
                 <TouchableItem
-                  borderless
+                  borderless={this.props.borderless}
                   key={route.key}
                   testID={route.testID}
                   accessible={route.accessible}
