@@ -50,6 +50,7 @@ export default class TopBarTextExample extends React.Component<*, State> {
       style={styles.tabbar}
       tabStyle={styles.tab}
       labelStyle={styles.label}
+      activeLabelStyle={styles.activeLabel}
     />
   );
 
@@ -88,7 +89,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffeb3b',
   },
   label: {
-    color: '#fff',
+    color: '#d3d3d3',
     fontWeight: '400',
+  },
+  activeLabel: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });

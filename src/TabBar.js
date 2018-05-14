@@ -37,6 +37,7 @@ type Props<T> = SceneRendererProps<T> & {
   tabStyle?: Style,
   indicatorStyle?: Style,
   labelStyle?: Style,
+  activeLabelStyle?: Style,
   style?: Style,
   activeTabStyle?: Style,
 };
@@ -179,7 +180,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
     this._adjustScroll(value);
   };
 
-  _renderLabel = (scene: Scene<*>) => {
+  _renderLabel = (scene: Scene<*>, focused: boolean) => {
     if (typeof this.props.renderLabel !== 'undefined') {
       return this.props.renderLabel(scene);
     }
@@ -188,7 +189,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
       return null;
     }
     return (
-      <Animated.Text style={[styles.tabLabel, this.props.labelStyle]}>
+      <Animated.Text style={[styles.tabLabel, this.props.labelStyle, focused ? this.props.activeLabelStyle : {}]}>
         {label}
       </Animated.Text>
     );
@@ -418,7 +419,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
                 focused,
                 index: i,
               };
-              const label = this._renderLabel(scene);
+              const label = this._renderLabel(scene, focused);
               const icon = this.props.renderIcon
                 ? this.props.renderIcon(scene)
                 : null;
