@@ -189,7 +189,13 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
       return null;
     }
     return (
-      <Animated.Text style={[styles.tabLabel, this.props.labelStyle, focused ? this.props.activeLabelStyle : {}]}>
+      <Animated.Text
+        style={[
+          styles.tabLabel,
+          this.props.labelStyle,
+          focused ? this.props.activeLabelStyle : {},
+        ]}
+      >
         {label}
       </Animated.Text>
     );
