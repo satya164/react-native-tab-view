@@ -35,11 +35,11 @@ type Props<T> = SceneRendererProps<T> & {
   renderIndicator?: (props: IndicatorProps<T>) => ?React.Element<any>,
   onTabPress?: (scene: Scene<T>) => mixed,
   tabStyle?: Style,
+  activeTabStyle?: Style,
   indicatorStyle?: Style,
   labelStyle?: Style,
   activeLabelStyle?: Style,
   style?: Style,
-  activeTabStyle?: Style,
 };
 
 type State = {|
