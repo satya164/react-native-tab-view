@@ -38,6 +38,7 @@ type Props<T> = SceneRendererProps<T> & {
   indicatorStyle?: Style,
   labelStyle?: Style,
   style?: Style,
+  activeTabStyle?: Style,
 };
 
 type State = {|
@@ -62,6 +63,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
     onTabPress: PropTypes.func,
     labelStyle: PropTypes.any,
     style: PropTypes.any,
+    activeTabStyle: PropTypes.any,
   };
 
   static defaultProps = {
@@ -335,7 +337,13 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
     (this._scrollView = el && el._component);
 
   render() {
-    const { position, navigationState, scrollEnabled, bounces } = this.props;
+    const {
+      position,
+      navigationState,
+      scrollEnabled,
+      bounces,
+      activeTabStyle,
+    } = this.props;
     const { routes, index } = navigationState;
     const tabWidth = this._getTabWidth(this.props);
     const tabBarWidth = tabWidth * routes.length;
@@ -471,6 +479,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
                         tabStyle,
                         passedTabStyle,
                         styles.container,
+                        focused && activeTabStyle ? activeTabStyle : null,
                       ]}
                     >
                       {icon}

@@ -140,6 +140,7 @@ Material design themed tab bar. Can be used as both top and bottom tab bar.
 - `bounces` - whether the tab bar bounces when scrolling
 - `useNativeDriver` - whether to use native animations
 - `tabStyle` - style object for the individual tabs in the tab bar
+- `activeTabStyle` - style object for the individual active tab in the tab bar
 - `indicatorStyle` - style object for the active indicator
 - `labelStyle` - style object for the tab item label
 - `style` - style object for the tab bar
