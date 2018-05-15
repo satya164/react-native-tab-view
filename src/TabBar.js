@@ -36,6 +36,7 @@ type Props<T> = SceneRendererProps<T> & {
   onTabPress?: (scene: Scene<T>) => void,
   tabStyle?: Style,
   indicatorStyle?: Style,
+  indicatorBaseLineViewStyle?: Style,
   labelStyle?: Style,
   style?: Style,
 };
@@ -353,6 +354,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
               : null,
           ]}
         >
+          <View style={[styles.indicator, this.props.indicatorBaseLineViewStyle]}></View>
           {this._renderIndicator({
             ...this.props,
             width: tabWidth,

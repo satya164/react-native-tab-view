@@ -47,6 +47,7 @@ export default class TopBarTextExample extends React.Component<*, State> {
       {...props}
       scrollEnabled
       indicatorStyle={styles.indicator}
+      indicatorBaseLineViewStyle={styles.indicatorBaseLineView}
       style={styles.tabbar}
       tabStyle={styles.tab}
       labelStyle={styles.label}
@@ -86,6 +87,9 @@ const styles = StyleSheet.create({
   },
   indicator: {
     backgroundColor: '#ffeb3b',
+  },
+  indicatorBaseLineView: {
+    backgroundColor: '#E91F63',
   },
   label: {
     color: '#fff',
