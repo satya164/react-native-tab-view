@@ -144,7 +144,6 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
   }
 
   _scrollView: ?ScrollView;
-  _indicatorScrollView: ?ScrollView;
   _isIntial: boolean = true;
   _isManualScroll: boolean = false;
   _isMomentumScroll: boolean = false;
@@ -188,7 +187,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
     const value = (panX + offsetX) / -(layout.width || 0.001);
     
     this.setState({
-      activePosition: value,
+      activePosition: Math.round(value),
     })
 
     this._adjustScroll(value);
@@ -233,35 +232,8 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
     
     if(scrollEnabled && typeof labelWidth[activePosition + 1] != "undefined" ) {
       width = labelWidth[activePosition + 1];
-      return (
-        <Animated.ScrollView
-        horizontal
-        style={[
-          styles.indicator,
-          {
-            width : 1200,
-            backgroundColor: "transparent"
-          }
-        ]}
-        showsHorizontalScrollIndicator={true}
-        ref={this._setRefIndicator}
-        >
-          <Animated.View style={{flex: 1, width: 1200}}>
-          <View style={{flex: 3, flexDirection: "row"}}>
-            <Animated.View
-              style={{
-                backgroundColor: "#FFFFFF",
-                width: width,
-                transform: [{
-                  translateX  : this.state.leftX,
-                }],
-              }}
-            />
-          </View>
-          </Animated.View>
-        </Animated.ScrollView>
-      );
-    } else {
+     
+    } else if(!scrollEnabled) {
       const translateX = Animated.multiply(
         Animated.multiply(
           position.interpolate({
@@ -273,6 +245,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
         ),
         I18nManager.isRTL ? -1 : 1
       );
+
       return (
         <Animated.View
           style={[
@@ -283,6 +256,33 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
         />
       );
     } 
+
+    return (
+      <Animated.ScrollView
+      horizontal
+      style={[
+        styles.indicator,
+        {
+          width : 1200,
+          backgroundColor: "transparent"
+        }
+      ]}
+      >
+        <Animated.View style={{flex: 1, width: 1200}}>
+        <View style={{flex: 3, flexDirection: "row"}}>
+          <Animated.View
+            style={{
+              backgroundColor: "#FFFFFF",
+              width: width,
+              transform: [{
+                translateX  : this.state.leftX,
+              }],
+            }}
+          />
+        </View>
+        </Animated.View>
+      </Animated.ScrollView>
+    );
   };
 
   _getTabWidth = props => {
@@ -332,6 +332,21 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
     return Math.max(Math.min(value, maxDistance), 0);
   };
 
+  _isFloat = (x) => { return !!(x % 1); }
+
+  _getTotalActiveWidth = (activePosition = 0) => {
+    let arrayLabelWidth = this.state.labelWidth;
+    let penampung       = 0;
+
+    activePosition      = activePosition;
+
+    for (let x = 0; x <= activePosition; x++) {
+      penampung += arrayLabelWidth[x];
+    }
+
+    return penampung;
+  }
+
   _getScrollAmount = (props, i) => {
     const { layout }  = props;
     const tabWidth    = this._getTabWidth(props);
@@ -340,29 +355,36 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
     let labelWidth      = this.state.labelWidth;
   
     let scrollAmount    = centerDistance - layout.width / 2;
-    let targetPosition  = Math.round(i) + 1;
+    let activePosition  = this.state.activePosition;
+    let targetPosition  = Math.floor(i);
     let indicatorScrollAmount = 0;
 
-    if(typeof labelWidth != "undefined" && indicatorScrollAmount <= labelWidth[targetPosition - 1] ) {
-      // indicatorScrollAmount = labelWidth[targetPosition - 1] ;
-      for (let x = 0; x <= i; x++) {
-        indicatorScrollAmount += labelWidth[x];
-      }
-    }     
+    if(typeof labelWidth != "undefined" ) {
+      let isFloatScroll   = 0;
+      let notFloatScroll  = 0;
+      let stabilizer      = i - targetPosition;
+      
+      isFloatScroll       = this._getTotalActiveWidth(activePosition) + (labelWidth[targetPosition + 1] * stabilizer);
 
-    if(!isNaN(indicatorScrollAmount)) {
-     Animated.spring(
-       this.state.leftX,
-       {
-           toValue: Math.round(indicatorScrollAmount),
-           velocity: 3,
-           tension: 2,
-           friction: 8,
-           useNativeDriver: true,
-       }
-     ).start();
-    }
-   
+      indicatorScrollAmount = isFloatScroll;
+      if(indicatorScrollAmount > this._getTotalActiveWidth(targetPosition + 1)) {
+        indicatorScrollAmount = this._getTotalActiveWidth(targetPosition + 1);
+      }
+
+      if(!isNaN(indicatorScrollAmount)) {
+       Animated.spring(
+         this.state.leftX,
+         {
+             toValue: Math.round(indicatorScrollAmount),
+             velocity: 3,
+             tension: 2,
+             friction: 8,
+             useNativeDriver: true,
+         }
+       ).start();
+      }
+    }  
+
     if(typeof labelWidth != "undefined") {
       scrollAmount = centerDistance  - layout.width;
       for (let x = 0; x <= i; x++) {
@@ -378,15 +400,6 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
       global.cancelAnimationFrame(this._scrollResetCallback);
       this._scrollView &&
         this._scrollView.scrollTo({
-          x: this._normalizeScrollValue(
-            this.props,
-            this._getScrollAmount(this.props, value)
-          ),
-          animated: !this._isIntial, // Disable animation for the initial render
-        });
-
-      this._indicatorScrollView &&
-        this._indicatorScrollView.scrollTo({
           x: this._normalizeScrollValue(
             this.props,
             this._getScrollAmount(this.props, value)
@@ -443,9 +456,6 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
   _setRef = (el: ?Animated.ScrollView) =>
     (this._scrollView = el && el._component);
 
-  _setRefIndicator = (el: ?Animated.ScrollView) =>
-    (this._indicatorScrollView = el && el._component);
-
   render() {
     const { position, navigationState, scrollEnabled, bounces } = this.props;
     const { routes, index } = navigationState;
@@ -489,7 +499,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
               styles.tabContent,
               scrollEnabled ? null : styles.container,
             ]}
-            scrollEventThrottle={2}
+            scrollEventThrottle={1}
             onScroll={Animated.event(
               [
                 {
