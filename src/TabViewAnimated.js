@@ -2,7 +2,13 @@
 
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Animated, Platform, View, StyleSheet } from 'react-native';
+import {
+  Animated,
+  Platform,
+  View,
+  StyleSheet,
+  ViewPropTypes,
+} from 'react-native';
 import { NavigationStatePropType } from './TabViewPropTypes';
 import type {
   Scene,
@@ -27,6 +33,7 @@ type Props<T> = PagerCommonProps<T> &
     renderFooter?: (props: SceneRendererProps<T>) => ?React.Element<any>,
     useNativeDriver?: boolean,
     style?: Style,
+    pagerStyle?: Style,
   };
 
 type State = {|
@@ -67,6 +74,7 @@ export default class TabViewAnimated<T: *> extends React.Component<
     renderScene: PropTypes.func.isRequired,
     renderHeader: PropTypes.func,
     renderFooter: PropTypes.func,
+    pagerStyle: ViewPropTypes.style,
   };
 
   static defaultProps = {
@@ -208,7 +216,10 @@ export default class TabViewAnimated<T: *> extends React.Component<
     return (
       <View collapsable={false} style={[styles.container, this.props.style]}>
         {renderHeader && renderHeader(props)}
-        <View onLayout={this._handleLayout} style={styles.pager}>
+        <View
+          onLayout={this._handleLayout}
+          style={[styles.pager, this.props.pagerStyle]}
+        >
           {renderPager({
             ...props,
             ...rest,

@@ -119,6 +119,7 @@ Container component responsible for managing tab transitions.
 - `renderFooter` - optional callback which returns a react element to use as bottom tab bar
 - `renderPager` - optional callback which returns a react element to handle swipe gesture and animation
 - `renderScene` - callback which returns a react element to use as a scene
+- `pagerStyle` - optional style object for the pager container
 
 Any other props are passed to the underlying pager.
 
