@@ -14,8 +14,8 @@ type Props<T> = PagerRendererProps<T> & {
 
 const DefaultTransitionSpec = {
   timing: Animated.spring,
-  tension: 75,
-  friction: 25,
+  tension: 68,
+  friction: 12,
 };
 
 export default class TabViewPagerExperimental<T: *> extends React.Component<
@@ -29,10 +29,6 @@ export default class TabViewPagerExperimental<T: *> extends React.Component<
   };
 
   static defaultProps = {
-    GestureHandler:
-      global.__expo && global.__expo.DangerZone
-        ? global.__expo.DangerZone.GestureHandler
-        : undefined,
     canJumpToTab: () => true,
   };
 
@@ -43,7 +39,8 @@ export default class TabViewPagerExperimental<T: *> extends React.Component<
     ) {
       this._transitionTo(this.props.navigationState.index, undefined, false);
     } else if (
-      prevProps.navigationState.index !== this.props.navigationState.index
+      prevProps.navigationState.index !== this.props.navigationState.index &&
+      this.props.navigationState.index !== this._pendingIndex
     ) {
       this._transitionTo(this.props.navigationState.index);
     }
@@ -188,7 +185,9 @@ export default class TabViewPagerExperimental<T: *> extends React.Component<
               style={
                 width
                   ? { width }
-                  : i === navigationState.index ? StyleSheet.absoluteFill : null
+                  : i === navigationState.index
+                    ? StyleSheet.absoluteFill
+                    : null
               }
             >
               {i === navigationState.index || width ? child : null}

@@ -4,6 +4,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import {
   Animated,
+  I18nManager,
   PanResponder,
   StyleSheet,
   View,
@@ -97,7 +98,9 @@ export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
       return false;
     }
 
-    const { navigationState: { routes } } = this.props;
+    const {
+      navigationState: { routes },
+    } = this.props;
 
     return (
       this._isMovingHorizontally(evt, gestureState) &&
@@ -113,7 +116,9 @@ export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
   };
 
   _respondToGesture = (evt: GestureEvent, gestureState: GestureState) => {
-    const { navigationState: { routes, index } } = this.props;
+    const {
+      navigationState: { routes, index },
+    } = this.props;
 
     if (
       // swiping left
@@ -227,11 +232,14 @@ export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
     const { width } = layout;
     const { routes } = navigationState;
     const maxTranslate = width * (routes.length - 1);
-    const translateX = Animated.add(panX, offsetX).interpolate({
-      inputRange: [-maxTranslate, 0],
-      outputRange: [-maxTranslate, 0],
-      extrapolate: 'clamp',
-    });
+    const translateX = Animated.multiply(
+      Animated.add(panX, offsetX).interpolate({
+        inputRange: [-maxTranslate, 0],
+        outputRange: [-maxTranslate, 0],
+        extrapolate: 'clamp',
+      }),
+      I18nManager.isRTL ? -1 : 1
+    );
 
     return (
       <Animated.View
@@ -253,7 +261,9 @@ export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
             style={
               width
                 ? { width }
-                : i === navigationState.index ? StyleSheet.absoluteFill : null
+                : i === navigationState.index
+                  ? StyleSheet.absoluteFill
+                  : null
             }
           >
             {i === navigationState.index || width ? child : null}
