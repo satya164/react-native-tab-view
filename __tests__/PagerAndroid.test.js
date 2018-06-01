@@ -3,11 +3,11 @@
 import * as React from 'react';
 import { shallow } from 'enzyme';
 import { Animated, View } from 'react-native';
-import TabViewPagerAndroid from '../src/TabViewPagerAndroid';
+import PagerAndroid from '../src/PagerAndroid';
 
 it('renders all children', () => {
   const component = shallow(
-    <TabViewPagerAndroid
+    <PagerAndroid
       layout={{ height: 320, width: 240, measured: false }}
       navigationState={{
         index: 1,
@@ -27,7 +27,7 @@ it('renders all children', () => {
       <View />
       <View />
       <View />
-    </TabViewPagerAndroid>
+    </PagerAndroid>
   );
 
   expect(component.children().length).toBe(3);
@@ -38,7 +38,7 @@ it('renders all children', () => {
 
 it('initial page is same as navigation state index', () => {
   const component = shallow(
-    <TabViewPagerAndroid
+    <PagerAndroid
       layout={{ height: 320, width: 240, measured: false }}
       navigationState={{
         index: 2,
@@ -58,7 +58,7 @@ it('initial page is same as navigation state index', () => {
       <View />
       <View />
       <View />
-    </TabViewPagerAndroid>
+    </PagerAndroid>
   );
 
   expect(component.dive().instance().props.initialPage).toBe(2);
