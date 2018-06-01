@@ -25,6 +25,7 @@ it('renders only focused child until layout', () => {
       panX={new Animated.Value(0)}
       offsetX={new Animated.Value(0)}
       useNativeDriver={false}
+      getTestID={({ route }) => route.testID}
     >
       <View />
       <View />
@@ -95,6 +96,7 @@ it('sets initial scroll position according to navigation state index', () => {
       panX={new Animated.Value(0)}
       offsetX={new Animated.Value(0)}
       useNativeDriver={false}
+      getTestID={jest.fn()}
     >
       <View />
       <View />

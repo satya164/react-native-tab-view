@@ -22,6 +22,7 @@ it('renders all children', () => {
       panX={new Animated.Value(0)}
       offsetX={new Animated.Value(0)}
       useNativeDriver={false}
+      getTestID={({ route }) => route.testID}
     >
       <View />
       <View />
@@ -52,6 +53,7 @@ it('initial page is same as navigation state index', () => {
       panX={new Animated.Value(0)}
       offsetX={new Animated.Value(0)}
       useNativeDriver={false}
+      getTestID={({ route }) => route.testID}
     >
       <View />
       <View />
