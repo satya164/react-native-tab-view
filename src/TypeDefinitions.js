@@ -2,6 +2,7 @@
 
 import { Animated } from 'react-native';
 import type { Node } from 'react';
+import * as React from 'react';
 
 export type Route<T: { key: string }> = $Exact<T>;
 
