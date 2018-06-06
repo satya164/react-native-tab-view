@@ -43,6 +43,7 @@ type GestureState = {
 type Props<T> = PagerRendererProps<T> & {
   swipeDistanceThreshold?: number,
   swipeVelocityThreshold?: number,
+  transitionConfig: *,
 };
 
 const DEAD_ZONE = 12;
@@ -58,10 +59,14 @@ export default class PagerPan<T: *> extends React.Component<Props<T>> {
     ...PagerRendererPropType,
     swipeDistanceThreshold: PropTypes.number,
     swipeVelocityThreshold: PropTypes.number,
+    transitionConfig: PropTypes.shape({
+      timing: PropTypes.func.isRequired,
+    }),
   };
 
   static defaultProps = {
     canJumpToTab: () => true,
+    transitionConfig: DefaultTransitionSpec,
     initialLayout: {
       height: 0,
       width: 0,
@@ -196,7 +201,7 @@ export default class PagerPan<T: *> extends React.Component<Props<T>> {
       return;
     }
 
-    const { timing, ...transitionConfig } = DefaultTransitionSpec;
+    const { timing, ...transitionConfig } = this.props.transitionConfig;
 
     Animated.parallel([
       timing(this.props.panX, {
