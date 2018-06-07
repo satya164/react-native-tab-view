@@ -56,6 +56,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
   static propTypes = {
     ...SceneRendererPropType,
     scrollEnabled: PropTypes.bool,
+    dynamicWidth: PropTypes.bool,
     bounces: PropTypes.bool,
     pressColor: TouchableItem.propTypes.pressColor,
     pressOpacity: TouchableItem.propTypes.pressOpacity,
@@ -92,6 +93,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
       }
     }
 
+    this.tabWidth = {};
     const initialOffset =
       this.props.scrollEnabled
         ? {
@@ -112,11 +114,11 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
   }
 
   componentDidMount() {
-    this.props.scrollEnabled && this._startTrackingPosition();
+    this.props.scrollEnabled && !this.props.dynamicWidth && this._startTrackingPosition();
   }
 
   componentDidUpdate(prevProps: Props<T>) {
-    console.log('inside component did update');
+    // console.log('inside component did update');
     const prevTabWidth = this._getTabWidth(prevProps);
     const currentTabWidth = this._getTabWidth(this.props);
     const pendingIndex =
@@ -130,15 +132,15 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
       this.state.visibility.setValue(1);
     }
 
-    if (
-      prevProps.navigationState.routes !== this.props.navigationState.routes ||
-      prevProps.layout.width !== this.props.layout.width
-    ) {
-      this._resetScroll(this.props.navigationState.index, false);
-    } else if (prevProps.navigationState.index !== pendingIndex) {
-      this._resetScroll(this.props.navigationState.index);
-    }
-    // this._resetScroll(this.props.navigationState.index);
+    // if (
+    //   prevProps.navigationState.routes !== this.props.navigationState.routes ||
+    //   prevProps.layout.width !== this.props.layout.width
+    // ) {
+    //   this._resetScroll(this.props.navigationState.index, false);
+    // } else if (prevProps.navigationState.index !== pendingIndex) {
+    //   this._resetScroll(this.props.navigationState.index);
+    // }
+    this._resetScroll(this.props.navigationState.index);
   }
 
   componentWillUnmount() {
@@ -173,7 +175,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
   };
 
   _handlePosition = () => {
-    const { navigationState, layout } = this.props;
+    const { layout } = this.props;
 
     if (layout.width === 0) {
       // Don't do anything if we don't have layout yet
@@ -184,8 +186,6 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
     const lastOffsetX = typeof this._lastOffsetX === 'number' ? this._lastOffsetX : 0; 
 
     const value = (panX + lastOffsetX) / -(layout.width || 0.001);
-    // console.log('lastOffsetX: ', lastOffsetX);
-    // console.log('panX: ', panX / layout.width);
     this._adjustScroll(value);
   };
 
@@ -198,7 +198,10 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
       return null;
     }
     return (
-      <Animated.Text numberOfLines={1} style={[styles.tabLabel, this.props.labelStyle]}>
+      <Animated.Text
+        numberOfLines={1}
+        style={[styles.tabLabel, this.props.labelStyle]}
+      >
         {label}
       </Animated.Text>
     );
@@ -212,9 +215,9 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
     const { index, width, position, navigationState, translateIndicatorX } = props;
     const { tabWidth } = this.state;
 
-    const inputRange = [];
-    const outputRange = [];
-    const scaleOutputRange = [];
+    let inputRange = [];
+    let outputRange = [];
+    let scaleOutputRange = [];
     let cummulativeWidth = 0;
     // console.log(tabWidth);
     for (let i = 0; i < navigationState.routes.length; i += 1) {
@@ -226,8 +229,23 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
       scaleOutputRange.push(tabWidth[i]);
     }
     
+    
+    // handle case when only one section is present
+    if (inputRange.length === 1) {
+      inputRange = [-1, ...inputRange];
+    }
+
+    if (outputRange.length === 1) {
+      outputRange = [0, ...outputRange];
+    }
+
+    if (scaleOutputRange.length === 1) {
+      scaleOutputRange = [0, ...scaleOutputRange];
+    }
+
     // console.log(inputRange);
     // console.log(outputRange);
+    // console.log(scaleOutputRange);
 
     const translateX = Animated.multiply(
         position.interpolate({
@@ -341,11 +359,11 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
     finalScroll += tabWidth[targetIndex] * 0.5;
 
     if (i > this.props.navigationState.index) {
-      const diff = (tabWidth[targetIndex] * 0.5 + tabWidth[this.props.navigationState.index] * 0.5) * (targetIndex - i);
+      const diff = (tabWidth[targetIndex] * 0.5 + tabWidth[this.props.navigationState.index] * 0.5) * ((targetIndex - i) || 0.001);
       // console.log(`diff: ${diff}`)
       finalScroll -= diff;
     } else if (i < this.props.navigationState.index) {
-      const diff = (tabWidth[this.props.navigationState.index] * 0.5 + tabWidth[targetIndex] * 0.5) * (i - targetIndex);
+      const diff = (tabWidth[this.props.navigationState.index] * 0.5 + tabWidth[targetIndex] * 0.5) * ((i - targetIndex) || 0.001);
       finalScroll += diff;
     }
 
@@ -380,7 +398,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
         this._scrollView &&
           this._scrollView.scrollTo({
             x: this._getScrollAmount(this.props, value),
-            animated,
+            animated: animated,
           });
       });
     }
@@ -416,9 +434,12 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
   };
 
   _onTabLayout = (tabIndex, { nativeEvent: { layout: { width } } }) => {
-    this.setState(oldState => ({
-      tabWidth: { ...oldState.tabWidth, [tabIndex]: width }
-    }));
+    this.tabWidth[tabIndex] = width;
+    if (Object.keys(this.tabWidth).length === this.props.navigationState.routes.length) {
+      this.setState(oldState => ({
+        tabWidth: this.tabWidth 
+      }));
+    } 
     // console.log('updated layout for tab: ', tabIndex);
     // console.log(this.state.tabWidth);
   }
