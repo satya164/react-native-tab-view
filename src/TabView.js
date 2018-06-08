@@ -69,14 +69,16 @@ export default class TabView<T: *> extends React.Component<Props<T>, State> {
   constructor(props: Props<T>) {
     super(props);
 
-    const { navigationState } = this.props;
+    const { navigationState, explicitPanX, explicitOffsetX } = this.props;
     const layout = {
       ...this.props.initialLayout,
       measured: false,
     };
 
-    const panX = new Animated.Value(0);
-    const offsetX = new Animated.Value(-navigationState.index * layout.width);
+    const panX = explicitPanX || new Animated.Value(0);
+    const offsetX =
+      explicitOffsetX ||
+      new Animated.Value(-navigationState.index * layout.width);
     const layoutXY = new Animated.ValueXY({
       // This is hacky, but we need to make sure that the value is never 0
       x: layout.width || 0.001,
