@@ -93,9 +93,12 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
       }
     }
 
+    // static variable to keep track of tab width
     this.tabWidth = {};
+
     const initialOffset =
-      this.props.scrollEnabled
+      this.props.scrollEnabled &&
+      (!this.props.dynamicWidth && this.props.layout.width)
         ? {
             x: this._getScrollAmount(
               this.props,
@@ -114,11 +117,12 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
   }
 
   componentDidMount() {
-    this.props.scrollEnabled && !this.props.dynamicWidth && this._startTrackingPosition();
+    this.props.scrollEnabled &&
+      !this.props.dynamicWidth &&
+      this._startTrackingPosition();
   }
 
   componentDidUpdate(prevProps: Props<T>) {
-    // console.log('inside component did update');
     const prevTabWidth = this._getTabWidth(prevProps);
     const currentTabWidth = this._getTabWidth(this.props);
     const pendingIndex =
@@ -132,15 +136,19 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
       this.state.visibility.setValue(1);
     }
 
-    // if (
-    //   prevProps.navigationState.routes !== this.props.navigationState.routes ||
-    //   prevProps.layout.width !== this.props.layout.width
-    // ) {
-    //   this._resetScroll(this.props.navigationState.index, false);
-    // } else if (prevProps.navigationState.index !== pendingIndex) {
-    //   this._resetScroll(this.props.navigationState.index);
-    // }
-    this._resetScroll(this.props.navigationState.index);
+    if (!this.props.dynamicWidth) {
+      if (
+        prevProps.navigationState.routes !==
+          this.props.navigationState.routes ||
+        prevProps.layout.width !== this.props.layout.width
+      ) {
+        this._resetScroll(this.props.navigationState.index, false);
+      } else if (prevProps.navigationState.index !== pendingIndex) {
+        this._resetScroll(this.props.navigationState.index);
+      }
+    } else {
+      this._resetScroll(this.props.navigationState.index);
+    }
   }
 
   componentWillUnmount() {
@@ -175,7 +183,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
   };
 
   _handlePosition = () => {
-    const { layout } = this.props;
+    const { navigationState, layout } = this.props;
 
     if (layout.width === 0) {
       // Don't do anything if we don't have layout yet
@@ -183,9 +191,13 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
     }
 
     const panX = typeof this._lastPanX === 'number' ? this._lastPanX : 0;
-    const lastOffsetX = typeof this._lastOffsetX === 'number' ? this._lastOffsetX : 0; 
+    const offsetX =
+      typeof this._lastOffsetX === 'number'
+        ? this._lastOffsetX
+        : -navigationState.index * layout.width;
 
-    const value = (panX + lastOffsetX) / -(layout.width || 0.001);
+    const value = (panX + offsetX) / -(layout.width || 0.001);
+
     this._adjustScroll(value);
   };
 
@@ -197,9 +209,15 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
     if (typeof label !== 'string') {
       return null;
     }
+
+    const numberOfLinesProp = {};
+    if (this.props.dynamicWidth) {
+      numberOfLinesProp.numberOfLines = 1;
+    }
+
     return (
       <Animated.Text
-        numberOfLines={1}
+        {...numberOfLinesProp}
         style={[styles.tabLabel, this.props.labelStyle]}
       >
         {label}
@@ -212,75 +230,81 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
       return this.props.renderIndicator(props);
     }
 
-    const { index, width, position, navigationState, translateIndicatorX } = props;
-    const { tabWidth } = this.state;
+    const { position, navigationState, width } = props;
 
-    let inputRange = [];
-    let outputRange = [];
-    let scaleOutputRange = [];
-    let cummulativeWidth = 0;
-    // console.log(tabWidth);
-    for (let i = 0; i < navigationState.routes.length; i += 1) {
-      inputRange.push(i);
-      if (i !== 0) {
-        cummulativeWidth += tabWidth[i - 1];
+    let translateX = null;
+    let scaleX = null;
+
+    if (!this.props.dynamicWidth) {
+      translateX = Animated.multiply(
+        Animated.multiply(
+          position.interpolate({
+            inputRange: [0, navigationState.routes.length - 1],
+            outputRange: [0, navigationState.routes.length - 1],
+            extrapolate: 'clamp',
+          }),
+          width
+        ),
+        I18nManager.isRTL ? -1 : 1
+      );
+    } else {
+      const { tabWidth } = this.state;
+
+      let inputRange = [];
+      let outputRange = [];
+      let scaleOutputRange = [];
+      let cummulativeWidth = 0;
+
+      for (let i = 0; i < navigationState.routes.length; i += 1) {
+        inputRange.push(i);
+        if (i !== 0) {
+          cummulativeWidth += tabWidth[i - 1];
+        }
+        outputRange.push(cummulativeWidth + tabWidth[i] * 0.5);
+        scaleOutputRange.push(tabWidth[i]);
       }
-      outputRange.push(cummulativeWidth + tabWidth[i] * 0.5);
-      scaleOutputRange.push(tabWidth[i]);
-    }
-    
-    
-    // handle case when only one section is present
-    if (inputRange.length === 1) {
-      inputRange = [-1, ...inputRange];
-    }
 
-    if (outputRange.length === 1) {
-      outputRange = [0, ...outputRange];
-    }
+      // handle case when only one section is present
+      if (inputRange.length === 1) {
+        inputRange = [-1, ...inputRange];
+      }
 
-    if (scaleOutputRange.length === 1) {
-      scaleOutputRange = [0, ...scaleOutputRange];
-    }
+      if (outputRange.length === 1) {
+        outputRange = [0, ...outputRange];
+      }
 
-    // console.log(inputRange);
-    // console.log(outputRange);
-    // console.log(scaleOutputRange);
+      if (scaleOutputRange.length === 1) {
+        scaleOutputRange = [0, ...scaleOutputRange];
+      }
 
-    const translateX = Animated.multiply(
+      translateX = Animated.multiply(
         position.interpolate({
           inputRange,
           outputRange,
           extrapolate: 'clamp',
         }),
-      I18nManager.isRTL ? -1 : 1
-    );
+        I18nManager.isRTL ? -1 : 1
+      );
 
-    const scaleX = position.interpolate({
+      scaleX = position.interpolate({
         inputRange,
         outputRange: scaleOutputRange,
-        extrapolate: 'clamp'
+        extrapolate: 'clamp',
       });
-    // const translateX = Animated.multiply(
-    //   Animated.add(
-    //     position.interpolate({
-    //       inputRange: [0, navigationState.routes.length - 1],
-    //       outputRange: [0, 500],
-    //       extrapolate: 'clamp',
-    //     }),
-    //     translateIndicatorX,
-    //   ),
-    //   I18nManager.isRTL ? -1 : 1
-    // );
-    // const translateX = Animated.multiply(translateIndicatorX, I18nManager.isRTL ? -1 : 1);
-    // console.log('translated: ', translateX);
+    }
+
+    const additionalStyle = {};
+    additionalStyle.transform = [{ translateX }];
+    if (!this.props.dynamicWidth) {
+      additionalStyle.width = width;
+    } else {
+      additionalStyle.transform.push({ scaleX });
+      additionalStyle.width = 1;
+    }
+
     return (
       <Animated.View
-        style={[
-          styles.indicator,
-          { width: 1, transform: [{ translateX }, { scaleX }] },
-          this.props.indicatorStyle,
-        ]}
+        style={[styles.indicator, additionalStyle, this.props.indicatorStyle]}
       />
     );
   };
@@ -313,8 +337,6 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
   _handleTabPress = ({ route }: Scene<*>) => {
     this._pendingIndex = this.props.navigationState.routes.indexOf(route);
 
-    // console.log('in _handleTabPress');
-
     if (this.props.onTabPress) {
       this.props.onTabPress({ route });
     }
@@ -324,55 +346,74 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
 
   _normalizeScrollValue = (props, value) => {
     const { layout, navigationState } = props;
-    // const tabWidth = this._getTabWidth(props);
-    const { tabWidth } = this.state;
+    let maxDistance = null;
 
-    const tabBarWidth = Math.max(
-      Object.keys(tabWidth).reduce((total, key) => total + tabWidth[key], 0),
-      layout.width
-    );
-    const maxDistance = tabBarWidth - layout.width;
+    if (!this.props.dynamicWidth) {
+      const tabWidth = this._getTabWidth(props);
+      const tabBarWidth = Math.max(
+        tabWidth * navigationState.routes.length,
+        layout.width
+      );
+      maxDistance = tabBarWidth - layout.width;
+    } else {
+      const { tabWidth } = this.state;
+
+      const tabBarWidth = Math.max(
+        Object.keys(tabWidth).reduce((total, key) => total + tabWidth[key], 0),
+        layout.width
+      );
+      maxDistance = tabBarWidth - layout.width;
+    }
 
     return Math.max(Math.min(value, maxDistance), 0);
   };
 
   _getScrollAmount = (props, i) => {
     const { layout } = props;
-    // const tabWidth = this._getTabWidth(props);
-    if (!this.state) {
-      return 0;
-    }
 
-    let targetIndex = null;
-    if (i > this.props.navigationState.index && i < this.props.navigationState.routes.length - 1) {
-      targetIndex = Math.ceil(i);
+    let scrollAmount = null;
+    if (!this.props.dynamicWidth) {
+      const tabWidth = this._getTabWidth(props);
+      const centerDistance = tabWidth * (i + 1 / 2);
+      scrollAmount = centerDistance - layout.width / 2;
     } else {
-      targetIndex = Math.floor(i);
+      if (!this.state.tabWidth) {
+        scrollAmount = 0;
+      } else {
+        let targetIndex = null;
+        if (
+          i > this.props.navigationState.index &&
+          i < this.props.navigationState.routes.length - 1
+        ) {
+          targetIndex = Math.ceil(i);
+        } else {
+          targetIndex = Math.floor(i);
+        }
+
+        const { tabWidth } = this.state;
+        let finalScroll = 0;
+        for (let j = 0; j < targetIndex; ++j) {
+          finalScroll += tabWidth[j];
+        }
+        finalScroll += tabWidth[targetIndex] * 0.5;
+
+        if (i > this.props.navigationState.index) {
+          const diff =
+            (tabWidth[targetIndex] * 0.5 +
+              tabWidth[this.props.navigationState.index] * 0.5) *
+            (targetIndex - i || 0.001);
+
+          finalScroll -= diff;
+        } else if (i < this.props.navigationState.index) {
+          const diff =
+            (tabWidth[this.props.navigationState.index] * 0.5 +
+              tabWidth[targetIndex] * 0.5) *
+            (i - targetIndex || 0.001);
+          finalScroll += diff;
+        }
+        scrollAmount = finalScroll - layout.width / 2;
+      }
     }
-
-
-    const { tabWidth } = this.state;
-    let finalScroll = 0;
-    for (let j = 0; j < targetIndex; ++j) {
-      finalScroll += tabWidth[j];
-    }
-    finalScroll += tabWidth[targetIndex] * 0.5;
-
-    if (i > this.props.navigationState.index) {
-      const diff = (tabWidth[targetIndex] * 0.5 + tabWidth[this.props.navigationState.index] * 0.5) * ((targetIndex - i) || 0.001);
-      // console.log(`diff: ${diff}`)
-      finalScroll -= diff;
-    } else if (i < this.props.navigationState.index) {
-      const diff = (tabWidth[this.props.navigationState.index] * 0.5 + tabWidth[targetIndex] * 0.5) * ((i - targetIndex) || 0.001);
-      finalScroll += diff;
-    }
-
-    scrollAmount = finalScroll - layout.width / 2;
-
-    // console.log(`i: ${i}`);
-    // console.log(`currentIndex: ${this.props.navigationState.index}`);
-    // console.log(`targetIndex: ${targetIndex}`);
-    // console.log(`scrollAmount: ${scrollAmount}`);
 
     return this._normalizeScrollValue(props, scrollAmount);
   };
@@ -380,25 +421,35 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
   _adjustScroll = (value: number) => {
     if (this.props.scrollEnabled) {
       global.cancelAnimationFrame(this._scrollResetCallback);
-      this._scrollView &&
-        this._scrollView.scrollTo({
-          x: this._getScrollAmount(this.props, value),
-          animated: false, // Disable animation for the initial render
-        });
+      if (!this.state.dynamicWidth) {
+        this._scrollView &&
+          this._scrollView.scrollTo({
+            x: this._normalizeScrollValue(
+              this.props,
+              this._getScrollAmount(this.props, value)
+            ),
+            animated: !this._isIntial, // Disable animation for the initial render
+          });
 
-      this._isIntial = false;
+        this._isIntial = false;
+      } else {
+        this._scrollView &&
+          this._scrollView.scrollTo({
+            x: this._getScrollAmount(this.props, value),
+            animated: false, // Disable animation for the initial render
+          });
+      }
     }
   };
 
   _resetScroll = (value: number, animated = true) => {
-    // console.log('inside _resetScroll');
     if (this.props.scrollEnabled) {
       global.cancelAnimationFrame(this._scrollResetCallback);
       this._scrollResetCallback = global.requestAnimationFrame(() => {
         this._scrollView &&
           this._scrollView.scrollTo({
             x: this._getScrollAmount(this.props, value),
-            animated: animated,
+            animated,
           });
       });
     }
@@ -433,58 +484,83 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
     this._isManualScroll = false;
   };
 
-  _onTabLayout = (tabIndex, { nativeEvent: { layout: { width } } }) => {
+  _onTabLayout = (
+    tabIndex,
+    {
+      nativeEvent: {
+        layout: { width },
+      },
+    }
+  ) => {
     this.tabWidth[tabIndex] = width;
-    if (Object.keys(this.tabWidth).length === this.props.navigationState.routes.length) {
-      this.setState(oldState => ({
-        tabWidth: this.tabWidth 
-      }));
-    } 
-    // console.log('updated layout for tab: ', tabIndex);
-    // console.log(this.state.tabWidth);
-  }
+    if (
+      Object.keys(this.tabWidth).length ===
+      this.props.navigationState.routes.length
+    ) {
+      this.setState({
+        tabWidth: this.tabWidth,
+      });
+    }
+  };
 
   render() {
-    // console.log(this.props.navigationState);
     const { position, navigationState, scrollEnabled, bounces } = this.props;
     const { routes, index } = navigationState;
-    // const tabWidth = this._getTabWidth(this.props);
-    // const tabBarWidth = tabWidth * routes.length;
-    const { tabWidth: newTabWidth } = this.state;
-    const newTabBarWidth = Object.keys(newTabWidth).reduce((total, key) => total + newTabWidth[key], 0);
+    let tabWidth = null;
+    let tabBarWidth = null;
+    let translateIndicatorX = 0;
+    let indicator = null;
 
-    // console.log('dynamic tabWidth: ', newTabWidth);
-    // console.log('dynamic tabBarWidth: ', newTabBarWidth);
+    if (!this.props.dynamicWidth) {
+      tabWidth = this._getTabWidth(this.props);
+      tabBarWidth = tabWidth * routes.length;
+      indicator = this._renderIndicator({
+        ...this.props,
+        width: tabWidth,
+      });
+    } else {
+      const { tabWidth: dynamicTabWidth } = this.state;
+      tabBarWidth = Object.keys(dynamicTabWidth).reduce(
+        (total, key) => total + dynamicTabWidth[key],
+        0
+      );
+      for (let i = 0; i < index; ++i) {
+        translateIndicatorX += dynamicTabWidth[i];
+      }
+
+      if (Object.keys(dynamicTabWidth).length === routes.length) {
+        indicator = this._renderIndicator({
+          ...this.props,
+          translateIndicatorX,
+        });
+      }
+    }
 
     // Prepend '-1', so there are always at least 2 items in inputRange
     const inputRange = [-1, ...routes.map((x, i) => i)];
     const translateX = Animated.multiply(this.state.scrollAmount, -1);
-    let translateIndicatorX = 0;
-    for (let i = 0; i < index; ++i) {
-      translateIndicatorX += newTabWidth[i];
+
+    const scrollBehaviourProps = {};
+    if (!this.props.dynamicTabWidth) {
+      scrollBehaviourProps.onScrollBeginDrag = this._handleBeginDrag;
+      scrollBehaviourProps.onScrollEndDrag = this._handleEndDrag;
+      scrollBehaviourProps.onMomentumScrollBegin = this._handleMomentumScrollBegin;
+      scrollBehaviourProps.onMomentumScrollEnd = this._handleMomentumScrollEnd;
     }
 
     return (
       <Animated.View style={[styles.tabBar, this.props.style]}>
-        { Object.keys(newTabWidth).length === routes.length && (
         <Animated.View
           pointerEvents="none"
           style={[
             styles.indicatorContainer,
             scrollEnabled
-                  ? { width: newTabBarWidth, transform: [{ translateX }] }
+              ? { width: tabBarWidth, transform: [{ translateX }] }
               : null,
           ]}
         >
-          {this._renderIndicator({
-            ...this.props,
-                width: newTabWidth[Object.keys(newTabWidth)[index]],
-                translateIndicatorX,
-                index 
-                // width: tabWidth
-          })}
-            </Animated.View>)
-        }
+          {indicator}
+        </Animated.View>
         <View style={styles.scroll}>
           <Animated.ScrollView
             horizontal
@@ -511,10 +587,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
               ],
               { useNativeDriver }
             )}
-            // onScrollBeginDrag={this._handleBeginDrag}
-            // onScrollEndDrag={this._handleEndDrag}
-            // onMomentumScrollBegin={this._handleMomentumScrollBegin}
-            // onMomentumScrollEnd={this._handleMomentumScrollEnd}
+            {...scrollBehaviourProps}
             contentOffset={this.state.initialOffset}
             ref={el => (this._scrollView = el && el._component)}
           >
@@ -550,18 +623,24 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
               }
 
               const passedTabStyle = StyleSheet.flatten(this.props.tabStyle);
-              // const isWidthSet =
-              //   (passedTabStyle &&
-              //     typeof passedTabStyle.width !== 'undefined') ||
-              //   scrollEnabled === true;
               const tabContainerStyle = {};
-
-              // if (isWidthSet) {
-              //   tabStyle.width = tabWidth;
-              // }
-
               if (passedTabStyle && typeof passedTabStyle.flex === 'number') {
                 tabContainerStyle.flex = passedTabStyle.flex;
+              }
+
+              if (!this.state.dynamicWidth) {
+                const isWidthSet =
+                  (passedTabStyle &&
+                    typeof passedTabStyle.width !== 'undefined') ||
+                  scrollEnabled === true;
+
+                if (isWidthSet) {
+                  tabStyle.width = tabWidth;
+                }
+
+                if (!isWidthSet) {
+                  tabContainerStyle.flex = 1;
+                }
               } else {
                 tabContainerStyle.flex = 1;
               }
@@ -576,6 +655,11 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
                   : this.props.getLabelText({ route });
 
               const isFocused = i === navigationState.index;
+
+              const onLayoutProp = {};
+              if (this.props.dynamicWidth) {
+                onLayoutProp.onLayout = event => this._onTabLayout(i, event);
+              }
 
               return (
                 <TouchableItem
@@ -597,7 +681,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
                   <View
                     pointerEvents="none"
                     style={styles.container}
-                    onLayout={(event) => this._onTabLayout(i, event)}
+                    {...onLayoutProp}
                   >
                     <Animated.View
                       style={[
