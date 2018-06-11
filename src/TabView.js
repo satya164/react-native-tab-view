@@ -2,8 +2,10 @@
 
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Animated, Platform, View, StyleSheet } from 'react-native';
-import { NavigationStatePropType } from './TabViewPropTypes';
+import { Animated, View, StyleSheet } from 'react-native';
+import TabBar from './TabBar';
+import PagerDefault from './PagerDefault';
+import { NavigationStatePropType } from './PropTypes';
 import type {
   Scene,
   SceneRendererProps,
@@ -11,22 +13,20 @@ import type {
   Layout,
   PagerCommonProps,
   PagerExtraProps,
-  Style,
-} from './TabViewTypeDefinitions';
+} from './TypeDefinitions';
+import type { ViewStyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
 
 type Props<T> = PagerCommonProps<T> &
   PagerExtraProps & {
     navigationState: NavigationState<T>,
     onIndexChange: (index: number) => mixed,
     initialLayout?: Layout,
-    renderPager: (props: *) => React.Element<any>,
-    renderScene: (
-      props: SceneRendererProps<T> & Scene<T>
-    ) => ?React.Element<any>,
-    renderHeader?: (props: SceneRendererProps<T>) => ?React.Element<any>,
-    renderFooter?: (props: SceneRendererProps<T>) => ?React.Element<any>,
+    renderPager: (props: *) => React.Node,
+    renderScene: (props: SceneRendererProps<T> & Scene<T>) => React.Node,
+    renderTabBar: (props: SceneRendererProps<T>) => React.Node,
+    tabBarPosition: 'top' | 'bottom',
     useNativeDriver?: boolean,
-    style?: Style,
+    style?: ViewStyleProp,
   };
 
 type State = {|
@@ -37,24 +37,7 @@ type State = {|
   position: any,
 |};
 
-let TabViewPager;
-
-switch (Platform.OS) {
-  case 'android':
-    TabViewPager = require('./TabViewPagerAndroid').default;
-    break;
-  case 'ios':
-    TabViewPager = require('./TabViewPagerScroll').default;
-    break;
-  default:
-    TabViewPager = require('./TabViewPagerPan').default;
-    break;
-}
-
-export default class TabViewAnimated<T: *> extends React.Component<
-  Props<T>,
-  State
-> {
+export default class TabView<T: *> extends React.Component<Props<T>, State> {
   static propTypes = {
     navigationState: NavigationStatePropType.isRequired,
     onIndexChange: PropTypes.func.isRequired,
@@ -65,13 +48,17 @@ export default class TabViewAnimated<T: *> extends React.Component<
     canJumpToTab: PropTypes.func.isRequired,
     renderPager: PropTypes.func.isRequired,
     renderScene: PropTypes.func.isRequired,
-    renderHeader: PropTypes.func,
-    renderFooter: PropTypes.func,
+    renderTabBar: PropTypes.func,
+    tabBarPosition: PropTypes.oneOf(['top', 'bottom']),
   };
 
   static defaultProps = {
     canJumpToTab: () => true,
-    renderPager: props => <TabViewPager {...props} />,
+    tabBarPosition: 'top',
+    renderTabBar: (props: *) => <TabBar {...props} />,
+    renderPager: (props: *) => <PagerDefault {...props} />,
+    getTestID: ({ route }: Scene<*>) =>
+      typeof route.testID === 'string' ? route.testID : undefined,
     initialLayout: {
       height: 0,
       width: 0,
@@ -156,20 +143,8 @@ export default class TabViewAnimated<T: *> extends React.Component<
     layout: this.state.layout,
     navigationState: this.props.navigationState,
     jumpTo: this._jumpTo,
-    jumpToIndex: this._jumpToIndex,
     useNativeDriver: this.props.useNativeDriver === true,
   });
-
-  _jumpToIndex = (index: number) => {
-    const { key } = this.props.navigationState.routes[index];
-
-    console.warn(
-      'Method `jumpToIndex` is deprecated. Please upgrade your code to use `jumpTo` instead.',
-      `Change your code from \`jumpToIndex(${index})\` to \`jumpTo('${key}').\``
-    );
-
-    this._jumpTo(key);
-  };
 
   _jumpTo = (key: string) => {
     if (!this._mounted) {
@@ -198,8 +173,8 @@ export default class TabViewAnimated<T: *> extends React.Component<
       renderScene,
       /* eslint-enable no-unused-vars */
       renderPager,
-      renderHeader,
-      renderFooter,
+      renderTabBar,
+      tabBarPosition,
       ...rest
     } = this.props;
 
@@ -207,22 +182,21 @@ export default class TabViewAnimated<T: *> extends React.Component<
 
     return (
       <View collapsable={false} style={[styles.container, this.props.style]}>
-        {renderHeader && renderHeader(props)}
+        {tabBarPosition === 'top' && renderTabBar(props)}
         <View onLayout={this._handleLayout} style={styles.pager}>
           {renderPager({
             ...props,
             ...rest,
             panX: this.state.panX,
             offsetX: this.state.offsetX,
-            children: navigationState.routes.map((route, index) => {
+            children: navigationState.routes.map(route => {
               const scene = this._renderScene({
                 ...props,
                 route,
-                index,
-                focused: index === navigationState.index,
               });
 
-              if (scene) {
+              if (React.isValidElement(scene)) {
+                /* $FlowFixMe: https://github.com/facebook/flow/issues/4775 */
                 return React.cloneElement(scene, { key: route.key });
               }
 
@@ -230,7 +204,7 @@ export default class TabViewAnimated<T: *> extends React.Component<
             }),
           })}
         </View>
-        {renderFooter && renderFooter(props)}
+        {tabBarPosition === 'bottom' && renderTabBar(props)}
       </View>
     );
   }

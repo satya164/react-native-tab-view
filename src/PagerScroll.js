@@ -2,8 +2,8 @@
 
 import * as React from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
-import { PagerRendererPropType } from './TabViewPropTypes';
-import type { PagerRendererProps } from './TabViewTypeDefinitions';
+import { PagerRendererPropType } from './PropTypes';
+import type { PagerRendererProps } from './TypeDefinitions';
 
 type ScrollEvent = {
   nativeEvent: {
@@ -24,7 +24,7 @@ type State = {|
 
 type Props<T> = PagerRendererProps<T>;
 
-export default class TabViewPagerScroll<T: *> extends React.Component<
+export default class PagerScroll<T: *> extends React.Component<
   Props<T>,
   State
 > {
@@ -55,7 +55,8 @@ export default class TabViewPagerScroll<T: *> extends React.Component<
     const amount = this.props.navigationState.index * this.props.layout.width;
 
     if (
-      prevProps.navigationState.routes !== this.props.navigationState.routes ||
+      prevProps.navigationState.routes.length !==
+        this.props.navigationState.routes.length ||
       prevProps.layout.width !== this.props.layout.width
     ) {
       this._scrollTo(amount, false);
@@ -101,7 +102,7 @@ export default class TabViewPagerScroll<T: *> extends React.Component<
 
     const nextRoute = this.props.navigationState.routes[nextIndex];
 
-    if (this.props.canJumpToTab(nextRoute)) {
+    if (this.props.canJumpToTab({ route: nextRoute })) {
       this.props.jumpTo(nextRoute.key);
       this.props.onAnimationEnd && this.props.onAnimationEnd();
     } else {
@@ -165,19 +166,30 @@ export default class TabViewPagerScroll<T: *> extends React.Component<
         contentContainerStyle={layout.width ? null : styles.container}
         ref={el => (this._scrollView = el)}
       >
-        {React.Children.map(children, (child, i) => (
-          <View
-            key={navigationState.routes[i].key}
-            testID={navigationState.routes[i].testID}
-            style={
-              layout.width
-                ? { width: layout.width, overflow: 'hidden' }
-                : i === navigationState.index ? styles.page : null
-            }
-          >
-            {i === navigationState.index || layout.width ? child : null}
-          </View>
-        ))}
+        {React.Children.map(children, (child, i) => {
+          const route = navigationState.routes[i];
+          const focused = i === navigationState.index;
+
+          return (
+            <View
+              key={route.key}
+              testID={this.props.getTestID({ route })}
+              accessibilityElementsHidden={!focused}
+              importantForAccessibility={
+                focused ? 'auto' : 'no-hide-descendants'
+              }
+              style={
+                layout.width
+                  ? { width: layout.width, overflow: 'hidden' }
+                  : focused
+                    ? styles.page
+                    : null
+              }
+            >
+              {focused || layout.width ? child : null}
+            </View>
+          );
+        })}
       </ScrollView>
     );
   }

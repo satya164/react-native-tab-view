@@ -1,5 +1,4 @@
 /* @flow */
-/* eslint-disable import/no-commonjs */
 
 import * as React from 'react';
 import {
@@ -10,9 +9,12 @@ import {
   Dimensions,
   StyleSheet,
 } from 'react-native';
-import { TabViewAnimated, TabViewPagerPan } from 'react-native-tab-view';
-
-import type { Route, NavigationState } from 'react-native-tab-view/types';
+import {
+  TabView,
+  PagerPan,
+  type Route,
+  type NavigationState,
+} from 'react-native-tab-view';
 
 type State = NavigationState<
   Route<{
@@ -52,7 +54,7 @@ export default class CoverflowExample extends React.Component<*, State> {
     const currentIndex = routes.indexOf(route);
     const inputRange = routes.map((x, i) => i);
     const translateOutputRange = inputRange.map(i => {
-      return width / 2 * (currentIndex - i) * -1;
+      return (width / 2) * (currentIndex - i) * -1;
     });
     const scaleOutputRange = inputRange.map(i => {
       if (currentIndex === i) {
@@ -96,6 +98,8 @@ export default class CoverflowExample extends React.Component<*, State> {
       index,
     });
 
+  _renderTabBar = () => null;
+
   _renderScene = props => (
     <Animated.View style={[styles.page, this._buildCoverFlowStyle(props)]}>
       <View style={styles.album}>
@@ -105,13 +109,14 @@ export default class CoverflowExample extends React.Component<*, State> {
     </Animated.View>
   );
 
-  _renderPager = props => <TabViewPagerPan {...props} />;
+  _renderPager = props => <PagerPan {...props} />;
 
   render() {
     return (
-      <TabViewAnimated
+      <TabView
         style={[styles.container, this.props.style]}
         navigationState={this.state}
+        renderTabBar={this._renderTabBar}
         renderPager={this._renderPager}
         renderScene={this._renderScene}
         onIndexChange={this._handleIndexChange}

@@ -3,8 +3,8 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { Animated, StyleSheet, View } from 'react-native';
-import { PagerRendererPropType } from './TabViewPropTypes';
-import type { PagerRendererProps } from './TabViewTypeDefinitions';
+import { PagerRendererPropType } from './PropTypes';
+import type { PagerRendererProps } from './TypeDefinitions';
 
 type Props<T> = PagerRendererProps<T> & {
   swipeDistanceThreshold?: number,
@@ -14,13 +14,11 @@ type Props<T> = PagerRendererProps<T> & {
 
 const DefaultTransitionSpec = {
   timing: Animated.spring,
-  tension: 75,
-  friction: 25,
+  tension: 68,
+  friction: 12,
 };
 
-export default class TabViewPagerExperimental<T: *> extends React.Component<
-  Props<T>
-> {
+export default class PagerExperimental<T: *> extends React.Component<Props<T>> {
   static propTypes = {
     ...PagerRendererPropType,
     swipeDistanceThreshold: PropTypes.number,
@@ -29,21 +27,19 @@ export default class TabViewPagerExperimental<T: *> extends React.Component<
   };
 
   static defaultProps = {
-    GestureHandler:
-      global.__expo && global.__expo.DangerZone
-        ? global.__expo.DangerZone.GestureHandler
-        : undefined,
     canJumpToTab: () => true,
   };
 
   componentDidUpdate(prevProps: Props<T>) {
     if (
-      prevProps.navigationState.routes !== this.props.navigationState.routes ||
+      prevProps.navigationState.routes.length !==
+        this.props.navigationState.routes.length ||
       prevProps.layout.width !== this.props.layout.width
     ) {
       this._transitionTo(this.props.navigationState.index, undefined, false);
     } else if (
-      prevProps.navigationState.index !== this.props.navigationState.index
+      prevProps.navigationState.index !== this.props.navigationState.index &&
+      this.props.navigationState.index !== this._pendingIndex
     ) {
       this._transitionTo(this.props.navigationState.index);
     }
@@ -181,19 +177,26 @@ export default class TabViewPagerExperimental<T: *> extends React.Component<
               : null,
           ]}
         >
-          {React.Children.map(children, (child, i) => (
-            <View
-              key={navigationState.routes[i].key}
-              testID={navigationState.routes[i].testID}
-              style={
-                width
-                  ? { width }
-                  : i === navigationState.index ? StyleSheet.absoluteFill : null
-              }
-            >
-              {i === navigationState.index || width ? child : null}
-            </View>
-          ))}
+          {React.Children.map(children, (child, i) => {
+            const route = navigationState.routes[i];
+            const focused = i === navigationState.index;
+
+            return (
+              <View
+                key={route.key}
+                testID={this.props.getTestID({ route })}
+                accessibilityElementsHidden={!focused}
+                importantForAccessibility={
+                  focused ? 'auto' : 'no-hide-descendants'
+                }
+                style={
+                  width ? { width } : focused ? StyleSheet.absoluteFill : null
+                }
+              >
+                {focused || width ? child : null}
+              </View>
+            );
+          })}
         </Animated.View>
       </GestureHandler.PanGestureHandler>
     );

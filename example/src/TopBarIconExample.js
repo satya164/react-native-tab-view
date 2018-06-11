@@ -3,12 +3,16 @@
 import * as React from 'react';
 import { StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { TabViewAnimated, TabBar, SceneMap } from 'react-native-tab-view';
+import {
+  TabView,
+  TabBar,
+  SceneMap,
+  type Route,
+  type NavigationState,
+} from 'react-native-tab-view';
 import Article from './shared/Article';
 import Chat from './shared/Chat';
 import Contacts from './shared/Contacts';
-
-import type { Route, NavigationState } from 'react-native-tab-view/types';
 
 type State = NavigationState<
   Route<{
@@ -40,7 +44,7 @@ export default class TopBarIconExample extends React.Component<*, State> {
     <Ionicons name={route.icon} size={24} color="white" />
   );
 
-  _renderHeader = props => {
+  _renderTabBar = props => {
     return (
       <TabBar
         {...props}
@@ -59,11 +63,11 @@ export default class TopBarIconExample extends React.Component<*, State> {
 
   render() {
     return (
-      <TabViewAnimated
+      <TabView
         style={[styles.container, this.props.style]}
         navigationState={this.state}
         renderScene={this._renderScene}
-        renderHeader={this._renderHeader}
+        renderTabBar={this._renderTabBar}
         onIndexChange={this._handleIndexChange}
       />
     );

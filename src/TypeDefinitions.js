@@ -2,7 +2,6 @@
 
 import { Animated } from 'react-native';
 import type { Node } from 'react';
-import type { StyleObj } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
 
 export type Route<T: { key: string }> = $Exact<T>;
 
@@ -13,8 +12,6 @@ export type NavigationState<T> = {
 
 export type Scene<T> = {
   route: T,
-  focused: boolean,
-  index: number,
 };
 
 export type Layout = {
@@ -31,7 +28,6 @@ export type SceneRendererProps<T> = {
   offsetX: Animated.Value,
   position: any,
   jumpTo: (key: string) => mixed,
-  jumpToIndex: (index: number) => mixed, // Deprecated, use `jumpTo` instead
   useNativeDriver: boolean,
 };
 
@@ -48,12 +44,13 @@ export type PagerRendererProps<T> = PagerCommonProps<T> & {
 };
 
 export type PagerCommonProps<T> = {
-  canJumpToTab: (route: T) => boolean,
   animationEnabled?: boolean,
   swipeEnabled?: boolean,
   onSwipeStart?: () => mixed,
   onSwipeEnd?: () => mixed,
   onAnimationEnd?: () => mixed,
+  canJumpToTab: (scene: Scene<T>) => boolean,
+  getTestID: (scene: Scene<T>) => ?string,
 };
 
 export type PagerExtraProps = {
@@ -61,5 +58,3 @@ export type PagerExtraProps = {
   swipeDistanceThreshold?: number,
   swipeVelocityThreshold?: number,
 };
-
-export type Style = StyleObj;

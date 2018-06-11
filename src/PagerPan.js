@@ -4,13 +4,14 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import {
   Animated,
+  I18nManager,
   PanResponder,
   StyleSheet,
   View,
   Platform,
 } from 'react-native';
-import { PagerRendererPropType } from './TabViewPropTypes';
-import type { PagerRendererProps } from './TabViewTypeDefinitions';
+import { PagerRendererPropType } from './PropTypes';
+import type { PagerRendererProps } from './TypeDefinitions';
 
 type GestureEvent = {
   nativeEvent: {
@@ -52,7 +53,7 @@ const DefaultTransitionSpec = {
   friction: 35,
 };
 
-export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
+export default class PagerPan<T: *> extends React.Component<Props<T>> {
   static propTypes = {
     ...PagerRendererPropType,
     swipeDistanceThreshold: PropTypes.number,
@@ -71,7 +72,8 @@ export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
     this._currentIndex = this.props.navigationState.index;
 
     if (
-      prevProps.navigationState.routes !== this.props.navigationState.routes ||
+      prevProps.navigationState.routes.length !==
+        this.props.navigationState.routes.length ||
       prevProps.layout.width !== this.props.layout.width
     ) {
       this._transitionTo(this.props.navigationState.index, false);
@@ -97,7 +99,9 @@ export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
       return false;
     }
 
-    const { navigationState: { routes } } = this.props;
+    const {
+      navigationState: { routes },
+    } = this.props;
 
     return (
       this._isMovingHorizontally(evt, gestureState) &&
@@ -113,7 +117,9 @@ export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
   };
 
   _respondToGesture = (evt: GestureEvent, gestureState: GestureState) => {
-    const { navigationState: { routes, index } } = this.props;
+    const {
+      navigationState: { routes, index },
+    } = this.props;
 
     if (
       // swiping left
@@ -172,7 +178,9 @@ export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
 
     if (
       !isFinite(nextIndex) ||
-      !this.props.canJumpToTab(this.props.navigationState.routes[nextIndex])
+      !this.props.canJumpToTab({
+        route: this.props.navigationState.routes[nextIndex],
+      })
     ) {
       nextIndex = currentIndex;
     }
@@ -227,11 +235,14 @@ export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
     const { width } = layout;
     const { routes } = navigationState;
     const maxTranslate = width * (routes.length - 1);
-    const translateX = Animated.add(panX, offsetX).interpolate({
-      inputRange: [-maxTranslate, 0],
-      outputRange: [-maxTranslate, 0],
-      extrapolate: 'clamp',
-    });
+    const translateX = Animated.multiply(
+      Animated.add(panX, offsetX).interpolate({
+        inputRange: [-maxTranslate, 0],
+        outputRange: [-maxTranslate, 0],
+        extrapolate: 'clamp',
+      }),
+      I18nManager.isRTL ? -1 : 1
+    );
 
     return (
       <Animated.View
@@ -246,19 +257,22 @@ export default class TabViewPagerPan<T: *> extends React.Component<Props<T>> {
         ]}
         {...this._panResponder.panHandlers}
       >
-        {React.Children.map(children, (child, i) => (
-          <View
-            key={navigationState.routes[i].key}
-            testID={navigationState.routes[i].testID}
-            style={
-              width
-                ? { width }
-                : i === navigationState.index ? StyleSheet.absoluteFill : null
-            }
-          >
-            {i === navigationState.index || width ? child : null}
-          </View>
-        ))}
+        {React.Children.map(children, (child, i) => {
+          const route = navigationState.routes[i];
+          const focused = i === navigationState.index;
+
+          return (
+            <View
+              key={route.key}
+              testID={this.props.getTestID({ route })}
+              style={
+                width ? { width } : focused ? StyleSheet.absoluteFill : null
+              }
+            >
+              {focused || width ? child : null}
+            </View>
+          );
+        })}
       </Animated.View>
     );
   }
