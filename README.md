@@ -148,6 +148,7 @@ renderTabBar={props =>
 - `tabStyle`: style object for the individual tabs in the tab bar.
 - `indicatorStyle`: style object for the active indicator.
 - `activeTabStyle` - style object for the individual active tab in the tab bar
+- `activeLabelStyle` - style object for the individual label in the active tab bar
 - `labelStyle`: style object for the tab item label.
 - `style`: style object for the tab bar.
 

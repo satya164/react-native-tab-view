@@ -192,7 +192,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
     this._adjustScroll(value);
   };
 
-  _renderLabel = (scene: Scene<*>) => {
+  _renderLabel = (scene: Scene<*>, focused: boolean) => {
     if (typeof this.props.renderLabel !== 'undefined') {
       return this.props.renderLabel(scene);
     }
@@ -205,7 +205,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
         style={[
           styles.tabLabel,
           this.props.labelStyle,
-          scene.focused ? this.props.activeLabelStyle : {},
+          focused ? this.props.activeLabelStyle : {},
         ]}
       >
         {label}
@@ -355,9 +355,14 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
   };
 
   render() {
-    const { position, navigationState, scrollEnabled, bounces, activeTabStyle } = this.props;
+    const {
+      position,
+      navigationState,
+      scrollEnabled,
+      bounces,
+      activeTabStyle,
+    } = this.props;
     const { routes } = navigationState;
-    const { routes, index } = navigationState;
     const tabWidth = this._getTabWidth(this.props);
     const tabBarWidth = tabWidth * routes.length;
 
@@ -425,7 +430,9 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
                   outputRange,
                 })
               );
-              const label = this._renderLabel({ route, focused });
+
+              const isFocused = i === navigationState.index;
+              const label = this._renderLabel({ route }, isFocused);
               const icon = this.props.renderIcon
                 ? this.props.renderIcon({ route })
                 : null;
@@ -471,8 +478,6 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
                   ? accessibilityLabel
                   : this.props.getLabelText({ route });
 
-              const isFocused = i === navigationState.index;
-
               return (
                 <TouchableItem
                   borderless
@@ -497,7 +502,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
                         tabStyle,
                         passedTabStyle,
                         styles.container,
-                        focused && activeTabStyle ? activeTabStyle : null,
+                        isFocused && activeTabStyle ? activeTabStyle : null,
                       ]}
                     >
                       {icon}
