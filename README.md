@@ -121,8 +121,8 @@ Material design themed tab bar. To pass props to the tab bar, you'd need to use 
 #### Example
 
 ```js
-renderTabBar={props =>
-  <TabBar
+renderTabBar= props =>{
+  return <TabBar
     {...props}
     indicatorStyle={{ backgroundColor: 'pink' }}
   />
