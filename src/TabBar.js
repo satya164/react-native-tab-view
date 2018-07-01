@@ -39,7 +39,7 @@ type Props<T> = SceneRendererProps<T> & {
   onTabPress?: (scene: Scene<T>) => mixed,
   tabStyle?: ViewStyleProp,
   indicatorStyle?: ViewStyleProp,
-  indicatorBaseLineViewStyle?: Style,
+  indicatorBaseLineViewStyle?: ViewStyleProp,
   labelStyle?: TextStyleProp,
   style?: ViewStyleProp,
 };
@@ -346,7 +346,13 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
   };
 
   render() {
-    const { position, navigationState, scrollEnabled, bounces } = this.props;
+    const {
+      indicatorBaseLineViewStyle,
+      position,
+      navigationState,
+      scrollEnabled,
+      bounces,
+    } = this.props;
     const { routes } = navigationState;
     const tabWidth = this._getTabWidth(this.props);
     const tabBarWidth = tabWidth * routes.length;
@@ -366,7 +372,9 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
               : null,
           ]}
         >
-          <View style={[styles.indicator, this.props.indicatorBaseLineViewStyle]}></View>
+          {indicatorBaseLineViewStyle && (
+            <View style={[styles.indicator, indicatorBaseLineViewStyle]} />
+          )}
           {this._renderIndicator({
             ...this.props,
             width: tabWidth,
