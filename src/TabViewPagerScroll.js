@@ -163,8 +163,6 @@ export default class TabViewPagerScroll<T: *> extends React.Component<
         contentOffset={this.state.initialOffset}
         style={styles.container}
         contentContainerStyle={layout.width ? null : styles.container}
-        onStartShouldSetResponderCapture = {(evt) => true}
-        onMoveShouldSetResponderCapture = {(evt) => true}
         ref={el => (this._scrollView = el)}
       >
         {React.Children.map(children, (child, i) => (
