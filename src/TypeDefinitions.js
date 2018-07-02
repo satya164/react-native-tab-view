@@ -40,6 +40,7 @@ export type PagerRendererProps<T> = PagerCommonProps<T> & {
   offsetX: Animated.Value,
   jumpTo: (key: string) => mixed,
   useNativeDriver: boolean,
+  bounces?: boolean,
   children: Node,
 };
 
