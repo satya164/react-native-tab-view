@@ -126,7 +126,11 @@ export default class TabView<T: *> extends React.Component<Props<T>, State> {
 
     this.state.offsetX.setValue(
       (I18nManager.isRTL
-        ? this.props.navigationState.routes.length - 1 - this.props.navigationState.index : -this.props.navigationState.index) * width);
+        ? this.props.navigationState.routes.length - 
+          1 - 
+          this.props.navigationState.index
+        : -this.props.navigationState.index) * width
+      );
     this.state.layoutXY.setValue({
       // This is hacky, but we need to make sure that the value is never 0
       x: width || 0.001,
