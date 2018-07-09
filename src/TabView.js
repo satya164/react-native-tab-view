@@ -85,8 +85,9 @@ export default class TabView<T: *> extends React.Component<Props<T>, State> {
     const position = Animated.add(
       Animated.multiply(
         Animated.divide(Animated.add(panX, offsetX), layoutXY.x),
-        -1),
-      I18nManager.isRTL? navigationState.routes.length - 1 : 0
+        -1
+      ),
+      I18nManager.isRTL ? navigationState.routes.length - 1 : 0
     );
 
     this.state = {
@@ -123,7 +124,9 @@ export default class TabView<T: *> extends React.Component<Props<T>, State> {
       return;
     }
 
-    this.state.offsetX.setValue((I18nManager.isRTL? this.props.navigationState.routes.length - 1 - this.props.navigationState.index : -this.props.navigationState.index) * width);
+    this.state.offsetX.setValue(
+      (I18nManager.isRTL
+        ? this.props.navigationState.routes.length - 1 - this.props.navigationState.index : -this.props.navigationState.index) * width);
     this.state.layoutXY.setValue({
       // This is hacky, but we need to make sure that the value is never 0
       x: width || 0.001,
