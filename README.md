@@ -251,6 +251,7 @@ renderScene = ({ route }) => {
   default:
     return null;
   }
+};
 ```
 
 If you don't use `SceneMap`, you will need to take care of optimizing the individual scenes.
