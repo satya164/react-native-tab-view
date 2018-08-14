@@ -36,12 +36,14 @@ yarn add react-native-tab-view
 import * as React from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import { TabView, TabBar, SceneMap } from 'react-native-tab-view';
+import { Constants } from 'expo';
 
 const FirstRoute = () => (
-  <View style={[styles.container, { backgroundColor: '#ff4081' }]} />
+  <View style={[styles.scene, { backgroundColor: '#ff4081' }]} />
 );
+
 const SecondRoute = () => (
-  <View style={[styles.container, { backgroundColor: '#673ab7' }]} />
+  <View style={[styles.scene, { backgroundColor: '#673ab7' }]} />
 );
 
 export default class TabViewExample extends React.Component {
@@ -53,20 +55,38 @@ export default class TabViewExample extends React.Component {
     ],
   };
 
+  _handleIndexChange = index => this.setState({ index });
+
+  _renderTabBar = props => <TabBar {...props} style={styles.header} />;
+
+  _renderScene = SceneMap({
+    first: FirstRoute,
+    second: SecondRoute,
+  });
+
   render() {
     return (
       <TabView
         navigationState={this.state}
-        renderScene={SceneMap({
-          first: FirstRoute,
-          second: SecondRoute,
-        })}
-        onIndexChange={index => this.setState({ index })}
-        initialLayout={{ width: Dimensions.get('window').width }}
+        renderScene={this._renderScene}
+        renderTabBar={this._renderTabBar}
+        onIndexChange={this._handleIndexChange}
+        initialLayout={{
+          width: Dimensions.get('window').width,
+        }}
       />
     );
   }
 }
+
+const styles = StyleSheet.create({
+  scene: {
+    flex: 1,
+  },
+  header: {
+    paddingTop: Constants.statusBarHeight,
+  },
+});
 ```
 
 ## Integration with React Navigation
