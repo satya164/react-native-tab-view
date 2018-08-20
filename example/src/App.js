@@ -19,6 +19,7 @@ import BottomBarIconTextExample from './BottomBarIconTextExample';
 import NoAnimationExample from './NoAnimationExample';
 import CoverflowExample from './CoverflowExample';
 import NativeDriverExample from './NativeDriverExample';
+import VerticalTabBarExample from './VerticalTabBarExample';
 
 const PERSISTENCE_KEY = 'index_persistence';
 
@@ -29,6 +30,7 @@ const EXAMPLE_COMPONENTS = [
   NoAnimationExample,
   CoverflowExample,
   NativeDriverExample,
+  VerticalTabBarExample,
 ];
 
 type State = {
@@ -201,12 +203,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#eceff1',
   },
   statusbar: {
-    height: Platform.OS === 'ios' ? 20 : 25,
+    height: 25,
   },
   appbar: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: Platform.OS === 'ios' ? 44 : 56,
+    height: 56,
     borderBottomColor: 'rgba(0, 0, 0, 0.1)',
   },
   title: {
@@ -220,7 +222,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     width: 56,
-    padding: Platform.OS === 'ios' ? 12 : 16,
+    padding: 16,
   },
   touchable: {
     padding: 16,
