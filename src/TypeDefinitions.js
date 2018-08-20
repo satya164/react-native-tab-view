@@ -14,6 +14,10 @@ export type Scene<T> = {
   route: T,
 };
 
+export type RenderProps<T> = Scene<T> & {
+  focused: boolean,
+};
+
 export type Layout = {
   height: number,
   width: number,

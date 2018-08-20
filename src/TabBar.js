@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import TouchableItem from './TouchableItem';
 import { SceneRendererPropType } from './PropTypes';
-import type { Scene, SceneRendererProps } from './TypeDefinitions';
+import type { Scene, SceneRendererProps, RenderProps } from './TypeDefinitions';
 import type {
   ViewStyleProp,
   TextStyleProp,
@@ -32,9 +32,9 @@ type Props<T> = SceneRendererProps<T> & {
   getAccessible: (scene: Scene<T>) => ?boolean,
   getAccessibilityLabel: (scene: Scene<T>) => ?string,
   getTestID: (scene: Scene<T>) => ?string,
-  renderLabel?: (scene: Scene<T>) => React.Node,
-  renderIcon?: (scene: Scene<T>) => React.Node,
-  renderBadge?: (scene: Scene<T>) => React.Node,
+  renderLabel?: (scene: RenderProps<T>) => React.Node,
+  renderIcon?: (scene: RenderProps<T>) => React.Node,
+  renderBadge?: (scene: RenderProps<T>) => React.Node,
   renderIndicator?: (props: IndicatorProps<T>) => React.Node,
   onTabPress?: (scene: Scene<T>) => mixed,
   tabStyle?: ViewStyleProp,
@@ -188,7 +188,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
     this._adjustScroll(value);
   };
 
-  _renderLabel = (scene: Scene<*>) => {
+  _renderLabel = (scene: RenderProps<*>) => {
     if (typeof this.props.renderLabel !== 'undefined') {
       return this.props.renderLabel(scene);
     }
@@ -404,6 +404,8 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
             ref={el => (this._scrollView = el && el._component)}
           >
             {routes.map((route, i) => {
+              const isFocused = i === navigationState.index;
+
               const outputRange = inputRange.map(
                 inputIndex => (inputIndex === i ? 1 : 0.7)
               );
@@ -414,12 +416,12 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
                   outputRange,
                 })
               );
-              const label = this._renderLabel({ route });
+              const label = this._renderLabel({ route, focused: isFocused });
               const icon = this.props.renderIcon
-                ? this.props.renderIcon({ route })
+                ? this.props.renderIcon({ route, focused: isFocused })
                 : null;
               const badge = this.props.renderBadge
-                ? this.props.renderBadge({ route })
+                ? this.props.renderBadge({ route, focused: isFocused })
                 : null;
 
               const tabStyle = {};
@@ -459,8 +461,6 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
                 typeof accessibilityLabel !== 'undefined'
                   ? accessibilityLabel
                   : this.props.getLabelText({ route });
-
-              const isFocused = i === navigationState.index;
 
               return (
                 <TouchableItem
