@@ -46,7 +46,6 @@ type Props<T> = SceneRendererProps<T> & {
 type State = {|
   visibility: Animated.Value,
   scrollAmount: Animated.Value,
-  initialOffset: ?{| x: number, y: number |},
 |};
 
 const useNativeDriver = Boolean(NativeModules.NativeAnimatedModule);
@@ -91,21 +90,9 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
       }
     }
 
-    const initialOffset =
-      this.props.scrollEnabled && this.props.layout.width
-        ? {
-            x: this._getScrollAmount(
-              this.props,
-              this.props.navigationState.index
-            ),
-            y: 0,
-          }
-        : undefined;
-
     this.state = {
       visibility: new Animated.Value(initialVisibility),
       scrollAmount: new Animated.Value(0),
-      initialOffset,
     };
   }
 
@@ -132,7 +119,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
         this.props.navigationState.routes.length ||
       prevProps.layout.width !== this.props.layout.width
     ) {
-      this._resetScroll(this.props.navigationState.index, false);
+      this._resetState();
     } else if (prevProps.navigationState.index !== pendingIndex) {
       this._resetScroll(this.props.navigationState.index);
     }
@@ -152,6 +139,18 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
   _lastOffsetX: ?number;
   _panXListener: string;
   _offsetXListener: string;
+
+  _resetState = () => {
+    this.props.scrollEnabled && this._stopTrackingPosition();
+    this.setState(
+      {
+        scrollAmount: new Animated.Value(0),
+      },
+      () => {
+        this.props.scrollEnabled && this._startTrackingPosition();
+      }
+    );
+  };
 
   _startTrackingPosition = () => {
     this._offsetXListener = this.props.offsetX.addListener(({ value }) => {
@@ -400,7 +399,6 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
             onScrollEndDrag={this._handleEndDrag}
             onMomentumScrollBegin={this._handleMomentumScrollBegin}
             onMomentumScrollEnd={this._handleMomentumScrollEnd}
-            contentOffset={this.state.initialOffset}
             ref={el => (this._scrollView = el && el._component)}
           >
             {routes.map((route, i) => {
