@@ -142,14 +142,8 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
 
   _resetState = () => {
     this.props.scrollEnabled && this._stopTrackingPosition();
-    this.setState(
-      {
-        scrollAmount: new Animated.Value(0),
-      },
-      () => {
-        this.props.scrollEnabled && this._startTrackingPosition();
-      }
-    );
+    this.state.scrollAmount.setValue(0);
+    this.props.scrollEnabled && this._startTrackingPosition();
   };
 
   _startTrackingPosition = () => {
