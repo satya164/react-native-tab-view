@@ -6,9 +6,9 @@ import {
   Animated,
   I18nManager,
   PanResponder,
+  Platform,
   StyleSheet,
   View,
-  Platform,
 } from 'react-native';
 import { PagerRendererPropType } from './PropTypes';
 import type { PagerRendererProps } from './TypeDefinitions';
@@ -243,6 +243,7 @@ export default class PagerPan<T: *> extends React.Component<Props<T>> {
       }),
       I18nManager.isRTL ? -1 : 1
     );
+    const onWeb = Platform.OS === 'web';
 
     return (
       <Animated.View
@@ -265,9 +266,10 @@ export default class PagerPan<T: *> extends React.Component<Props<T>> {
             <View
               key={route.key}
               testID={this.props.getTestID({ route })}
-              style={
-                width ? { width } : focused ? StyleSheet.absoluteFill : null
-              }
+              style={[
+                width ? { width } : focused ? StyleSheet.absoluteFill : null,
+                onWeb && !focused ? { visibility: 'hidden' } : null,
+              ]}
             >
               {focused || width ? child : null}
             </View>
