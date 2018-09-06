@@ -94,8 +94,8 @@ export default class TabView<T: *> extends React.Component<Props<T>, State> {
         -1
       ),
       I18nManager.isRTL && Platform.OS !== 'ios'
-      ? navigationState.routes.length - 1
-       : 0
+        ? navigationState.routes.length - 1
+        : 0
     );
 
     this.state = {
