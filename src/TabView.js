@@ -7,7 +7,7 @@ import {
   View, 
   StyleSheet, 
   I18nManager, 
-  Platform 
+  Platform, 
 } from 'react-native';
 import TabBar from './TabBar';
 import PagerDefault from './PagerDefault';
@@ -90,13 +90,9 @@ export default class TabView<T: *> extends React.Component<Props<T>, State> {
     });
     const position = Animated.add(
       Animated.multiply(
-        Animated.divide(
-          Animated.add(panX, offsetX),
-          layoutXY.x
-        ),
-        -1),
-      I18nManager.isRTL && Platform.OS !== 'ios' ?
-        navigationState.routes.length - 1 : 0
+        Animated.divide(Animated.add(panX,offsetX),layoutXY.x),-1),
+        I18nManager.isRTL && Platform.OS !== 'ios' ?
+          navigationState.routes.length - 1 : 0
     );
 
     this.state = {
