@@ -303,7 +303,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
             this.props,
             this._getScrollAmount(this.props, value)
           ),
-          animated: !this._isIntial, // Disable animation for the initial render
+          animated: useNativeDriver ? false : !this._isIntial, // Disable animation for the initial render
         });
 
       this._isIntial = false;
