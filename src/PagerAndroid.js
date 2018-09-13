@@ -122,7 +122,7 @@ export default class PagerAndroid<T: *> extends React.Component<Props<T>> {
     const { navigationState, swipeEnabled, keyboardDismissMode } = this.props;
     const children = I18nManager.isRTL
       ? this.props.children.slice().reverse()
-      : this.props.children
+      : this.props.children;
     const content = React.Children.map(children, (child, i) => {
       const route = navigationState.routes[i];
       const focused = i === navigationState.index;
