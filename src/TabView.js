@@ -2,13 +2,7 @@
 
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import {
-  Animated,
-  View,
-  StyleSheet,
-  I18nManager,
-  Platform,
-} from 'react-native';
+import { Animated, View, StyleSheet } from 'react-native';
 import TabBar from './TabBar';
 import PagerDefault from './PagerDefault';
 import { NavigationStatePropType } from './PropTypes';
@@ -88,14 +82,9 @@ export default class TabView<T: *> extends React.Component<Props<T>, State> {
       x: layout.width || 0.001,
       y: layout.height || 0.001,
     });
-    const position = Animated.add(
-      Animated.multiply(
-        Animated.divide(Animated.add(panX, offsetX), layoutXY.x),
-        -1
-      ),
-      I18nManager.isRTL && Platform.OS !== 'ios'
-        ? navigationState.routes.length - 1
-        : 0
+    const position = Animated.multiply(
+      Animated.divide(Animated.add(panX, offsetX), layoutXY.x),
+      -1
     );
 
     this.state = {
@@ -131,12 +120,8 @@ export default class TabView<T: *> extends React.Component<Props<T>, State> {
     ) {
       return;
     }
-    const { navigationState } = this.props;
-    this.state.offsetX.setValue(
-      (I18nManager.isRTL && Platform.OS !== 'ios'
-        ? navigationState.routes.length - 1 - navigationState.index
-        : -navigationState.index) * width
-    );
+
+    this.state.offsetX.setValue(-this.props.navigationState.index * width);
     this.state.layoutXY.setValue({
       // This is hacky, but we need to make sure that the value is never 0
       x: width || 0.001,
