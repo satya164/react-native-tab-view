@@ -123,7 +123,7 @@ export default class PagerAndroid<T: *> extends React.Component<Props<T>> {
     let children = [];
     React.Children.forEach(this.props.children, c => {
       if (I18nManager.isRTL) {
-        children = [c ,...children];
+        children = [c, ...children];
       } else {
         children = [...children, c];
       }
