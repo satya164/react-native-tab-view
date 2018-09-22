@@ -33,8 +33,7 @@ export default class PagerAndroid<T: *> extends React.Component<Props<T>> {
 
   componentDidUpdate(prevProps: Props<T>) {
     if (
-      prevProps.navigationState.routes.length !==
-        this.props.navigationState.routes.length ||
+      prevProps.navigationState.routes !== this.props.navigationState.routes ||
       prevProps.layout.width !== this.props.layout.width
     ) {
       this._handlePageChange(this.props.navigationState.index, false);
