@@ -189,10 +189,12 @@ export default class TabView<T: *> extends React.Component<Props<T>, State> {
             ...rest,
             panX: this.state.panX,
             offsetX: this.state.offsetX,
-            children: navigationState.routes.map(route => {
+            children: navigationState.routes.map((route, index) => {
               const scene = this._renderScene({
                 ...props,
                 route,
+                index: index,
+                focused: index === navigationState.index,
               });
 
               if (React.isValidElement(scene)) {

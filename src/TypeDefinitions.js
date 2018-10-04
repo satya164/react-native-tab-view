@@ -7,11 +7,13 @@ export type Route<T: { key: string }> = $Exact<T>;
 
 export type NavigationState<T> = {
   index: number,
+  focused: boolean,
   routes: Array<T>,
 };
 
 export type Scene<T> = {
   route: T,
+  index: number,
 };
 
 export type Layout = {
@@ -40,6 +42,7 @@ export type PagerRendererProps<T> = PagerCommonProps<T> & {
   offsetX: Animated.Value,
   jumpTo: (key: string) => mixed,
   useNativeDriver: boolean,
+  bounces?: boolean,
   children: Node,
 };
 

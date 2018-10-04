@@ -140,6 +140,7 @@ export default class PagerScroll<T: *> extends React.Component<
       navigationState,
       onSwipeStart,
       onSwipeEnd,
+      bounces = false,
     } = this.props;
 
     return (
@@ -152,7 +153,7 @@ export default class PagerScroll<T: *> extends React.Component<
         overScrollMode="never"
         scrollEnabled={this.props.swipeEnabled}
         automaticallyAdjustContentInsets={false}
-        bounces={false}
+        bounces={bounces}
         alwaysBounceHorizontal={false}
         scrollsToTop={false}
         showsHorizontalScrollIndicator={false}
