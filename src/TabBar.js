@@ -24,7 +24,7 @@ type IndicatorProps<T> = SceneRendererProps<T> & {
 };
 
 type Props<T> = SceneRendererProps<T> & {
-  scrollEnabledDivisor?:number,
+  scrollEnabledDivisor?: number,
   scrollEnabled?: boolean,
   bounces?: boolean,
   pressColor?: string,
