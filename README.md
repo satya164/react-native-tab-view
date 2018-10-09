@@ -150,7 +150,8 @@ renderTabBar={props =>
 - `indicatorStyle`: style object for the active indicator.
 - `labelStyle`: style object for the tab item label.
 - `style`: style object for the tab bar.
-
+- `scrollEnabledDivisor`: if scrollable tabs have been enabled set the divisor that calculates the width of the tab
+ 
 ### `<PagerPan />`
 
 Cross-platform pager based on the [`PanResponder`](https://facebook.github.io/react-native/docs/panresponder.html).
