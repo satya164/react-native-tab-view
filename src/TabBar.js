@@ -24,6 +24,7 @@ type IndicatorProps<T> = SceneRendererProps<T> & {
 };
 
 type Props<T> = SceneRendererProps<T> & {
+  scrollEnabledDivisor?:number,
   scrollEnabled?: boolean,
   bounces?: boolean,
   pressColor?: string,
@@ -251,6 +252,9 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
     }
 
     if (props.scrollEnabled) {
+      if (props.scrollEnabledDivisor && props.scrollEnabledDivisor > 0) {
+        return layout.width / props.scrollEnabledDivisor;
+      }
       return (layout.width / 5) * 2;
     }
 
