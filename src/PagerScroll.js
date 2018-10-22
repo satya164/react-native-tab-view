@@ -63,6 +63,10 @@ export default class PagerScroll<T: *> extends React.Component<
     } else if (
       prevProps.navigationState.index !== this.props.navigationState.index
     ) {
+      const { navigationState, layout, offsetX, panX } = this.props;
+
+      offsetX.setValue(-navigationState.index * layout.width);
+      panX.setValue(0);
       this._scrollTo(amount);
     }
   }
