@@ -26,6 +26,7 @@ type Props<T> = PagerCommonProps<T> &
     renderTabBar: (props: SceneRendererProps<T>) => React.Node,
     tabBarPosition: 'top' | 'bottom',
     useNativeDriver?: boolean,
+    delayRenderOfNonFocusedTabs?: boolean,
     style?: ViewStyleProp,
   };
 
@@ -35,6 +36,7 @@ type State = {|
   panX: Animated.Value,
   offsetX: Animated.Value,
   position: any,
+  delayRenderOfNonFocusedTabs: any,
 |};
 
 export default class TabView<T: *> extends React.Component<Props<T>, State> {
@@ -49,6 +51,7 @@ export default class TabView<T: *> extends React.Component<Props<T>, State> {
     renderPager: PropTypes.func.isRequired,
     renderScene: PropTypes.func.isRequired,
     renderTabBar: PropTypes.func,
+    delayRenderOfNonFocusedTabs: PropTypes.bool,
     tabBarPosition: PropTypes.oneOf(['top', 'bottom']),
   };
 
@@ -64,12 +67,13 @@ export default class TabView<T: *> extends React.Component<Props<T>, State> {
       width: 0,
     },
     useNativeDriver: false,
+    delayRenderOfNonFocusedTabs: false,
   };
 
   constructor(props: Props<T>) {
     super(props);
 
-    const { navigationState } = this.props;
+    const { navigationState, delayRenderOfNonFocusedTabs } = this.props;
     const layout = {
       ...this.props.initialLayout,
       measured: false,
@@ -93,11 +97,13 @@ export default class TabView<T: *> extends React.Component<Props<T>, State> {
       panX,
       offsetX,
       position,
+      delayRenderOfNonFocusedTabs,
     };
   }
 
   componentDidMount() {
     this._mounted = true;
+    setTimeout(() => this.setState({ delayRenderOfNonFocusedTabs: false }), 0);
   }
 
   componentWillUnmount() {
@@ -109,6 +115,13 @@ export default class TabView<T: *> extends React.Component<Props<T>, State> {
 
   _renderScene = (props: SceneRendererProps<T> & Scene<T>) => {
     return this.props.renderScene(props);
+  };
+
+  _shouldRenderScene = (index: number) => {
+    return (
+      !this.state.delayRenderOfNonFocusedTabs ||
+      this.props.navigationState.index === index
+    );
   };
 
   _handleLayout = (e: any) => {
@@ -189,18 +202,17 @@ export default class TabView<T: *> extends React.Component<Props<T>, State> {
             ...rest,
             panX: this.state.panX,
             offsetX: this.state.offsetX,
-            children: navigationState.routes.map(route => {
-              const scene = this._renderScene({
+            children: navigationState.routes.map((route, index) => {
+              let scene = this._renderScene({
                 ...props,
                 route,
               });
-
               if (React.isValidElement(scene)) {
                 /* $FlowFixMe: https://github.com/facebook/flow/issues/4775 */
-                return React.cloneElement(scene, { key: route.key });
+                scene = React.cloneElement(scene, { key: route.key });
               }
 
-              return scene;
+              return this._shouldRenderScene(index) ? scene : <View />;
             }),
           })}
         </View>
