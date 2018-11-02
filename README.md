@@ -109,6 +109,7 @@ Container component responsible for rendering and managing tabs.
 - `renderTabBar`: callback which returns a custom React Element to use as the tab bar.
 - `renderPager`: callback which returns a custom React Element to handle swipe gesture and animation.
 - `canJumpToTab`: callback which returns a boolean indicating whether jumping to the tab is allowed.
+- `delayRenderOfNonFocusedTabs`: delay the rendering of non-focused tabs to the next tick, for better initial loading time.
 - `initialLayout`: object containing the initial `height` and `width`, can be passed to prevent the one frame delay in rendering.
 - `tabBarPosition`: position of the tab bar, `'top'` or `'bottom'`. Defaults to `'top'`.
 
