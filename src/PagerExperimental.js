@@ -23,6 +23,7 @@ export default class PagerExperimental<T: *> extends React.Component<Props<T>> {
     ...PagerRendererPropType,
     swipeDistanceThreshold: PropTypes.number,
     swipeVelocityThreshold: PropTypes.number,
+    minXDelta: PropTypes.number,
     GestureHandler: PropTypes.object,
   };
 
@@ -149,6 +150,7 @@ export default class PagerExperimental<T: *> extends React.Component<Props<T>> {
       navigationState,
       swipeEnabled,
       children,
+      minXDelta = 10
     } = this.props;
     const { width } = layout;
     const { routes } = navigationState;
@@ -165,7 +167,7 @@ export default class PagerExperimental<T: *> extends React.Component<Props<T>> {
     return (
       <GestureHandler.PanGestureHandler
         enabled={layout.width !== 0 && swipeEnabled !== false}
-        minDeltaX={10}
+        minDeltaX={minXDelta}
         onGestureEvent={Animated.event(
           [{ nativeEvent: { translationX: this.props.panX } }],
           { useNativeDriver: this.props.useNativeDriver }
