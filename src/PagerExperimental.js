@@ -9,6 +9,7 @@ import type { PagerRendererProps } from './TypeDefinitions';
 type Props<T> = PagerRendererProps<T> & {
   swipeDistanceThreshold?: number,
   swipeVelocityThreshold?: number,
+  minXDelta?: number,
   GestureHandler: any,
 };
 
