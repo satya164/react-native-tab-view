@@ -33,7 +33,7 @@ export default class PagerExperimental<T: *> extends React.Component<Props<T>> {
   componentDidUpdate(prevProps: Props<T>) {
     if (
       prevProps.navigationState.routes.length !==
-        this.props.navigationState.routes.length ||
+      this.props.navigationState.routes.length ||
       prevProps.layout.width !== this.props.layout.width
     ) {
       this._transitionTo(this.props.navigationState.index, undefined, false);
@@ -112,7 +112,7 @@ export default class PagerExperimental<T: *> extends React.Component<Props<T>> {
 
     const { timing, ...transitionConfig } = DefaultTransitionSpec;
     const { useNativeDriver } = this.props;
-
+    
     Animated.parallel([
       timing(this.props.panX, {
         ...transitionConfig,
@@ -136,6 +136,7 @@ export default class PagerExperimental<T: *> extends React.Component<Props<T>> {
     });
 
     this._pendingIndex = index;
+    this.forceUpdate();
   };
 
   _pendingIndex: ?number;
@@ -156,16 +157,27 @@ export default class PagerExperimental<T: *> extends React.Component<Props<T>> {
     const translateX =
       routes.length > 1
         ? Animated.add(panX, offsetX).interpolate({
-            inputRange: [-maxTranslate, 0],
-            outputRange: [-maxTranslate, 0],
-            extrapolate: 'clamp',
-          })
+          inputRange: [-maxTranslate, 0],
+          outputRange: [-maxTranslate, 0],
+          extrapolate: 'clamp',
+        })
         : 0;
 
+    let activeOffsetX = [-4, 4];
+    const currentIndex =
+        typeof this._pendingIndex === 'number'
+          ? this._pendingIndex
+          : navigationState.index;
+    if (currentIndex === navigationState.routes.length - 1) {
+      activeOffsetX[0] = -10000;
+    }  
+    if (currentIndex === 0) {
+      activeOffsetX[1] = 10000;
+    }
     return (
       <GestureHandler.PanGestureHandler
         enabled={layout.width !== 0 && swipeEnabled !== false}
-        minDeltaX={10}
+        activeOffsetX={activeOffsetX}
         onGestureEvent={Animated.event(
           [{ nativeEvent: { translationX: this.props.panX } }],
           { useNativeDriver: this.props.useNativeDriver }
