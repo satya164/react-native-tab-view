@@ -236,6 +236,10 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
     const { layout, navigationState, tabStyle } = props;
     const flattened = StyleSheet.flatten(tabStyle);
 
+    if(tabStyle.width) {
+      return tabStyle.width
+    }
+
     if (flattened) {
       switch (typeof flattened.width) {
         case 'number':
