@@ -16,6 +16,8 @@ type PageScrollState = 'dragging' | 'settling' | 'idle';
 
 type Props<T> = PagerRendererProps<T> & {
   keyboardDismissMode: 'none' | 'on-drag',
+  accessible?: boolean,
+  importantForAccessibility?: 'auto' | 'yes' | 'no' | 'no-hide-descendants',
 };
 
 export default class PagerAndroid<T: *> extends React.Component<Props<T>> {
@@ -24,6 +26,8 @@ export default class PagerAndroid<T: *> extends React.Component<Props<T>> {
   static defaultProps = {
     canJumpToTab: () => true,
     keyboardDismissMode: 'on-drag',
+    accessible: true,
+    importantForAccessibility: 'auto',
   };
 
   constructor(props: Props<T>) {
@@ -120,7 +124,13 @@ export default class PagerAndroid<T: *> extends React.Component<Props<T>> {
   };
 
   render() {
-    const { navigationState, swipeEnabled, keyboardDismissMode } = this.props;
+    const {
+      navigationState,
+      swipeEnabled,
+      keyboardDismissMode,
+      accessible,
+      importantForAccessibility,
+    } = this.props;
     const children = I18nManager.isRTL
       ? React.Children.toArray(this.props.children).reverse()
       : React.Children.toArray(this.props.children);
@@ -155,6 +165,8 @@ export default class PagerAndroid<T: *> extends React.Component<Props<T>> {
         onPageSelected={this._handlePageSelected}
         style={styles.container}
         ref={el => (this._viewPager = el)}
+        accessible={accessible}
+        importantForAccessibility={importantForAccessibility}
       >
         {content}
       </ViewPagerAndroid>

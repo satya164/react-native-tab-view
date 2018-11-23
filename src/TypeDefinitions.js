@@ -57,4 +57,6 @@ export type PagerExtraProps = {
   keyboardDismissMode?: 'none' | 'on-drag',
   swipeDistanceThreshold?: number,
   swipeVelocityThreshold?: number,
+  accessible?: boolean,
+  importantForAccessibility?: 'auto' | 'yes' | 'no' | 'no-hide-descendants',
 };
