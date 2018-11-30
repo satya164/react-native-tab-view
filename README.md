@@ -35,7 +35,7 @@ yarn add react-native-tab-view
 ```js
 import * as React from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
-import { TabView, TabBar, SceneMap } from 'react-native-tab-view';
+import { TabView, SceneMap } from 'react-native-tab-view';
 
 const FirstRoute = () => (
   <View style={[styles.scene, { backgroundColor: '#ff4081' }]} />
