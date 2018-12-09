@@ -35,6 +35,7 @@ type State = {|
   panX: Animated.Value,
   offsetX: Animated.Value,
   position: any,
+  renderUnfocusedScenes: boolean,
 |};
 
 export default class TabView<T: *> extends React.Component<Props<T>, State> {
@@ -93,11 +94,15 @@ export default class TabView<T: *> extends React.Component<Props<T>, State> {
       panX,
       offsetX,
       position,
+      renderUnfocusedScenes: false,
     };
   }
 
   componentDidMount() {
     this._mounted = true;
+
+    // Delay rendering of unfocused scenes for improved startup
+    setTimeout(() => this.setState({ renderUnfocusedScenes: true }), 0);
   }
 
   componentWillUnmount() {
@@ -189,15 +194,23 @@ export default class TabView<T: *> extends React.Component<Props<T>, State> {
             ...rest,
             panX: this.state.panX,
             offsetX: this.state.offsetX,
-            children: navigationState.routes.map(route => {
-              const scene = this._renderScene({
-                ...props,
-                route,
-              });
+            children: navigationState.routes.map((route, index) => {
+              const isFocused = this.props.navigationState.index === index;
+
+              let scene;
+
+              if (isFocused || this.state.renderUnfocusedScenes) {
+                scene = this._renderScene({
+                  ...props,
+                  route,
+                });
+              } else {
+                scene = <View />;
+              }
 
               if (React.isValidElement(scene)) {
                 /* $FlowFixMe: https://github.com/facebook/flow/issues/4775 */
-                return React.cloneElement(scene, { key: route.key });
+                scene = React.cloneElement(scene, { key: route.key });
               }
 
               return scene;
