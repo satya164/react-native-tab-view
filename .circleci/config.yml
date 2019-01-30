@@ -58,6 +58,3 @@ workflows:
       - lint-and-flow:
           requires:
             - install-dependencies
-      - unit-tests:
-          requires:
-            - install-dependencies

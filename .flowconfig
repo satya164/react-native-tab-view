@@ -46,10 +46,13 @@
 .*/node_modules/prettier/.*
 .*/node_modules/eslint.*
 
+; Ignore modules with errors
+.*/node_modules/@expo/.*
+
 [untyped]
 .*/node_modules/expo/.*
 .*/node_modules/xdl/.*
-.*/node_modules/react-native-gesture-handler/.*
+.*/node_modules/react-native-view-shot/.*
 
 [include]
 
