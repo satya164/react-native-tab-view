@@ -116,13 +116,6 @@ export default class TabView<T: *> extends React.Component<Props<T>, State> {
     return this.props.renderScene(props);
   };
 
-  _shouldRenderScene = (index: number) => {
-    return (
-      !this.state.delayRenderOfNonFocusedTabs ||
-      this.props.navigationState.index === index
-    );
-  };
-
   _handleLayout = (e: any) => {
     const { height, width } = e.nativeEvent.layout;
 
@@ -133,6 +126,7 @@ export default class TabView<T: *> extends React.Component<Props<T>, State> {
       return;
     }
 
+    this.state.panX.setValue(0);
     this.state.offsetX.setValue(-this.props.navigationState.index * width);
     this.state.layoutXY.setValue({
       // This is hacky, but we need to make sure that the value is never 0
