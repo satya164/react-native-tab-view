@@ -77,7 +77,7 @@ export default class PagerAndroid<T: *> extends React.Component<Props<T>> {
   };
 
   _handlePageScroll = (e: PageScrollEvent) => {
-	  let nextIndex = this._currentIndex;
+    let nextIndex = this._currentIndex;
 
     const nextRoute = this.props.navigationState.routes[nextIndex];
 
