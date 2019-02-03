@@ -360,7 +360,10 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
 
     // Prepend '-1', so there are always at least 2 items in inputRange
     const inputRange = [-1, ...routes.map((x, i) => i)];
-    const translateX = Animated.multiply(this.state.scrollAmount, -1);
+    const translateX = Animated.multiply(
+      this.state.scrollAmount,
+      I18nManager.isRTL ? 1 : -1
+    );
 
     return (
       <Animated.View style={[styles.tabBar, this.props.style]}>
