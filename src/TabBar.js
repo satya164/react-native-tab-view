@@ -392,6 +392,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
             contentContainerStyle={[
               styles.tabContent,
               scrollEnabled ? null : styles.container,
+              this.props.tabContentContainerStyle,
             ]}
             scrollEventThrottle={1}
             onScroll={Animated.event(
