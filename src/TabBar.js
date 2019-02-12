@@ -41,6 +41,7 @@ type Props<T> = SceneRendererProps<T> & {
   tabStyle?: ViewStyleProp,
   indicatorStyle?: ViewStyleProp,
   labelStyle?: TextStyleProp,
+  tabContentContainerStyle?: ViewStyleProp,
   style?: ViewStyleProp,
 };
 
