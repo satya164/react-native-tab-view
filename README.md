@@ -157,7 +157,7 @@ renderTabBar={props =>
 - `tabStyle`: style object for the individual tabs in the tab bar.
 - `indicatorStyle`: style object for the active indicator.
 - `labelStyle`: style object for the tab item label.
-- `contentContainerStyle`:  style object for the tabs's container.
+- `contentContainerStyle`:  style object for the tabs' container.
 - `style`: style object for the tab bar.
 
 ### `<PagerPan />`
