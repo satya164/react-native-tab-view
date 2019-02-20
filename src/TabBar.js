@@ -41,7 +41,7 @@ type Props<T> = SceneRendererProps<T> & {
   tabStyle?: ViewStyleProp,
   indicatorStyle?: ViewStyleProp,
   labelStyle?: TextStyleProp,
-  tabContentContainerStyle?: ViewStyleProp,
+  contentContainerStyle?: ViewStyleProp,
   style?: ViewStyleProp,
 };
 
@@ -393,7 +393,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
             contentContainerStyle={[
               styles.tabContent,
               scrollEnabled ? null : styles.container,
-              this.props.tabContentContainerStyle,
+              this.props.contentContainerStyle,
             ]}
             scrollEventThrottle={1}
             onScroll={Animated.event(
