@@ -15,6 +15,7 @@
   },
 
   "rules": {
-    "eslint-comments/no-unused-disable": "off"
+    "eslint-comments/no-unused-disable": "off",
+    "flowtype/no-dupe-keys": "off"
   }
 }
