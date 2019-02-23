@@ -48,6 +48,7 @@ export type Props<T> = {|
   tabStyle?: ViewStyleProp,
   indicatorStyle?: ViewStyleProp,
   labelStyle?: TextStyleProp,
+  contentContainerStyle?: ViewStyleProp,
   style?: ViewStyleProp,
 |};
 
@@ -300,6 +301,7 @@ export default class TabBar<T: Route> extends React.Component<Props<T>, State> {
             contentContainerStyle={[
               styles.tabContent,
               scrollEnabled ? null : styles.container,
+              this.props.contentContainerStyle,
             ]}
             scrollEventThrottle={16}
             onScroll={Animated.event(
