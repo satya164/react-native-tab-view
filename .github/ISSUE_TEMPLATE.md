@@ -23,10 +23,12 @@
 
 ### Your Environment
 
-| software              | version
-| --------------------- | -------
-| ios or android        |
-| react-native          |
-| react-native-tab-view |
-| node                  |
-| npm or yarn           |
+| software                     | version
+| ---------------------------- | -------
+| ios or android               |
+| react-native                 |
+| react-native-tab-view        |
+| react-native-gesture-handler |
+| react-native-reanimated      |
+| node                         |
+| npm or yarn                  |
