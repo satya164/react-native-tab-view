@@ -38,6 +38,7 @@ type Props<T> = {|
   onLongPress: () => mixed,
   tabWidth: number,
   labelStyle?: TextStyleProp,
+  tabBarItemStyle: ViewStyleProp,
   style: ViewStyleProp,
 |};
 
@@ -61,6 +62,7 @@ export default function TabBarItem<T: Route>({
   pressColor,
   pressOpacity,
   labelStyle,
+  tabBarItemStyle,
   style,
   tabWidth,
   onPress,
@@ -201,7 +203,10 @@ export default function TabBarItem<T: Route>({
       onLongPress={onLongPress}
       style={tabContainerStyle}
     >
-      <View pointerEvents="none" style={[styles.item, itemStyle]}>
+      <View
+        pointerEvents="none"
+        style={[styles.item, itemStyle, tabBarItemStyle]}
+      >
         {icon}
         {label}
         {badge != null ? <View style={styles.badge}>{badge}</View> : null}

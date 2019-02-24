@@ -384,6 +384,10 @@ Boolean indicating whether the tab bar bounces when scrolling.
 
 Style to apply to the individual tabs in the tab bar.
 
+##### `tabBarItemStyle`
+
+ Complementary Style to apply to the individual tabs in the tab bar. (for example : overriding default minHeight, padding ...)
+ 
 ##### `indicatorStyle`
 
 Style to apply to the active indicator.

@@ -46,6 +46,7 @@ export type Props<T> = {|
   onTabPress?: (scene: Scene<T>) => mixed,
   onTabLongPress?: (scene: Scene<T>) => mixed,
   tabStyle?: ViewStyleProp,
+  tabBarItemStyle?: ViewStyleProp,
   indicatorStyle?: ViewStyleProp,
   labelStyle?: TextStyleProp,
   style?: ViewStyleProp,
@@ -255,6 +256,7 @@ export default class TabBar<T: Route> extends React.Component<Props<T>, State> {
       onTabPress,
       onTabLongPress,
       tabStyle,
+      tabBarItemStyle,
       labelStyle,
       indicatorStyle,
       style,
@@ -345,6 +347,7 @@ export default class TabBar<T: Route> extends React.Component<Props<T>, State> {
                 onLongPress={() => onTabLongPress && onTabLongPress({ route })}
                 labelStyle={labelStyle}
                 style={tabStyle}
+                tabBarItemStyle={tabBarItemStyle}
               />
             ))}
           </Animated.ScrollView>
