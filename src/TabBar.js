@@ -258,6 +258,7 @@ export default class TabBar<T: Route> extends React.Component<Props<T>, State> {
       tabStyle,
       labelStyle,
       indicatorStyle,
+      contentContainerStyle,
       style,
     } = this.props;
     const { routes } = navigationState;
@@ -301,7 +302,7 @@ export default class TabBar<T: Route> extends React.Component<Props<T>, State> {
             contentContainerStyle={[
               styles.tabContent,
               scrollEnabled ? null : styles.container,
-              this.props.contentContainerStyle,
+              contentContainerStyle,
             ]}
             scrollEventThrottle={16}
             onScroll={Animated.event(
