@@ -38,6 +38,7 @@ type Props<T> = {|
   onLongPress: () => mixed,
   tabWidth: number,
   labelStyle?: TextStyleProp,
+  activeTabContainerStyle?: ViewStyleProp,
   style: ViewStyleProp,
 |};
 
@@ -61,6 +62,7 @@ export default function TabBarItem<T: Route>({
   pressColor,
   pressOpacity,
   labelStyle,
+  activeTabContainerStyle = {},
   style,
   tabWidth,
   onPress,
@@ -164,13 +166,13 @@ export default function TabBarItem<T: Route>({
     (tabStyle && typeof tabStyle.width !== 'undefined') ||
     scrollEnabled === true;
 
-  const tabContainerStyle = {};
+  let tabContainerStyle = isFocused ? activeTabContainerStyle : {};
   const itemStyle = isWidthSet ? { width: tabWidth } : null;
 
   if (tabStyle && typeof tabStyle.flex === 'number') {
-    tabContainerStyle.flex = tabStyle.flex;
+    tabContainerStyle = StyleSheet.flatten([{flex: tabStyle.flex}, tabContainerStyle]);
   } else if (!isWidthSet) {
-    tabContainerStyle.flex = 1;
+    tabContainerStyle = StyleSheet.flatten([{flex: 1}, tabContainerStyle]);
   }
 
   const scene = { route };
