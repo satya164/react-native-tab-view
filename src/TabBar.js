@@ -46,7 +46,7 @@ export type Props<T> = {|
   onTabPress?: (scene: Scene<T>) => mixed,
   onTabLongPress?: (scene: Scene<T>) => mixed,
   tabStyle?: ViewStyleProp,
-  activeTabContainerStyle?: ViewStyleProp,
+  activeTabStyle?: ViewStyleProp,
   indicatorStyle?: ViewStyleProp,
   labelStyle?: TextStyleProp,
   contentContainerStyle?: ViewStyleProp,
@@ -267,7 +267,7 @@ export default class TabBar<T: Route> extends React.Component<Props<T>, State> {
       onTabPress,
       onTabLongPress,
       tabStyle,
-      activeTabContainerStyle,
+      activeTabStyle,
       labelStyle,
       indicatorStyle,
       contentContainerStyle,
@@ -359,7 +359,7 @@ export default class TabBar<T: Route> extends React.Component<Props<T>, State> {
                 }}
                 onLongPress={() => onTabLongPress && onTabLongPress({ route })}
                 labelStyle={labelStyle}
-                activeTabContainerStyle={activeTabContainerStyle}
+                activeTabStyle={activeTabStyle}
                 style={tabStyle}
               />
             ))}

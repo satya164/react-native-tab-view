@@ -38,7 +38,7 @@ type Props<T> = {|
   onLongPress: () => mixed,
   tabWidth: number,
   labelStyle?: TextStyleProp,
-  activeTabContainerStyle?: ViewStyleProp,
+  activeTabStyle?: ViewStyleProp,
   style: ViewStyleProp,
 |};
 
@@ -62,7 +62,7 @@ export default function TabBarItem<T: Route>({
   pressColor,
   pressOpacity,
   labelStyle,
-  activeTabContainerStyle = {},
+  activeTabStyle = {},
   style,
   tabWidth,
   onPress,
@@ -166,13 +166,15 @@ export default function TabBarItem<T: Route>({
     (tabStyle && typeof tabStyle.width !== 'undefined') ||
     scrollEnabled === true;
 
-  let tabContainerStyle = isFocused ? activeTabContainerStyle : {};
+  const tabContainerStyle = {};
   const itemStyle = isWidthSet ? { width: tabWidth } : null;
 
+  const isActiveStyle = isFocused && activeTabStyle != null;
+
   if (tabStyle && typeof tabStyle.flex === 'number') {
-    tabContainerStyle = StyleSheet.flatten([{flex: tabStyle.flex}, tabContainerStyle]);
+    tabContainerStyle.flex = isActiveStyle ? activeTabStyle.flex : tabStyle.flex;
   } else if (!isWidthSet) {
-    tabContainerStyle = StyleSheet.flatten([{flex: 1}, tabContainerStyle]);
+    tabContainerStyle.flex = 1;
   }
 
   const scene = { route };
@@ -203,7 +205,7 @@ export default function TabBarItem<T: Route>({
       onLongPress={onLongPress}
       style={tabContainerStyle}
     >
-      <View pointerEvents="none" style={[styles.item, itemStyle, tabStyle]}>
+      <View pointerEvents="none" style={[styles.item, itemStyle, isActiveStyle ? activeTabStyle : tabStyle]}>
         {icon}
         {label}
         {badge != null ? <View style={styles.badge}>{badge}</View> : null}

@@ -414,9 +414,9 @@ Boolean indicating whether the tab bar bounces when scrolling.
 
 Style to apply to the individual tab items in the tab bar.
 
-##### `activeTabContainerStyle`
+##### `activeTabStyle`
 
-Style to apply to the active tab container item in the tab bar.
+Style to apply to the active individual tab item in the tab bar.
 
 ##### `indicatorStyle`
 
