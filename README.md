@@ -252,11 +252,9 @@ By default, this renders `null`.
 
 ##### `removeClippedSubviews`
 
-*Note*: Don't enable this on iOS where this is buggy and views don't re-appear.
+Removes not visible subviews to improve memory usage. Defaults to `false`.
 
-Removes not visible subviews to improve memory usage.
-
-`false` by default.
+**Note**: Don't enable this on iOS where this is buggy and views don't re-appear.
 
 ##### `keyboardDismissMode`
 
