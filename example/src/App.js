@@ -19,6 +19,7 @@ import TabBarIconExample from './TabBarIconExample';
 import CustomIndicatorExample from './CustomIndicatorExample';
 import CustomTabBarExample from './CustomTabBarExample';
 import CoverflowExample from './CoverflowExample';
+import FastIndexChange from './FastIndexChange';
 
 YellowBox.ignoreWarnings(['bind():']);
 
@@ -30,6 +31,7 @@ const EXAMPLE_COMPONENTS = [
   CustomIndicatorExample,
   CustomTabBarExample,
   CoverflowExample,
+  FastIndexChange,
 ];
 
 type State = {

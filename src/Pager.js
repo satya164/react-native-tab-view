@@ -284,6 +284,11 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
         set(state.finished, FALSE),
         set(this._index, index),
         startClock(this._clock),
+        call([this._index], ([value]) => {
+          // set current index so componentDidUpdate not trigger new onIndexChange causing double swipe
+          this._currentIndexValue = value;
+          this.props.onIndexChange(value);
+        }),
       ]),
       cond(
         this._isSwipeGesture,
@@ -307,9 +312,6 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
         // When the animation finishes, stop the clock
         stopClock(this._clock),
         call([this._index], ([value]) => {
-          // If the index changed, and previous animation has finished, update state
-          this.props.onIndexChange(value);
-
           // Without this check, the pager can go to an infinite update <-> animate loop for sync updates
           if (value !== this.props.navigationState.index) {
             this._pendingIndexValue = value;
