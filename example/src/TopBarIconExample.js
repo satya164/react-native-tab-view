@@ -69,6 +69,7 @@ export default class TopBarIconExample extends React.Component<*, State> {
         renderScene={this._renderScene}
         renderTabBar={this._renderTabBar}
         onIndexChange={this._handleIndexChange}
+        bouncesEnabled // only iOS
       />
     );
   }
