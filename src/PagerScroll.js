@@ -32,6 +32,7 @@ export default class PagerScroll<T: *> extends React.Component<
 
   static defaultProps = {
     canJumpToTab: () => true,
+    bounces: false,
   };
 
   constructor(props: Props<T>) {
@@ -153,8 +154,8 @@ export default class PagerScroll<T: *> extends React.Component<
         overScrollMode="never"
         scrollEnabled={this.props.swipeEnabled}
         automaticallyAdjustContentInsets={false}
-        bounces={bounces || false} // default false
-        alwaysBounceHorizontal={bounces || false} // default false
+        bounces={bounces}
+        alwaysBounceHorizontal={bounces}
         scrollsToTop={false}
         showsHorizontalScrollIndicator={false}
         scrollEventThrottle={1}
