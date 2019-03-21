@@ -1,0 +1,14 @@
+{
+  "extends": "eslint-config-satya164",
+
+  "plugins": ["react-native-globals"],
+
+  "env": {
+    "react-native-globals/all": true
+  },
+
+  "rules": {
+    "flowtype/no-dupe-keys": "off",
+    "flowtype/no-existential-type": "off"
+  }
+}
