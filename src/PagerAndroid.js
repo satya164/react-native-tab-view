@@ -12,11 +12,15 @@ type PageScrollEvent = {
   },
 };
 
-type PageScrollStateEvent = {
-  nativeEvent: {
-    pageScrollState: 'dragging' | 'settling' | 'idle',
-  },
-};
+type PageScrollState = 'dragging' | 'settling' | 'idle';
+
+type PageScrollStateEvent =
+  | PageScrollState
+  | {
+      nativeEvent: {
+        pageScrollState: PageScrollState,
+      },
+    };
 
 type Props<T> = PagerRendererProps<T> & {
   keyboardDismissMode: 'none' | 'on-drag',
@@ -93,7 +97,10 @@ export default class PagerAndroid<T: *> extends React.Component<Props<T>> {
 
   _handlePageScrollStateChanged = (e: PageScrollStateEvent) => {
     // Support both React Native < 0.59 and 0.59+
-    this._isIdle = e.nativeEvent.pageScrollState === 'idle' || e === 'idle';
+    this._isIdle =
+      typeof e !== 'string' && e.nativeEvent
+        ? e.nativeEvent.pageScrollState === 'idle'
+        : e === 'idle';
 
     let nextIndex = this._currentIndex;
 
