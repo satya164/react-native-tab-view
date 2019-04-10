@@ -1,7 +1,7 @@
 /* @flow */
 
 import * as React from 'react';
-import { StyleSheet, Keyboard } from 'react-native';
+import { StyleSheet, Keyboard, I18nManager } from 'react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import Animated, { Easing } from 'react-native-reanimated';
 
@@ -388,7 +388,7 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
           set(this._offsetX, this._position),
         ]),
         // Update position with previous offset + gesture distance
-        set(this._position, add(this._offsetX, this._gestureX)),
+        set(this._position, I18nManager.isRTL ? sub(this._offsetX, this._gestureX) : add(this._offsetX, this._gestureX)),
         // Stop animations while we're dragging
         stopClock(this._clock),
       ],
@@ -422,14 +422,14 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
                       // If gesture value exceeded the threshold, calculate direction from distance travelled
                       cond(
                         greaterThan(this._gestureX, 0),
-                        DIRECTION_LEFT,
-                        DIRECTION_RIGHT
+                        I18nManager.isRTL ? DIRECTION_RIGHT : DIRECTION_LEFT,
+                        I18nManager.isRTL ? DIRECTION_LEFT :DIRECTION_RIGHT
                       ),
                       // Otherwise calculate direction from the gesture velocity
                       cond(
                         greaterThan(this._velocityX, 0),
-                        DIRECTION_LEFT,
-                        DIRECTION_RIGHT
+                        I18nManager.isRTL ? DIRECTION_RIGHT : DIRECTION_LEFT,
+                        I18nManager.isRTL ? DIRECTION_LEFT :DIRECTION_RIGHT
                       )
                     )
                   )
@@ -494,7 +494,7 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
               layout.width
                 ? {
                     width: layout.width * navigationState.routes.length,
-                    transform: [{ translateX }],
+                    transform: [{ translateX: I18nManager.isRTL ? multiply(translateX, -1) : translateX }],
                   }
                 : null,
             ]}
