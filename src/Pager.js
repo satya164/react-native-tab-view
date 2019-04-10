@@ -388,7 +388,12 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
           set(this._offsetX, this._position),
         ]),
         // Update position with previous offset + gesture distance
-        set(this._position, I18nManager.isRTL ? sub(this._offsetX, this._gestureX) : add(this._offsetX, this._gestureX)),
+        set(
+          this._position,
+          I18nManager.isRTL
+            ? sub(this._offsetX, this._gestureX)
+            : add(this._offsetX, this._gestureX)
+        ),
         // Stop animations while we're dragging
         stopClock(this._clock),
       ],
@@ -423,13 +428,13 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
                       cond(
                         greaterThan(this._gestureX, 0),
                         I18nManager.isRTL ? DIRECTION_RIGHT : DIRECTION_LEFT,
-                        I18nManager.isRTL ? DIRECTION_LEFT :DIRECTION_RIGHT
+                        I18nManager.isRTL ? DIRECTION_LEFT : DIRECTION_RIGHT
                       ),
                       // Otherwise calculate direction from the gesture velocity
                       cond(
                         greaterThan(this._velocityX, 0),
                         I18nManager.isRTL ? DIRECTION_RIGHT : DIRECTION_LEFT,
-                        I18nManager.isRTL ? DIRECTION_LEFT :DIRECTION_RIGHT
+                        I18nManager.isRTL ? DIRECTION_LEFT : DIRECTION_RIGHT
                       )
                     )
                   )
@@ -494,7 +499,13 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
               layout.width
                 ? {
                     width: layout.width * navigationState.routes.length,
-                    transform: [{ translateX: I18nManager.isRTL ? multiply(translateX, -1) : translateX }],
+                    transform: [
+                      {
+                        translateX: I18nManager.isRTL
+                          ? multiply(translateX, -1)
+                          : translateX,
+                      },
+                    ],
                   }
                 : null,
             ]}
