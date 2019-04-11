@@ -1,7 +1,7 @@
 /* @flow */
 
 import * as React from 'react';
-import { StyleSheet, View, ScrollView } from 'react-native';
+import { StyleSheet, View, ScrollView, I18nManager } from 'react-native';
 import Animated from 'react-native-reanimated';
 import TabBarItem from './TabBarItem';
 import TabBarIndicator, {
@@ -67,8 +67,8 @@ export default class TabBar<T: Route> extends React.Component<Props<T>, State> {
       typeof route.accessibilityLabel === 'string'
         ? route.accessibilityLabel
         : typeof route.title === 'string'
-        ? route.title
-        : undefined,
+          ? route.title
+          : undefined,
     getTestID: ({ route }: Scene<T>) => route.testID,
     renderIndicator: (props: IndicatorProps<T>) => (
       <TabBarIndicator {...props} />
@@ -171,8 +171,9 @@ export default class TabBar<T: Route> extends React.Component<Props<T>, State> {
       layout.width
     );
     const maxDistance = tabBarWidth - layout.width;
+    let result = Math.max(Math.min(value, maxDistance), 0);
 
-    return Math.max(Math.min(value, maxDistance), 0);
+    return I18nManager.isRTL ? maxDistance - result : result;
   };
 
   _getScrollAmount = (props, i) => {
@@ -292,6 +293,7 @@ export default class TabBar<T: Route> extends React.Component<Props<T>, State> {
             layout,
             navigationState,
             jumpTo,
+            scrollEnabled,
             addListener,
             removeListener,
             width: tabWidth,

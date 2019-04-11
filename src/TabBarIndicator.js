@@ -14,18 +14,28 @@ export type Props<T> = {|
 |};
 
 export default function TabBarIndicator<T: Route>(props: Props<T>) {
-  const { width, position, navigationState, style } = props;
+  const {
+    width,
+    position,
+    navigationState,
+    style,
+    layout,
+    scrollEnabled,
+  } = props;
   const { routes } = navigationState;
-  const translateX = Animated.multiply(
+  const translateX = Animated.add(
     Animated.multiply(
-      Animated.interpolate(position, {
-        inputRange: [0, routes.length - 1],
-        outputRange: [0, routes.length - 1],
-        extrapolate: 'clamp',
-      }),
-      width
+      Animated.multiply(
+        Animated.interpolate(position, {
+          inputRange: [0, routes.length - 1],
+          outputRange: [0, routes.length - 1],
+          extrapolate: 'clamp',
+        }),
+        width
+      ),
+      I18nManager.isRTL ? -1 : 1
     ),
-    I18nManager.isRTL ? -1 : 1
+    I18nManager.isRTL && scrollEnabled ? layout.width : 0
   );
 
   return (
