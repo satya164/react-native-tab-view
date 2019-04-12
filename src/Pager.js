@@ -58,6 +58,7 @@ const {
   multiply,
   neq,
   or,
+  not,
   round,
   set,
   spring,
@@ -189,6 +190,10 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
   _swipeDistanceThreshold = new Value(this.props.swipeDistanceThreshold || 180);
   _swipeVelocityThreshold = new Value(this.props.swipeVelocityThreshold);
 
+  // Velocity of a pan movement used for a natural swipe
+  // Setting before gesture
+  _initialVelocityForSpring = new Value(0);
+
   // Whether we need to add a listener for position change
   // To avoid unnecessary traffic through the bridge, don't add listeners unless needed
   _isListening = new Value(FALSE);
@@ -288,11 +293,22 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
       cond(
         this._isSwipeGesture,
         // Animate the values with a spring for swipe
-        spring(
-          this._clock,
-          { ...state, velocity: this._velocityX },
-          { ...SPRING_CONFIG, toValue }
-        ),
+        [
+          cond(
+            not(clockRunning(this._clock)),
+            I18nManager.isRTL
+              ? set(
+                  this._initialVelocityForSpring,
+                  multiply(-1, this._velocityX)
+                )
+              : set(this._initialVelocityForSpring, this._velocityX)
+          ),
+          spring(
+            this._clock,
+            { ...state, velocity: this._initialVelocityForSpring },
+            { ...SPRING_CONFIG, toValue }
+          ),
+        ],
         // Otherwise use a timing animation for faster switching
         timing(
           this._clock,
