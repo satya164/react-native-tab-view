@@ -191,10 +191,7 @@ export default class TabBar<T: Route> extends React.Component<Props<T>, State> {
 
       this._scrollView &&
         this._scrollView.scrollTo({
-          x: this._normalizeScrollValue(
-            this.props,
-            this._getScrollAmount(this.props, value)
-          ),
+          x: this._getScrollAmount(this.props, value),
           animated: false,
         });
     }
