@@ -163,7 +163,7 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
 
   // Current position of the page (translateX value)
   _position = new Value(
-    // Intial value is based on the index and page width
+    // Initial value is based on the index and page width
     this.props.navigationState.index * this.props.layout.width * DIRECTION_RIGHT
   );
 
@@ -190,8 +190,12 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
   _swipeDistanceThreshold = new Value(this.props.swipeDistanceThreshold || 180);
   _swipeVelocityThreshold = new Value(this.props.swipeVelocityThreshold);
 
-  // Velocity of a pan movement used for a natural swipe
-  // Setting before gesture
+  // The reason for using this value instead of simply passing `this._velocity`
+  // into a spring animation is that we need to reverse it if we're using RTL mode.
+  // Also, it's not possible to pass multiplied value there, because
+  // value passed to STATE of spring (the first argument) has to be Animated.Value
+  // and it's not allowed to pass other nodes there. The result of multiplying is not an
+  // Animated.Value. So this value is being updated on each start of spring animation.
   _initialVelocityForSpring = new Value(0);
 
   // Whether we need to add a listener for position change
