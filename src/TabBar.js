@@ -67,8 +67,8 @@ export default class TabBar<T: Route> extends React.Component<Props<T>, State> {
       typeof route.accessibilityLabel === 'string'
         ? route.accessibilityLabel
         : typeof route.title === 'string'
-          ? route.title
-          : undefined,
+        ? route.title
+        : undefined,
     getTestID: ({ route }: Scene<T>) => route.testID,
     renderIndicator: (props: IndicatorProps<T>) => (
       <TabBarIndicator {...props} />
