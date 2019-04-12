@@ -173,7 +173,7 @@ export default class TabBar<T: Route> extends React.Component<Props<T>, State> {
     const maxDistance = tabBarWidth - layout.width;
     let result = Math.max(Math.min(value, maxDistance), 0);
 
-    return I18nManager.isRTL ? maxDistance - result : result;
+    return I18nManager.isRTL ? layout.width - result : result;
   };
 
   _getScrollAmount = (props, i) => {
