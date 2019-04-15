@@ -13,7 +13,7 @@ import type { ViewStyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet
 const LOLLIPOP = 21;
 
 type Props = {
-  onPress: () => mixed,
+  onPressIn: () => mixed,
   delayPressIn?: number,
   borderless?: boolean,
   pressColor?: string,
@@ -24,7 +24,7 @@ type Props = {
 
 export default class TouchableItem extends React.Component<Props> {
   static propTypes = {
-    onPress: PropTypes.func.isRequired,
+    onPressIn: PropTypes.func.isRequired,
     delayPressIn: PropTypes.number,
     borderless: PropTypes.bool,
     pressColor: PropTypes.string,

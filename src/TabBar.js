@@ -486,7 +486,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
                   pressColor={this.props.pressColor}
                   pressOpacity={this.props.pressOpacity}
                   delayPressIn={0}
-                  onPress={() => this._handleTabPress({ route })}
+                  onPressIn={() => this._handleTabPress({ route })}
                   onLongPress={() => this._handleTabLongPress({ route })}
                   style={tabContainerStyle}
                 >
