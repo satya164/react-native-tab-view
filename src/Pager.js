@@ -96,6 +96,8 @@ const TIMING_CONFIG = {
 export default class Pager<T: Route> extends React.Component<Props<T>> {
   static defaultProps = {
     swipeVelocityThreshold: 1200,
+    extraSpringConfig: {},
+    extraTimingConfig: {},
   };
 
   componentDidUpdate(prevProps: Props<T>) {
@@ -283,6 +285,8 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
       finished: new Value(FALSE),
     };
 
+    const { extraTimingConfig, extraSpringConfig } = this.props;
+
     return block([
       cond(clockRunning(this._clock), NOOP, [
         // Animation wasn't running before
@@ -310,14 +314,14 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
           spring(
             this._clock,
             { ...state, velocity: this._initialVelocityForSpring },
-            { ...SPRING_CONFIG, toValue }
+            { ...SPRING_CONFIG, ...extraSpringConfig, toValue }
           ),
         ],
         // Otherwise use a timing animation for faster switching
         timing(
           this._clock,
           { ...state, frameTime },
-          { ...TIMING_CONFIG, toValue }
+          { ...TIMING_CONFIG, ...extraTimingConfig, toValue }
         )
       ),
       cond(state.finished, [
