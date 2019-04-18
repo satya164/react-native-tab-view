@@ -96,8 +96,8 @@ const TIMING_CONFIG = {
 export default class Pager<T: Route> extends React.Component<Props<T>> {
   static defaultProps = {
     swipeVelocityThreshold: 1200,
-    extraSpringConfig: {},
-    extraTimingConfig: {},
+    springConfig: {},
+    timingConfig: {},
   };
 
   componentDidUpdate(prevProps: Props<T>) {
@@ -285,7 +285,27 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
       finished: new Value(FALSE),
     };
 
-    const { extraTimingConfig, extraSpringConfig } = this.props;
+    const { timingConfig, springConfig } = this.props;
+
+    const currentSpringConfig = {
+      damping: new Value(0),
+      mass: new Value(0),
+      stiffness: new Value(0),
+      overshootClamping: new Value(0),
+      restSpeedThreshold: new Value(0),
+      restDisplacementThreshold: new Value(0),
+      toValue: new Value(0),
+    };
+
+    const currentTimingConfig = {
+      duration: new Value(0),
+      toValue: new Value(0),
+      easing: TIMING_CONFIG.easing,
+    };
+
+    const mergedSpringConfig = { ...SPRING_CONFIG, ...springConfig, toValue };
+
+    const mergedTimingConfig = { ...TIMING_CONFIG, ...timingConfig, toValue };
 
     return block([
       cond(clockRunning(this._clock), NOOP, [
@@ -295,6 +315,24 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
         set(frameTime, 0),
         set(state.time, 0),
         set(state.finished, FALSE),
+        set(currentSpringConfig.mass, mergedSpringConfig.mass),
+        set(currentSpringConfig.stiffness, mergedSpringConfig.stiffness),
+        set(currentSpringConfig.damping, mergedSpringConfig.damping),
+        set(
+          currentSpringConfig.overshootClamping,
+          mergedSpringConfig.overshootClamping
+        ),
+        set(
+          currentSpringConfig.restDisplacementThreshold,
+          mergedSpringConfig.restDisplacementThreshold
+        ),
+        set(
+          currentSpringConfig.restSpeedThreshold,
+          mergedSpringConfig.restSpeedThreshold
+        ),
+        set(currentSpringConfig.toValue, mergedSpringConfig.toValue),
+        set(currentTimingConfig.duration, mergedTimingConfig.duration),
+        set(currentTimingConfig.toValue, mergedTimingConfig.toValue),
         set(this._index, index),
         startClock(this._clock),
       ]),
@@ -314,15 +352,11 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
           spring(
             this._clock,
             { ...state, velocity: this._initialVelocityForSpring },
-            { ...SPRING_CONFIG, ...extraSpringConfig, toValue }
+            currentSpringConfig
           ),
         ],
         // Otherwise use a timing animation for faster switching
-        timing(
-          this._clock,
-          { ...state, frameTime },
-          { ...TIMING_CONFIG, ...extraTimingConfig, toValue }
-        )
+        timing(this._clock, { ...state, frameTime }, currentTimingConfig)
       ),
       cond(state.finished, [
         // Reset values
