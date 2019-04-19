@@ -79,25 +79,9 @@ const DIRECTION_RIGHT = -1;
 const SWIPE_DISTANCE_MINIMUM = 20;
 const SWIPE_DISTANCE_MULTIPLIER = 1 / 1.75;
 
-const SPRING_CONFIG = {
-  damping: 30,
-  mass: 1,
-  stiffness: 200,
-  overshootClamping: true,
-  restSpeedThreshold: 0.001,
-  restDisplacementThreshold: 0.001,
-};
-
-const TIMING_CONFIG = {
-  duration: 250,
-  easing: Easing.out(Easing.cubic),
-};
-
 export default class Pager<T: Route> extends React.Component<Props<T>> {
   static defaultProps = {
     swipeVelocityThreshold: 1200,
-    springConfig: {},
-    timingConfig: {},
   };
 
   componentDidUpdate(prevProps: Props<T>) {
@@ -152,6 +136,32 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
     ) {
       this._swipeVelocityThreshold.setValue(this.props.swipeVelocityThreshold);
     }
+
+    if (prevProps.springConfig !== this.props.springConfig) {
+      const { springConfig } = this.props;
+
+      springConfig.damping !== undefined &&
+        this._springConfig.damping.setValue(springConfig.damping);
+      springConfig.mass !== undefined &&
+        this._springConfig.mass.setValue(springConfig.mass);
+      springConfig.stiffness !== undefined &&
+        this._springConfig.stiffness.setValue(springConfig.stiffness);
+      springConfig.restSpeedThreshold !== undefined &&
+        this._springConfig.restSpeedThreshold.setValue(
+          springConfig.restSpeedThreshold
+        );
+      springConfig.restDisplacementThreshold !== undefined &&
+        this._springConfig.restDisplacementThreshold.setValue(
+          springConfig.restDisplacementThreshold
+        );
+    }
+
+    if (prevProps.timingConfig !== this.props.timingConfig) {
+      const { timingConfig } = this.props;
+
+      timingConfig.duration !== undefined &&
+        this._timingConfig.duration.setValue(timingConfig.duration);
+    }
   }
 
   // Clock used for tab transition animations
@@ -191,6 +201,45 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
   // Threshold values to determine when to trigger a swipe gesture
   _swipeDistanceThreshold = new Value(this.props.swipeDistanceThreshold || 180);
   _swipeVelocityThreshold = new Value(this.props.swipeVelocityThreshold);
+
+  // Animation configuration
+  _springConfig = {
+    damping: new Value(
+      this.props.springConfig.damping !== undefined
+        ? this.props.springConfig.damping
+        : 30
+    ),
+    mass: new Value(
+      this.props.springConfig.mass !== undefined
+        ? this.props.springConfig.mass
+        : 1
+    ),
+    stiffness: new Value(
+      this.props.springConfig.stiffness !== undefined
+        ? this.props.springConfig.stiffness
+        : 200
+    ),
+    restSpeedThreshold: new Value(
+      this.props.springConfig.restSpeedThreshold !== undefined
+        ? this.props.springConfig.restSpeedThreshold
+        : 0.001
+    ),
+    restDisplacementThreshold: new Value(
+      this.props.springConfig.restDisplacementThreshold !== undefined
+        ? this.props.springConfig.restDisplacementThreshold
+        : 0.001
+    ),
+    overshootClamping: true,
+  };
+
+  _timingConfig = {
+    duration: new Value(
+      this.props.timingConfig.duration !== undefined
+        ? this.props.timingConfig.duration
+        : 250
+    ),
+    easing: Easing.out(Easing.cubic),
+  };
 
   // The reason for using this value instead of simply passing `this._velocity`
   // into a spring animation is that we need to reverse it if we're using RTL mode.
@@ -285,28 +334,6 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
       finished: new Value(FALSE),
     };
 
-    const { timingConfig, springConfig } = this.props;
-
-    const currentSpringConfig = {
-      damping: new Value(0),
-      mass: new Value(0),
-      stiffness: new Value(0),
-      overshootClamping: new Value(0),
-      restSpeedThreshold: new Value(0),
-      restDisplacementThreshold: new Value(0),
-      toValue: new Value(0),
-    };
-
-    const currentTimingConfig = {
-      duration: new Value(0),
-      toValue: new Value(0),
-      easing: TIMING_CONFIG.easing,
-    };
-
-    const mergedSpringConfig = { ...SPRING_CONFIG, ...springConfig, toValue };
-
-    const mergedTimingConfig = { ...TIMING_CONFIG, ...timingConfig, toValue };
-
     return block([
       cond(clockRunning(this._clock), NOOP, [
         // Animation wasn't running before
@@ -315,24 +342,6 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
         set(frameTime, 0),
         set(state.time, 0),
         set(state.finished, FALSE),
-        set(currentSpringConfig.mass, mergedSpringConfig.mass),
-        set(currentSpringConfig.stiffness, mergedSpringConfig.stiffness),
-        set(currentSpringConfig.damping, mergedSpringConfig.damping),
-        set(
-          currentSpringConfig.overshootClamping,
-          mergedSpringConfig.overshootClamping
-        ),
-        set(
-          currentSpringConfig.restDisplacementThreshold,
-          mergedSpringConfig.restDisplacementThreshold
-        ),
-        set(
-          currentSpringConfig.restSpeedThreshold,
-          mergedSpringConfig.restSpeedThreshold
-        ),
-        set(currentSpringConfig.toValue, mergedSpringConfig.toValue),
-        set(currentTimingConfig.duration, mergedTimingConfig.duration),
-        set(currentTimingConfig.toValue, mergedTimingConfig.toValue),
         set(this._index, index),
         startClock(this._clock),
       ]),
@@ -352,11 +361,15 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
           spring(
             this._clock,
             { ...state, velocity: this._initialVelocityForSpring },
-            currentSpringConfig
+            { ...this._springConfig, toValue }
           ),
         ],
         // Otherwise use a timing animation for faster switching
-        timing(this._clock, { ...state, frameTime }, currentTimingConfig)
+        timing(
+          this._clock,
+          { ...state, frameTime },
+          { ...this._timingConfig, toValue }
+        )
       ),
       cond(state.finished, [
         // Reset values
