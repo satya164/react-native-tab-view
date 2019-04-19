@@ -79,6 +79,20 @@ const DIRECTION_RIGHT = -1;
 const SWIPE_DISTANCE_MINIMUM = 20;
 const SWIPE_DISTANCE_MULTIPLIER = 1 / 1.75;
 
+const SPRING_CONFIG = {
+  damping: 30,
+  mass: 1,
+  stiffness: 200,
+  overshootClamping: true,
+  restSpeedThreshold: 0.001,
+  restDisplacementThreshold: 0.001,
+};
+
+const TIMING_CONFIG = {
+  duration: 250,
+  easing: Easing.out(Easing.cubic),
+};
+
 export default class Pager<T: Route> extends React.Component<Props<T>> {
   static defaultProps = {
     swipeVelocityThreshold: 1200,
@@ -140,27 +154,43 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
     if (prevProps.springConfig !== this.props.springConfig) {
       const { springConfig } = this.props;
 
-      springConfig.damping !== undefined &&
-        this._springConfig.damping.setValue(springConfig.damping);
-      springConfig.mass !== undefined &&
-        this._springConfig.mass.setValue(springConfig.mass);
-      springConfig.stiffness !== undefined &&
-        this._springConfig.stiffness.setValue(springConfig.stiffness);
-      springConfig.restSpeedThreshold !== undefined &&
-        this._springConfig.restSpeedThreshold.setValue(
-          springConfig.restSpeedThreshold
-        );
-      springConfig.restDisplacementThreshold !== undefined &&
-        this._springConfig.restDisplacementThreshold.setValue(
-          springConfig.restDisplacementThreshold
-        );
+      this._springConfig.damping.setValue(
+        springConfig.damping !== undefined
+          ? springConfig.damping
+          : SPRING_CONFIG.damping
+      );
+
+      this._springConfig.mass.setValue(
+        springConfig.mass !== undefined ? springConfig.mass : SPRING_CONFIG.mass
+      );
+
+      this._springConfig.stiffness.setValue(
+        springConfig.stiffness !== undefined
+          ? springConfig.stiffness
+          : SPRING_CONFIG.stiffness
+      );
+
+      this._springConfig.restSpeedThreshold.setValue(
+        springConfig.restSpeedThreshold !== undefined
+          ? springConfig.restSpeedThreshold
+          : SPRING_CONFIG.restSpeedThreshold
+      );
+
+      this._springConfig.restDisplacementThreshold.setValue(
+        springConfig.restDisplacementThreshold !== undefined
+          ? springConfig.restDisplacementThreshold
+          : SPRING_CONFIG.restDisplacementThreshold
+      );
     }
 
     if (prevProps.timingConfig !== this.props.timingConfig) {
       const { timingConfig } = this.props;
 
-      timingConfig.duration !== undefined &&
-        this._timingConfig.duration.setValue(timingConfig.duration);
+      this._timingConfig.duration.setValue(
+        timingConfig.duration !== undefined
+          ? timingConfig.duration
+          : TIMING_CONFIG.duration
+      );
     }
   }
 
@@ -207,38 +237,36 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
     damping: new Value(
       this.props.springConfig.damping !== undefined
         ? this.props.springConfig.damping
-        : 30
+        : SPRING_CONFIG.damping
     ),
     mass: new Value(
       this.props.springConfig.mass !== undefined
         ? this.props.springConfig.mass
-        : 1
+        : SPRING_CONFIG.mass
     ),
     stiffness: new Value(
       this.props.springConfig.stiffness !== undefined
         ? this.props.springConfig.stiffness
-        : 200
+        : SPRING_CONFIG.stiffness
     ),
     restSpeedThreshold: new Value(
       this.props.springConfig.restSpeedThreshold !== undefined
         ? this.props.springConfig.restSpeedThreshold
-        : 0.001
+        : SPRING_CONFIG.restSpeedThreshold
     ),
     restDisplacementThreshold: new Value(
       this.props.springConfig.restDisplacementThreshold !== undefined
         ? this.props.springConfig.restDisplacementThreshold
-        : 0.001
+        : SPRING_CONFIG.restDisplacementThreshold
     ),
-    overshootClamping: true,
   };
 
   _timingConfig = {
     duration: new Value(
       this.props.timingConfig.duration !== undefined
         ? this.props.timingConfig.duration
-        : 250
+        : TIMING_CONFIG.duration
     ),
-    easing: Easing.out(Easing.cubic),
   };
 
   // The reason for using this value instead of simply passing `this._velocity`
@@ -361,14 +389,14 @@ export default class Pager<T: Route> extends React.Component<Props<T>> {
           spring(
             this._clock,
             { ...state, velocity: this._initialVelocityForSpring },
-            { ...this._springConfig, toValue }
+            { ...SPRING_CONFIG, ...this._springConfig, toValue }
           ),
         ],
         // Otherwise use a timing animation for faster switching
         timing(
           this._clock,
           { ...state, frameTime },
-          { ...this._timingConfig, toValue }
+          { ...TIMING_CONFIG, ...this._timingConfig, toValue }
         )
       ),
       cond(state.finished, [
