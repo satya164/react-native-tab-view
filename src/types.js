@@ -41,6 +41,15 @@ export type PagerCommonProps = {|
   swipeVelocityThreshold?: number,
   onSwipeStart?: () => mixed,
   onSwipeEnd?: () => mixed,
-  springConfig?: Object,
-  timingConfig?: Object,
+  springConfig?: {|
+    damping?: number,
+    mass?: number,
+    stiffness?: number,
+    overshootClamping?: number,
+    restSpeedThreshold?: number,
+    restDisplacementThreshold?: number,
+  |},
+  timingConfig?: {|
+    duration?: number,
+  |},
 |};
