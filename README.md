@@ -1,3 +1,7 @@
+__This branch is no longer maintained. We'll accept pull requests if you are facing a critical issue, but there won't be any new features or commits from the core team. You should [migrate your code to 2.x](https://github.com/react-native-community/react-native-tab-view/releases/tag/v2.0.1) as soon as possible.__
+
+---
+
 # React Native Tab View
 
 [![Build Status][build-badge]][build]
