@@ -376,13 +376,6 @@ const styles = StyleSheet.create({
   },
   tabBar: {
     backgroundColor: '#2196f3',
-    elevation: 4,
-    shadowColor: 'black',
-    shadowOpacity: 0.1,
-    shadowRadius: StyleSheet.hairlineWidth,
-    shadowOffset: {
-      height: StyleSheet.hairlineWidth,
-    },
     zIndex: 1,
   },
   tabContent: {
