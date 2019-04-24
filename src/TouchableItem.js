@@ -50,7 +50,7 @@ export default class TouchableItem extends React.Component<Props> {
       );
     } else {
       return (
-        <TouchableOpacity {...rest} rejectResponderTermination={true} style={style} activeOpacity={pressOpacity}>
+        <TouchableOpacity {...rest} rejectResponderTermination style={style} activeOpacity={pressOpacity}>
           {this.props.children}
         </TouchableOpacity>
       );
