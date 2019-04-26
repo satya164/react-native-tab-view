@@ -1,7 +1,7 @@
 /* @flow */
 
 import * as React from 'react';
-import { StyleSheet, I18nManager } from 'react-native';
+import { StyleSheet, I18nManager, Platform } from 'react-native';
 import Animated from 'react-native-reanimated';
 import type { ViewStyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
 import type { Route, SceneRendererProps, NavigationState } from './types';
@@ -10,6 +10,7 @@ export type Props<T> = {|
   ...SceneRendererProps,
   navigationState: NavigationState<T>,
   width: number,
+  scrollEnabled: boolean,
   style?: ViewStyleProp,
 |};
 
@@ -35,7 +36,9 @@ export default function TabBarIndicator<T: Route>(props: Props<T>) {
       ),
       I18nManager.isRTL ? -1 : 1
     ),
-    I18nManager.isRTL && scrollEnabled ? layout.width : 0
+    I18nManager.isRTL && scrollEnabled && Platform.OS == 'android'
+      ? layout.width
+      : 0
   );
 
   return (

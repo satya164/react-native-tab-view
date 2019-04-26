@@ -1,7 +1,13 @@
 /* @flow */
 
 import * as React from 'react';
-import { StyleSheet, View, ScrollView, I18nManager } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  I18nManager,
+  Platform,
+} from 'react-native';
 import Animated from 'react-native-reanimated';
 import TabBarItem from './TabBarItem';
 import TabBarIndicator, {
@@ -67,8 +73,8 @@ export default class TabBar<T: Route> extends React.Component<Props<T>, State> {
       typeof route.accessibilityLabel === 'string'
         ? route.accessibilityLabel
         : typeof route.title === 'string'
-        ? route.title
-        : undefined,
+          ? route.title
+          : undefined,
     getTestID: ({ route }: Scene<T>) => route.testID,
     renderIndicator: (props: IndicatorProps<T>) => (
       <TabBarIndicator {...props} />
@@ -173,7 +179,10 @@ export default class TabBar<T: Route> extends React.Component<Props<T>, State> {
     const maxDistance = tabBarWidth - layout.width;
     let result = Math.max(Math.min(value, maxDistance), 0);
 
-    return I18nManager.isRTL ? layout.width - result : result;
+    // in android and in RTL mode we should subtract the value from width
+    return I18nManager.isRTL && Platform.OS == 'android'
+      ? layout.width - result
+      : result;
   };
 
   _getScrollAmount = (props, i) => {
@@ -272,7 +281,10 @@ export default class TabBar<T: Route> extends React.Component<Props<T>, State> {
     const { routes } = navigationState;
     const tabWidth = this._getTabWidth(this.props);
     const tabBarWidth = tabWidth * routes.length;
-    const translateX = Animated.multiply(this.state.scrollAmount, -1);
+    const translateX = Animated.multiply(
+      this.state.scrollAmount,
+      Platform.OS == 'ios' ? 1 : -1
+    );
 
     return (
       <Animated.View style={[styles.tabBar, style]}>
