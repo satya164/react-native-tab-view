@@ -10,7 +10,7 @@ export type Props<T> = {|
   ...SceneRendererProps,
   navigationState: NavigationState<T>,
   width: number,
-  scrollEnabled: boolean,
+  scrollEnabled?: boolean,
   style?: ViewStyleProp,
 |};
 
