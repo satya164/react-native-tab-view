@@ -557,11 +557,11 @@ Nesting the `TabView` inside a vertical `ScrollView` will disable the optimizati
 
 ### Use `lazy` and `lazyPlaceholder` props to render routes as needed
 
-Enabling `lazy` can improve initial load performance by rendering routes only when they come into view. Refer the [prop reference](#lazy) for more details.
+The `lazy` option is disabled by default to provide a smoother tab switching experience, but you can enable it and provide a `lazyPlaceholder` component for a better lazy loading experience. Enabling `lazy` can improve initial load performance by rendering routes only when they come into view.   Refer the [prop reference](#lazy) for more details.
 
 ### Use `removeClippedSubviews` to improve memory usage
 
-On Android, enabling `removeClippedSubviews` can improve memory usage. Refer the [prop reference](#removeclippedsubviews) for more details.
+On Android, enabling `removeClippedSubviews` can improve memory usage. This option can also affect rendering performance negatively, so it is disabled by default. So make sure to test it when enabling it. Refer the [prop reference](#removeclippedsubviews) for more details.
 
 ## Contributing
 
