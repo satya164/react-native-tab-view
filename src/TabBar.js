@@ -281,8 +281,12 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
       layout.width
     );
     const maxDistance = tabBarWidth - layout.width;
-
-    return Math.max(Math.min(value, maxDistance), 0);
+    let res = Math.max(Math.min(value, maxDistance), 0);
+    const isIOS = Platform.OS === 'ios';
+    const isRTL = I18nManager.isRTL;
+    if (isIOS || !isRTL) return res;
+    res = maxDistance - 0 - res;
+    return Math.max(Math.min(res, maxDistance), 0);
   };
 
   _getScrollAmount = (props, i) => {
@@ -299,10 +303,7 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
       global.cancelAnimationFrame(this._scrollResetCallback);
       this._scrollView &&
         this._scrollView.scrollTo({
-          x: this._normalizeScrollValue(
-            this.props,
-            this._getScrollAmount(this.props, value)
-          ),
+          x: this._getScrollAmount(this.props, value),
           animated: !this._isIntial, // Disable animation for the initial render
         });
 
@@ -353,14 +354,35 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
   };
 
   render() {
-    const { position, navigationState, scrollEnabled, bounces } = this.props;
+    const {
+      position,
+      navigationState,
+      scrollEnabled,
+      bounces,
+      layout,
+    } = this.props;
     const { routes } = navigationState;
     const tabWidth = this._getTabWidth(this.props);
     const tabBarWidth = tabWidth * routes.length;
 
     // Prepend '-1', so there are always at least 2 items in inputRange
     const inputRange = [-1, ...routes.map((x, i) => i)];
-    const translateX = Animated.multiply(this.state.scrollAmount, -1);
+
+    const isAndroid = Platform.OS === 'android';
+    const isRTL = I18nManager.isRTL;
+    let translateX;
+    if (isAndroid && isRTL) {
+      translateX = Animated.multiply(
+        Animated.subtract(
+          this.state.scrollAmount,
+          Math.max(tabBarWidth - layout.width, 0)
+        ),
+        -1
+      );
+    } else {
+      const dir = isRTL ? 1 : -1;
+      translateX = Animated.multiply(this.state.scrollAmount, dir);
+    }
 
     return (
       <Animated.View style={[styles.tabBar, this.props.style]}>
@@ -412,8 +434,8 @@ export default class TabBar<T: *> extends React.Component<Props<T>, State> {
             ref={el => (this._scrollView = el && el.getNode())}
           >
             {routes.map((route, i) => {
-              const outputRange = inputRange.map(
-                inputIndex => (inputIndex === i ? 1 : 0.7)
+              const outputRange = inputRange.map(inputIndex =>
+                inputIndex === i ? 1 : 0.7
               );
               const opacity = Animated.multiply(
                 this.state.visibility,
@@ -543,6 +565,7 @@ const styles = StyleSheet.create({
     zIndex: Platform.OS === 'android' ? 0 : 1,
   },
   tabContent: {
+    minWidth: '100%',
     flexDirection: 'row',
     flexWrap: 'nowrap',
   },
