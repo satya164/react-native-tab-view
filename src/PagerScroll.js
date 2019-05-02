@@ -150,6 +150,7 @@ export default class PagerScroll<T: *> extends React.Component<
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="always"
         overScrollMode="never"
+        scrollToOverflowEnabled
         scrollEnabled={this.props.swipeEnabled}
         automaticallyAdjustContentInsets={false}
         bounces={false}
