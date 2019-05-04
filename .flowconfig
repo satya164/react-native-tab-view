@@ -49,6 +49,9 @@
 ; Ignore modules with errors
 .*/node_modules/@expo/.*
 
+; Ignore edit history
+.*/.history
+
 [untyped]
 .*/node_modules/expo/.*
 .*/node_modules/xdl/.*

@@ -2,7 +2,10 @@
 
 import * as React from 'react';
 import { StyleSheet, View } from 'react-native';
-import type { ViewStyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
+import type {
+  ViewStyleProp,
+  TextStyleProp,
+} from 'react-native/Libraries/StyleSheet/StyleSheet';
 import type { LayoutEvent } from 'react-native/Libraries/Types/CoreEventTypes';
 
 import TabBar, { type Props as TabBarProps } from './TabBar';
@@ -26,6 +29,10 @@ type Props<T: Route> = {|
   |}) => React.Node,
   renderLazyPlaceholder: (props: {| route: T |}) => React.Node,
   renderTabBar: (props: {|
+    style?: ViewStyleProp,
+    tabStyle?: ViewStyleProp,
+    indicatorStyle?: ViewStyleProp,
+    labelStyle?: TextStyleProp,
     ...SceneRendererProps,
     navigationState: NavigationState<T>,
   |}) => React.Node,
@@ -35,6 +42,9 @@ type Props<T: Route> = {|
   removeClippedSubviews?: boolean,
   sceneContainerStyle?: ViewStyleProp,
   style?: ViewStyleProp,
+  tabStyle?: ViewStyleProp,
+  indicatorStyle?: ViewStyleProp,
+  labelStyle?: TextStyleProp,
 |};
 
 type State = {|
@@ -104,6 +114,9 @@ export default class TabView<T: Route> extends React.Component<
       renderLazyPlaceholder,
       sceneContainerStyle,
       style,
+      tabStyle,
+      indicatorStyle,
+      labelStyle,
     } = this.props;
     const { layout } = this.state;
 
@@ -138,6 +151,10 @@ export default class TabView<T: Route> extends React.Component<
               <React.Fragment>
                 {tabBarPosition === 'top' &&
                   renderTabBar({
+                    tabStyle,
+                    indicatorStyle,
+                    labelStyle,
+                    style,
                     ...sceneRendererProps,
                     navigationState,
                   })}
@@ -166,6 +183,10 @@ export default class TabView<T: Route> extends React.Component<
                 )}
                 {tabBarPosition === 'bottom' &&
                   renderTabBar({
+                    tabStyle,
+                    indicatorStyle,
+                    labelStyle,
+                    style,
                     ...sceneRendererProps,
                     navigationState,
                   })}
