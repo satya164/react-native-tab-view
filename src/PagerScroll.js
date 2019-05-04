@@ -182,8 +182,8 @@ export default class PagerScroll<T: *> extends React.Component<
                 layout.width
                   ? { width: layout.width, overflow: 'hidden' }
                   : focused
-                    ? styles.page
-                    : null
+                  ? styles.page
+                  : null
               }
             >
               {focused || layout.width ? child : null}

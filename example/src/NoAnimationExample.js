@@ -53,8 +53,8 @@ export default class TopBarIconExample extends React.Component<*, State> {
 
   _renderLabel = ({ position, navigationState }) => ({ route, index }) => {
     const inputRange = navigationState.routes.map((x, i) => i);
-    const outputRange = inputRange.map(
-      inputIndex => (inputIndex === index ? '#2196f3' : '#939393')
+    const outputRange = inputRange.map(inputIndex =>
+      inputIndex === index ? '#2196f3' : '#939393'
     );
     const color = position.interpolate({
       inputRange,
