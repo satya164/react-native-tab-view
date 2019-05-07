@@ -46,6 +46,7 @@ export type PagerRendererProps<T> = PagerCommonProps<T> & {
 export type PagerCommonProps<T> = {
   animationEnabled?: boolean,
   swipeEnabled?: boolean,
+  bounces?: boolean,
   onSwipeStart?: () => mixed,
   onSwipeEnd?: () => mixed,
   onAnimationEnd?: () => mixed,

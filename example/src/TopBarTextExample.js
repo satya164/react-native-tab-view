@@ -73,6 +73,7 @@ export default class TopBarTextExample extends React.Component<*, State> {
         renderTabBar={this._renderTabBar}
         onIndexChange={this._handleIndexChange}
         initialLayout={initialLayout}
+        bounces // only iOS
       />
     );
   }
