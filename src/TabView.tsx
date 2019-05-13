@@ -19,7 +19,7 @@ import {
 } from './types';
 
 type Props<T extends Route> = PagerCommonProps & {
-  onIndexChange: (index: number) => void;
+  onIndexChange: (index: number, method: 'gesture' | 'tap') => void;
   navigationState: NavigationState<T>;
   renderScene: (
     props: SceneRendererProps & {
@@ -66,9 +66,9 @@ export default class TabView<T extends Route> extends React.Component<
     layout: { width: 0, height: 0, ...this.props.initialLayout },
   };
 
-  private jumpToIndex = (index: number) => {
+  private jumpToIndex = (index: number, method: 'gesture' | 'tap') => {
     if (index !== this.props.navigationState.index) {
-      this.props.onIndexChange(index);
+      this.props.onIndexChange(index, method);
     }
   };
 

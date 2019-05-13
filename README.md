@@ -154,7 +154,7 @@ Example:
 
 ##### `onIndexChange` (`required`)
 
-Callback which is called on tab change, receives the index of the new tab as argument.
+Callback which is called on tab change, receives the index of the new tab as its first argument, the second argument is the change method (gesture/tap).
 The navigation state needs to be updated when it's called, otherwise the change is dropped.
 
 ##### `renderScene` (`required`)
