@@ -1,6 +1,7 @@
 /* @flow */
 
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { PagerRendererPropType } from './PropTypes';
 import type { PagerRendererProps } from './TypeDefinitions';
@@ -22,13 +23,18 @@ type State = {|
   initialOffset: {| x: number, y: number |},
 |};
 
-type Props<T> = PagerRendererProps<T>;
+type Props<T> = PagerRendererProps<T> & {
+  bounces: boolean,
+};
 
 export default class PagerScroll<T: *> extends React.Component<
   Props<T>,
   State
 > {
-  static propTypes = PagerRendererPropType;
+  static propTypes = {
+    ...PagerRendererPropType,
+    bounces: PropTypes.bool.isRequired,
+  };
 
   static defaultProps = {
     canJumpToTab: () => true,
