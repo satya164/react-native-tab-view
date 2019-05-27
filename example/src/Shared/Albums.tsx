@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Image, Dimensions, ScrollView, StyleSheet } from 'react-native';
+import { Dimensions, Image, ScrollView, StyleSheet } from 'react-native';
 
 const COVERS = [
   require('../../assets/album-art-1.jpg'),
@@ -18,6 +18,7 @@ export default class Albums extends React.Component {
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.content}
+        testID="albums-container"
       >
         {COVERS.map((source, i) => (
           <Image key={i} source={source} style={styles.cover} />

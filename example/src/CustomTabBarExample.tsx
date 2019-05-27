@@ -7,7 +7,7 @@ import {
   SceneRendererProps,
 } from 'react-native-tab-view';
 import Animated from 'react-native-reanimated';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import Albums from './Shared/Albums';
 import Article from './Shared/Article';
 import Chat from './Shared/Chat';
@@ -17,6 +17,7 @@ type Route = {
   key: string;
   title: string;
   icon: string;
+  testID: string;
 };
 
 type State = NavigationState<Route>;
@@ -31,10 +32,25 @@ export default class CustomTabBarExample extends React.Component<{}, State> {
   state = {
     index: 0,
     routes: [
-      { key: 'contacts', title: 'Contacts', icon: 'ios-people' },
-      { key: 'albums', title: 'Albums', icon: 'ios-albums' },
-      { key: 'article', title: 'Article', icon: 'ios-paper' },
-      { key: 'chat', title: 'Chat', icon: 'ios-chatboxes' },
+      {
+        key: 'contacts',
+        title: 'Contacts',
+        icon: 'ios-people',
+        testID: 'contacts-tab',
+      },
+      {
+        key: 'albums',
+        title: 'Albums',
+        icon: 'ios-albums',
+        testID: 'albums-tab',
+      },
+      {
+        key: 'article',
+        title: 'Article',
+        icon: 'ios-paper',
+        testID: 'article-tab',
+      },
+      { key: 'chat', title: 'Chat', icon: 'ios-chatboxes', testID: 'chat-tab' },
     ],
   };
 
@@ -94,6 +110,7 @@ export default class CustomTabBarExample extends React.Component<{}, State> {
           <TouchableWithoutFeedback
             key={route.key}
             onPress={() => props.jumpTo(route.key)}
+            testID={route.testID}
           >
             {this.renderItem(props)({ route, index })}
           </TouchableWithoutFeedback>

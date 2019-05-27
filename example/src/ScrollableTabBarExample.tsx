@@ -28,10 +28,10 @@ export default class ScrollableTabBarExample extends React.Component<
   state = {
     index: 1,
     routes: [
-      { key: 'article', title: 'Article' },
-      { key: 'contacts', title: 'Contacts' },
-      { key: 'albums', title: 'Albums' },
-      { key: 'chat', title: 'Chat' },
+      { key: 'article', title: 'Article', testID: 'article-tab' },
+      { key: 'contacts', title: 'Contacts', testID: 'contacts-tab' },
+      { key: 'albums', title: 'Albums', testID: 'albums-tab' },
+      { key: 'chat', title: 'Chat', testID: 'chat-tab' },
     ],
   };
 

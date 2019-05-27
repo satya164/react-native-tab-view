@@ -1,7 +1,15 @@
-import { registerRootComponent, Asset, KeepAwake } from 'expo';
-import * as React from 'react';
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ *
+ * Generated with the TypeScript template
+ * https://github.com/emin93/react-native-template-typescript
+ *
+ * @format
+ */
+
+import React from 'react';
 import {
-  AsyncStorage,
   Platform,
   ScrollView,
   StatusBar,
@@ -11,12 +19,14 @@ import {
   View,
   YellowBox,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import ScrollableTabBarExample from './ScrollableTabBarExample';
-import TabBarIconExample from './TabBarIconExample';
-import CustomIndicatorExample from './CustomIndicatorExample';
-import CustomTabBarExample from './CustomTabBarExample';
-import CoverflowExample from './CoverflowExample';
+// tslint:disable-next-line: ordered-imports
+import AsyncStorage from '@react-native-community/async-storage';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import CoverflowExample from './src/CoverflowExample';
+import CustomIndicatorExample from './src/CustomIndicatorExample';
+import CustomTabBarExample from './src/CustomTabBarExample';
+import ScrollableTabBarExample from './src/ScrollableTabBarExample';
+import TabBarIconExample from './src/TabBarIconExample';
 
 type State = {
   title: string;
@@ -55,17 +65,6 @@ export default class ExampleList extends React.Component<{}, State> {
     if (process.env.NODE_ENV !== 'production') {
       this.restoreNavigationState();
     }
-
-    [
-      require('../assets/album-art-1.jpg'),
-      require('../assets/album-art-2.jpg'),
-      require('../assets/album-art-3.jpg'),
-      require('../assets/album-art-4.jpg'),
-      require('../assets/album-art-5.jpg'),
-      require('../assets/album-art-6.jpg'),
-      require('../assets/album-art-7.jpg'),
-      require('../assets/album-art-8.jpg'),
-    ].map(image => Asset.fromModule(image).downloadAsync());
   }
 
   private persistNavigationState = async (currentIndex: number) => {
@@ -115,6 +114,7 @@ export default class ExampleList extends React.Component<{}, State> {
 
   private renderItem = (component: ExampleComponentType, i: number) => (
     <TouchableOpacity
+      testID={component.title}
       key={i}
       style={styles.touchable}
       onPress={() => this.handleNavigate(i)}
@@ -157,7 +157,6 @@ export default class ExampleList extends React.Component<{}, State> {
         <StatusBar
           barStyle={Platform.OS === 'ios' ? statusBarStyle : 'light-content'}
         />
-        <KeepAwake />
         <View
           style={[
             styles.statusbar,
@@ -177,6 +176,7 @@ export default class ExampleList extends React.Component<{}, State> {
             <TouchableOpacity
               style={styles.button}
               onPress={this.handleNavigateBack}
+              testID="back-button"
             >
               <Ionicons
                 name={
@@ -193,7 +193,9 @@ export default class ExampleList extends React.Component<{}, State> {
           {index > -1 ? <View style={styles.button} /> : null}
         </View>
         {index === -1 ? (
-          <ScrollView>{EXAMPLE_COMPONENTS.map(this.renderItem)}</ScrollView>
+          <ScrollView testID="example_list">
+            {EXAMPLE_COMPONENTS.map(this.renderItem)}
+          </ScrollView>
         ) : ExampleComponent ? (
           <ExampleComponent />
         ) : null}
@@ -240,5 +242,3 @@ const styles = StyleSheet.create({
     color: '#333',
   },
 });
-
-registerRootComponent(ExampleList);

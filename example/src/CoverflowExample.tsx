@@ -1,3 +1,4 @@
+// tslint:disable: ordered-imports
 import * as React from 'react';
 import {
   View,
@@ -13,9 +14,10 @@ import {
 } from 'react-native-tab-view';
 import Animated from 'react-native-reanimated';
 
-type Route = {
+interface Route {
   key: string;
-};
+  testID: string;
+}
 
 type State = NavigationState<Route>;
 
@@ -31,13 +33,13 @@ const ALBUMS: { [key: string]: ImageRequireSource } = {
 };
 
 export default class CoverflowExample extends React.Component<{}, State> {
-  static title = 'Coverflow';
-  static backgroundColor = '#000';
-  static appbarElevation = 0;
+  public static title = 'Coverflow';
+  public static backgroundColor = '#000';
+  public static appbarElevation = 0;
 
-  state = {
+  public state = {
     index: 2,
-    routes: Object.keys(ALBUMS).map(key => ({ key })),
+    routes: Object.keys(ALBUMS).map(key => ({ key, testID: key })),
   };
 
   private buildCoverFlowStyle = ({
@@ -99,6 +101,7 @@ export default class CoverflowExample extends React.Component<{}, State> {
   private renderScene = (props: SceneRendererProps & { route: Route }) => (
     <Animated.View
       style={[styles.page, this.buildCoverFlowStyle(props) as any]}
+      testID={props.route.testID}
     >
       <View style={styles.album}>
         <Image source={ALBUMS[props.route.key]} style={styles.cover} />
@@ -107,7 +110,8 @@ export default class CoverflowExample extends React.Component<{}, State> {
     </Animated.View>
   );
 
-  render() {
+  // tslint:disable-next-line: member-ordering
+  public render() {
     return (
       <TabView
         style={styles.container}

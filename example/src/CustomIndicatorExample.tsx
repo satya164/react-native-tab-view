@@ -1,6 +1,7 @@
+// tslint:disable: ordered-imports
 import * as React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
   TabView,
   TabBar,
@@ -13,39 +14,49 @@ import Albums from './Shared/Albums';
 import Article from './Shared/Article';
 import Contacts from './Shared/Contacts';
 
-type Route = {
+interface Route {
   key: string;
   icon: string;
   color: [number, number, number];
-};
+  testID: string;
+}
 
 type State = NavigationState<Route>;
 
 export default class CustomIndicatorExample extends React.Component<{}, State> {
-  static title = 'Custom indicator';
-  static backgroundColor = '#263238';
-  static appbarElevation = 4;
+  public static title = 'Custom indicator';
+  public static backgroundColor = '#263238';
+  public static appbarElevation = 4;
 
-  state: State = {
+  public state: State = {
     index: 0,
     routes: [
       {
         key: 'article',
         icon: 'ios-paper',
         color: [244, 67, 54],
+        testID: 'article-tab',
       },
       {
         key: 'contacts',
         icon: 'ios-people',
         color: [0, 132, 255],
+        testID: 'contacts-tab',
       },
       {
         key: 'albums',
         icon: 'ios-albums',
         color: [76, 175, 80],
+        testID: 'albums-tab',
       },
     ],
   };
+
+  private renderScene = SceneMap({
+    article: Article,
+    contacts: Contacts,
+    albums: Albums,
+  });
 
   private handleIndexChange = (index: number) =>
     this.setState({
@@ -84,7 +95,7 @@ export default class CustomIndicatorExample extends React.Component<{}, State> {
     });
 
     const translateX = Animated.interpolate(position, {
-      inputRange: inputRange,
+      inputRange,
       outputRange: inputRange.map(x => Math.round(x) * width),
     });
 
@@ -142,13 +153,8 @@ export default class CustomIndicatorExample extends React.Component<{}, State> {
     />
   );
 
-  private renderScene = SceneMap({
-    article: Article,
-    contacts: Contacts,
-    albums: Albums,
-  });
-
-  render() {
+  // tslint:disable-next-line: member-ordering
+  public render() {
     return (
       <TabView
         navigationState={this.state}

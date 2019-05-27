@@ -22,6 +22,7 @@ export default class Chat extends React.Component {
         <ScrollView
           style={styles.inverted}
           contentContainerStyle={styles.content}
+          testID="chat-container"
         >
           {MESSAGES.map((text, i) => {
             const odd = i % 2;

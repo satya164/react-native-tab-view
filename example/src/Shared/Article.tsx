@@ -5,6 +5,7 @@ export default class Article extends React.Component {
   render() {
     return (
       <ScrollView
+        testID="article-container"
         style={styles.container}
         contentContainerStyle={styles.content}
       >

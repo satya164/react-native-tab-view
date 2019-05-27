@@ -89,6 +89,7 @@ export default class Contacts extends React.Component {
   render() {
     return (
       <FlatList
+        testID="contact-container"
         data={CONTACTS}
         keyExtractor={(_, i) => String(i)}
         renderItem={this.renderItem}
