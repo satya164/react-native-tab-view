@@ -6,6 +6,7 @@ import {
   ViewStyle,
   LayoutChangeEvent,
 } from 'react-native';
+import { PanGestureHandler } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import TabBar, { Props as TabBarProps } from './TabBar';
 import Pager from './Pager';
@@ -36,9 +37,11 @@ type Props<T extends Route> = PagerCommonProps & {
   tabBarPosition: 'top' | 'bottom';
   initialLayout?: { width?: number; height?: number };
   lazy: boolean;
+  lazyPreloadDistance: number;
   removeClippedSubviews?: boolean;
   sceneContainerStyle?: StyleProp<ViewStyle>;
   style?: StyleProp<ViewStyle>;
+  gestureHandlerProps: React.ComponentProps<typeof PanGestureHandler>;
 };
 
 type State = {
@@ -58,9 +61,11 @@ export default class TabView<T extends Route> extends React.Component<
     keyboardDismissMode: 'on-drag',
     swipeEnabled: true,
     lazy: false,
+    lazyPreloadDistance: 0,
     removeClippedSubviews: false,
     springConfig: {},
     timingConfig: {},
+    gestureHandlerProps: {},
   };
 
   state = {
@@ -98,6 +103,7 @@ export default class TabView<T extends Route> extends React.Component<
       onSwipeEnd,
       navigationState,
       lazy,
+      lazyPreloadDistance,
       removeClippedSubviews,
       keyboardDismissMode,
       swipeEnabled,
@@ -111,6 +117,7 @@ export default class TabView<T extends Route> extends React.Component<
       renderLazyPlaceholder,
       sceneContainerStyle,
       style,
+      gestureHandlerProps,
     } = this.props;
     const { layout } = this.state;
 
@@ -129,6 +136,7 @@ export default class TabView<T extends Route> extends React.Component<
           onSwipeEnd={onSwipeEnd}
           onIndexChange={this.jumpToIndex}
           removeClippedSubviews={removeClippedSubviews}
+          gestureHandlerProps={gestureHandlerProps}
         >
           {({ position, render, addListener, removeListener, jumpTo }) => {
             // All of the props here must not change between re-renders
@@ -161,6 +169,7 @@ export default class TabView<T extends Route> extends React.Component<
                         key={route.key}
                         index={i}
                         lazy={lazy}
+                        lazyPreloadDistance={lazyPreloadDistance}
                         navigationState={navigationState}
                         style={sceneContainerStyle}
                       >

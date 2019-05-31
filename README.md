@@ -257,6 +257,10 @@ Boolean indicating whether to lazily render the scenes. By default all scenes ar
 
 When you enable `lazy`, the unfocused screens will usually take some time to render when they come into focus. You can use the `renderLazyPlaceholder` prop to customize what the user sees during this short period.
 
+##### `lazyPreloadDistance`
+
+When `lazy` is enabled this number can be used to specify the pre-load distance. This value defaults to `0` which means lazy pages are loaded when they become active.
+
 ##### `renderLazyPlaceholder`
 
 Callback which returns a custom React Element to render for routes that haven't been rendered yet. Receives an object containing the route as the argument. The `lazy` prop also needs to be enabled.
@@ -347,6 +351,17 @@ Style to apply to the view wrapping each screen. You can pass this to override s
 ##### `style`
 
 Style to apply to the tab view container.
+
+##### `gestureHandlerProps`
+
+An object with props to be passed to underlying [`PanGestureHandler`](https://kmagiera.github.io/react-native-gesture-handler/docs/handler-pan.html#properties). For example:
+
+```js
+gestureHandlerProps={{
+  maxPointers: 1,
+  waitFor: [someRef]
+}}
+```
 
 ### `TabBar`
 
