@@ -56,8 +56,10 @@ describe('Example', () => {
   it('should open coverflow example', async () => {
     await element(by.id('Coverflow')).tap();
     await expect(element(by.id('Homogenic'))).toBeVisible();
-    await element(by.id('Homogenic')).swipe('left');
-    await expect(element(by.id('Number of the Beast'))).toBeVisible();
+    if (device.getPlatform() === 'ios') {
+      await element(by.id('Homogenic')).swipe('left');
+      await expect(element(by.id('Number of the Beast'))).toBeVisible();
+    }
     await element(by.id('back-button')).tap();
   });
 });
