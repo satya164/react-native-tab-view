@@ -15,6 +15,8 @@ import Contacts from './Shared/Contacts';
 type State = NavigationState<{
   key: string;
   title: string;
+  testID: string;
+  accessibilityLabel: string;
 }>;
 
 export default class ScrollableTabBarExample extends React.Component<
@@ -28,10 +30,30 @@ export default class ScrollableTabBarExample extends React.Component<
   state = {
     index: 1,
     routes: [
-      { key: 'article', title: 'Article', testID: 'article-tab' },
-      { key: 'contacts', title: 'Contacts', testID: 'contacts-tab' },
-      { key: 'albums', title: 'Albums', testID: 'albums-tab' },
-      { key: 'chat', title: 'Chat', testID: 'chat-tab' },
+      {
+        key: 'article',
+        title: 'Article',
+        testID: 'article-tab',
+        accessibilityLabel: 'article-tab',
+      },
+      {
+        key: 'contacts',
+        title: 'Contacts',
+        testID: 'contacts-tab',
+        accessibilityLabel: 'contacts-tab',
+      },
+      {
+        key: 'albums',
+        title: 'Albums',
+        testID: 'albums-tab',
+        accessibilityLabel: 'albums-tab',
+      },
+      {
+        key: 'chat',
+        title: 'Chat',
+        testID: 'chat-tab',
+        accessibilityLabel: 'chat-tab',
+      },
     ],
   };
 
@@ -53,6 +75,7 @@ export default class ScrollableTabBarExample extends React.Component<
     />
   );
 
+  // tslint:disable-next-line: member-ordering
   private renderScene = SceneMap({
     albums: Albums,
     contacts: Contacts,
@@ -60,7 +83,8 @@ export default class ScrollableTabBarExample extends React.Component<
     chat: Chat,
   });
 
-  render() {
+  // tslint:disable-next-line: member-ordering
+  public render() {
     return (
       <TabView
         navigationState={this.state}

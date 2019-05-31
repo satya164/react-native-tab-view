@@ -1,9 +1,7 @@
 /* eslint-disable no-undef */
 describe('Example', () => {
   beforeEach(async () => {
-    await setTimeout(() => {
-      device.reloadReactNative();
-    }, 1000);
+    // device.reloadReactNative();
   });
 
   it('should have list of examples', async () => {
