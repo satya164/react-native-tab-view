@@ -9,13 +9,13 @@ jobs:
     steps:
       - checkout
       - persist_to_workspace:
-        root: .
-        paths: .
-  analyse:
+          root: .
+          paths: .
+  analyse_js:
     executor: rn/linux_js
     steps:
       - attach_workspace:
-        at: .
+          at: .
       - rn/yarn_install
       - run:
           name: Lint check
@@ -39,7 +39,7 @@ workflows:
   test:
     jobs:
       - checkout_code
-      - analyse:
+      - analyse_js:
           requires:
             - checkout_code
       - rn/android_build:
@@ -47,13 +47,13 @@ workflows:
           project_path: "example/android"
           build_type: debug
           requires:
-            - analyse
+            - analyse_js
       - rn/android_build:
           name: build_android_release
           project_path: "example/android"
           build_type: release
           requires:
-            - analyse
+            - analyse_js
       - rn/android_test:
           detox_configuration: "android.emu.release"
           detox_loglevel: "trace"
@@ -68,5 +68,5 @@ workflows:
           detox_configuration: "ios.sim.release"
           detox_loglevel: "trace"
           requires:
-            - analyse
+            - analyse_js
 
