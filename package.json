@@ -22,13 +22,13 @@
     "test:detox:android:test:release": "detox test -c android.emu.release",
     "test:detox:android:build:debug": "detox build -c android.emu.debug",
     "test:detox:android:build:release": "detox build -c android.emu.release",
-    "test:detox:android:bundle:release": "mkdir -p .tmp && react-native bundle --max-workers 4 --platform android --dev false --entry-file index.js --bundle-output .tmp/android-bundle.js",
+    "test:detox:android:bundle:release": "mkdir -p .tmp && react-native bundle --max-workers 4 --platform android --dev false --entry-file example/index.js --bundle-output .tmp/android-bundle.js",
     "test:detox:ios:test:debug": "detox test -c ios.sim.debug",
     "test:detox:ios:test:release": "detox test -c ios.sim.release",
     "test:detox:ios:build:debug": "detox build -c ios.sim.debug",
     "test:detox:ios:build:release": "detox build -c ios.sim.release",
-    "test:detox:ios:bundle:release": "mkdir -p .tmp && react-native bundle --max-workers 4 --platform ios --dev false --entry-file index.js --bundle-output .tmp/ios-bundle.js",
-    "test:detox:clean": "rimraf android/build && rimraf android/app/build && rimraf android/.gradle && rimraf ios/build"
+    "test:detox:ios:bundle:release": "mkdir -p .tmp && react-native bundle --max-workers 4 --platform ios --dev false --entry-file example/index.js --bundle-output .tmp/ios-bundle.js",
+    "test:detox:clean": "rimraf example/android/build && rimraf example/android/app/build && rimraf example/android/.gradle && rimraf example/ios/build"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
