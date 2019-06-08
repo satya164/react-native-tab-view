@@ -6,7 +6,7 @@ module.exports = {
       'module-resolver',
       {
         alias: {
-          'react-native-tab-view': './lib/module/index.js',
+          'react-native-tab-view': './src/index.tsx',
         },
         cwd: 'babelrc',
       },

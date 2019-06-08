@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  rn: react-native-community/react-native@1.2.0
+  rn: react-native-community/react-native@1.1.0
 
 jobs:
   checkout_code:
@@ -11,35 +11,33 @@ jobs:
       - persist_to_workspace:
           root: .
           paths: .
-  analyse_js:
+  analyse:
     executor: rn/linux_js
     steps:
       - attach_workspace:
           at: .
       - rn/yarn_install
       - run:
-          name: Lint check
-          command: yarn run lint
+          name: Lint JS Code (ESLint)
+          command: yarn run validate:eslint
       - run:
-          name: Typecheck
-          command: yarn run typescript
+          name: Flow
+          command: yarn run validate:flow
       - run:
-          name: Install example app deps
-          command: cd example
-      - rn/yarn_install
+          name: Jest
+          command: yarn run test:jest
       - run:
           name: Build Android JavaScript Bundle
           command: yarn run test:detox:android:bundle:release
       - run:
-          name: Build ios JavaScript Bundle
+          name: Build iOS JavaScript Bundle
           command: yarn run test:detox:ios:bundle:release
-
 
 workflows:
   test:
     jobs:
       - checkout_code
-      - analyse_js:
+      - analyse:
           requires:
             - checkout_code
       - rn/android_build:
@@ -47,13 +45,13 @@ workflows:
           project_path: "example/android"
           build_type: debug
           requires:
-            - analyse_js
+            - analyse
       - rn/android_build:
           name: build_android_release
           project_path: "example/android"
           build_type: release
           requires:
-            - analyse_js
+            - analyse
       - rn/android_test:
           detox_configuration: "android.emu.release"
           detox_loglevel: "trace"
@@ -68,5 +66,4 @@ workflows:
           detox_configuration: "ios.sim.release"
           detox_loglevel: "trace"
           requires:
-            - analyse_js
-
+            - analyse

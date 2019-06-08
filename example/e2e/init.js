@@ -2,7 +2,7 @@
 /* eslint-disable no-undef */
 /* eslint-disable import/no-commonjs */
 const detox = require('detox');
-const config = require('../package.json').detox;
+const config = require('../../package.json').detox;
 const adapter = require('detox/runners/jest/adapter');
 const specReporter = require('detox/runners/jest/specReporter');
 

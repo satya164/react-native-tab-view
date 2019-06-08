@@ -73,10 +73,11 @@ import com.android.build.OutputFile
  */
 
 project.ext.react = [
-    entryFile: "index.js"
+    entryFile: "example/index.js",
+    root: "../../../"
 ]
 
-apply from: "../../node_modules/react-native/react.gradle"
+apply from: "../../../node_modules/react-native/react.gradle"
 
 /**
  * Set this to true to create two separate APKs instead of one:
@@ -134,7 +135,7 @@ android {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             // Detox-specific additions to pro-guard
-            proguardFile "${rootProject.projectDir}/../node_modules/detox/android/detox/proguard-rules-app.pro"
+            proguardFile "${rootProject.projectDir}/../../node_modules/detox/android/detox/proguard-rules-app.pro"
         }
     }
     // applicationVariants are e.g. debug, release

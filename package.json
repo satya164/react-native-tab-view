@@ -13,13 +13,22 @@
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "start:android": "react-native run-android --root example/",
-    "test": "jest",
     "typescript": "tsc --noEmit",
     "lint": "eslint --ext .js,.ts,.tsx .",
     "release": "release-it",
-    "example": "yarn --cwd example",
-    "bootstrap": "yarn && yarn example",
-    "prepare": "bob build"
+    "prepare": "bob build",
+    "test:jest": "jest",
+    "test:detox:android:test:debug": "detox test -c android.emu.debug",
+    "test:detox:android:test:release": "detox test -c android.emu.release",
+    "test:detox:android:build:debug": "detox build -c android.emu.debug",
+    "test:detox:android:build:release": "detox build -c android.emu.release",
+    "test:detox:android:bundle:release": "mkdir -p .tmp && react-native bundle --max-workers 4 --platform android --dev false --entry-file index.js --bundle-output .tmp/android-bundle.js",
+    "test:detox:ios:test:debug": "detox test -c ios.sim.debug",
+    "test:detox:ios:test:release": "detox test -c ios.sim.release",
+    "test:detox:ios:build:debug": "detox build -c ios.sim.debug",
+    "test:detox:ios:build:release": "detox build -c ios.sim.release",
+    "test:detox:ios:bundle:release": "mkdir -p .tmp && react-native bundle --max-workers 4 --platform ios --dev false --entry-file index.js --bundle-output .tmp/ios-bundle.js",
+    "test:detox:clean": "rimraf android/build && rimraf android/app/build && rimraf android/.gradle && rimraf ios/build"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
@@ -46,18 +55,22 @@
   },
   "homepage": "https://github.com/react-native-community/react-native-tab-view#readme",
   "devDependencies": {
+    "@babel/core": "^7.4.5",
     "@babel/runtime": "^7.4.5",
     "@commitlint/config-conventional": "^7.5.0",
     "@react-native-community/async-storage": "^1.4.2",
     "@react-native-community/bob": "^0.4.1",
+    "@types/jest": "^24.0.13",
     "@types/react": "^16.8.17",
-    "@types/react-native": "^0.57.56",
+    "@types/react-native": "^0.57.60",
     "@types/react-native-vector-icons": "^6.4.0",
     "@types/react-test-renderer": "^16.8.1",
-    "babel-jest": "^24.1.0",
+    "babel-jest": "^24.8.0",
+    "babel-plugin-module-resolver": "^3.2.0",
     "babel-preset-react-native": "^4.0.0",
     "commitlint": "^7.5.2",
     "conventional-changelog-cli": "^2.0.12",
+    "detox": "^12.11.0",
     "eslint": "^5.16.0",
     "eslint-config-satya164": "^2.4.1",
     "eslint-plugin-react-native-globals": "^0.1.2",
@@ -65,11 +78,11 @@
     "jest": "^24.1.0",
     "metro-react-native-babel-preset": "^0.54.1",
     "prettier": "^1.17.1",
-    "react": "16.5.0",
-    "react-dom": "16.5.0",
-    "react-native": "~0.57.1",
-    "react-native-gesture-handler": "^1.0.15",
-    "react-native-reanimated": "^1.0.0-alpha.12",
+    "react": "16.8.6",
+    "react-native": "~0.59.8",
+    "react-native-gesture-handler": "^1.2.1",
+    "react-native-reanimated": "^1.0.1",
+    "react-native-vector-icons": "^6.5.0",
     "react-test-renderer": "^16.8.6",
     "release-it": "^10.1.0",
     "typescript": "^3.4.5"
@@ -90,7 +103,8 @@
     "preset": "react-native",
     "modulePathIgnorePatterns": [
       "<rootDir>/example/node_modules",
-      "<rootDir>/lib/"
+      "<rootDir>/lib/",
+      "<rootDir>/example/e2e"
     ]
   },
   "@react-native-community/bob": {
@@ -101,5 +115,36 @@
       "module",
       "typescript"
     ]
+  },
+  "detox": {
+    "test-runner": "jest",
+    "runner-config": "example/e2e/config.json",
+    "specs": "e2e",
+    "configurations": {
+      "ios.sim.debug": {
+        "binaryPath": "example/ios/build/Build/Products/Debug-iphonesimulator/example.app",
+        "build": "xcodebuild -project example/ios/example.xcodeproj -scheme example -configuration Debug -sdk iphonesimulator -derivedDataPath example/ios/build",
+        "type": "ios.simulator",
+        "name": "iPhone Xs"
+      },
+      "ios.sim.release": {
+        "binaryPath": "example/ios/build/Build/Products/Release-iphonesimulator/example.app",
+        "build": "xcodebuild -project example/ios/example.xcodeproj -scheme example -configuration Release -sdk iphonesimulator -derivedDataPath example/ios/build",
+        "type": "ios.simulator",
+        "name": "iPhone Xs"
+      },
+      "android.emu.debug": {
+        "binaryPath": "example/android/app/build/outputs/apk/debug/app-debug.apk",
+        "build": "export RCT_NO_LAUNCH_PACKAGER=true && pushd example/android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && popd",
+        "type": "android.emulator",
+        "name": "Emu_E2E"
+      },
+      "android.emu.release": {
+        "binaryPath": "example/android/app/build/outputs/apk/release/app-release.apk",
+        "build": "export RCT_NO_LAUNCH_PACKAGER=true && pushd example/android && ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release && popd",
+        "type": "android.emulator",
+        "name": "Emu_E2E"
+      }
+    }
   }
 }
