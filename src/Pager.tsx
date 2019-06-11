@@ -410,8 +410,20 @@ export default class Pager<T extends Route> extends React.Component<Props<T>> {
     },
   ]);
 
-  private velocitySignum = cond(this.velocityX, divide(abs(this.velocityX), this.velocityX), 0);
-  private extrapolatedPosition = add(this.gestureX, multiply(this.velocityX, this.velocityX, this.velocitySignum, this.swipeVelocityImpact));
+  private velocitySignum = cond(
+    this.velocityX,
+    divide(abs(this.velocityX), this.velocityX),
+    0
+  );
+  private extrapolatedPosition = add(
+    this.gestureX,
+    multiply(
+      this.velocityX,
+      this.velocityX,
+      this.velocitySignum,
+      this.swipeVelocityImpact
+    )
+  );
 
   private translateX = block([
     onChange(
@@ -503,37 +515,38 @@ export default class Pager<T extends Route> extends React.Component<Props<T>> {
         stopClock(this.clock),
       ],
 
-        cond(eq(this.gestureState, State.END),
-        [
+      cond(eq(this.gestureState, State.END), [
         set(this.isSwiping, FALSE),
-          this.transitionTo(
-            cond(
-                greaterThan(abs(this.extrapolatedPosition), divide(this.layoutWidth, 2)),
-              // For swipe gesture, to calculate the index, determine direction and add to index
-              // When the user swipes towards the left, we transition to the next tab
-              // When the user swipes towards the right, we transition to the previous tab
-              round(
-                min(
-                  max(
-                    0,
-                    sub(
-                      this.index,
-                        cond(
-                          greaterThan(this.velocitySignum, 0),
-                          I18nManager.isRTL ? DIRECTION_RIGHT : DIRECTION_LEFT,
-                          I18nManager.isRTL ? DIRECTION_LEFT : DIRECTION_RIGHT
-                      )
-                    )
-                  ),
-                  sub(this.routesLength, 1)
-                )
-              ),
-              // Index didn't change/changed due to state update
-              this.index
+        this.transitionTo(
+          cond(
+            greaterThan(
+              abs(this.extrapolatedPosition),
+              divide(this.layoutWidth, 2)
             ),
-        )
-      ]
-        )
+            // For swipe gesture, to calculate the index, determine direction and add to index
+            // When the user swipes towards the left, we transition to the next tab
+            // When the user swipes towards the right, we transition to the previous tab
+            round(
+              min(
+                max(
+                  0,
+                  sub(
+                    this.index,
+                    cond(
+                      greaterThan(this.velocitySignum, 0),
+                      I18nManager.isRTL ? DIRECTION_RIGHT : DIRECTION_LEFT,
+                      I18nManager.isRTL ? DIRECTION_LEFT : DIRECTION_RIGHT
+                    )
+                  )
+                ),
+                sub(this.routesLength, 1)
+              )
+            ),
+            // Index didn't change/changed due to state update
+            this.index
+          )
+        ),
+      ])
     ),
     this.progress,
   ]);
