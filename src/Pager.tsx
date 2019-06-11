@@ -219,7 +219,7 @@ export default class Pager<T extends Route> extends React.Component<Props<T>> {
   private routesLength = new Value(this.props.navigationState.routes.length);
   private layoutWidth = new Value(this.props.layout.width);
 
-  // Threshold values to determine when to trigger a swipe gesture
+  // Determines how relevant is a velocity while calculating next position while swiping
   private swipeVelocityImpact = new Value(
     this.props.swipeVelocityImpact || SWIPE_VELOCITY_IMPACT
   );
