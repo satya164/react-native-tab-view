@@ -54,7 +54,7 @@ const EXAMPLE_COMPONENTS: ExampleComponentType[] = [
   CoverflowExample,
 ];
 
-export default class ExampleList extends React.Component<{}, State> {
+export default class ExampleList extends React.Component<any, State> {
   state = {
     title: 'Examples',
     index: -1,
