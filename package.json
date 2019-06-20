@@ -124,13 +124,13 @@
     "configurations": {
       "ios.sim.debug": {
         "binaryPath": "example/ios/build/Build/Products/Debug-iphonesimulator/example.app",
-        "build": "xcodebuild -project example/ios/example.xcodeproj -scheme example -configuration Debug -sdk iphonesimulator -derivedDataPath example/ios/build",
+        "build": "export RCT_NO_LAUNCH_PACKAGER=true && xcodebuild -project example/ios/example.xcodeproj -destination 'platform=iOS Simulator,name=iPhone Xs' -scheme example -parallelizeTargets -configuration Debug -derivedDataPath example/ios/build",
         "type": "ios.simulator",
         "name": "iPhone Xs"
       },
       "ios.sim.release": {
         "binaryPath": "example/ios/build/Build/Products/Release-iphonesimulator/example.app",
-        "build": "xcodebuild -project example/ios/example.xcodeproj -scheme example -configuration Release -sdk iphonesimulator -derivedDataPath example/ios/build",
+        "build": "export RCT_NO_LAUNCH_PACKAGER=true && xcodebuild -project example/ios/example.xcodeproj -destination 'platform=iOS Simulator,name=iPhone Xs' -scheme example -parallelizeTargets -configuration Release -derivedDataPath example/ios/build",
         "type": "ios.simulator",
         "name": "iPhone Xs"
       },
@@ -138,13 +138,13 @@
         "binaryPath": "example/android/app/build/outputs/apk/debug/app-debug.apk",
         "build": "export RCT_NO_LAUNCH_PACKAGER=true && pushd example/android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && popd",
         "type": "android.emulator",
-        "name": "Emu_E2E"
+        "name": "TestingAVD"
       },
       "android.emu.release": {
         "binaryPath": "example/android/app/build/outputs/apk/release/app-release.apk",
         "build": "export RCT_NO_LAUNCH_PACKAGER=true && pushd example/android && ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release && popd",
         "type": "android.emulator",
-        "name": "Emu_E2E"
+        "name": "TestingAVD"
       }
     }
   }
