@@ -3,6 +3,7 @@ import {
   StyleSheet,
   View,
   StyleProp,
+  LayoutChangeEvent,
   TextStyle,
   ViewStyle,
 } from 'react-native';
@@ -36,6 +37,7 @@ type Props<T extends Route> = {
     color: string;
   }) => React.ReactNode;
   renderBadge?: (scene: Scene<T>) => React.ReactNode;
+  onLayout: (event: LayoutChangeEvent) => void;
   onPress: () => void;
   onLongPress: () => void;
   tabWidth: number;
@@ -46,7 +48,7 @@ type Props<T extends Route> = {
 const DEFAULT_ACTIVE_COLOR = 'rgba(255, 255, 255, 1)';
 const DEFAULT_INACTIVE_COLOR = 'rgba(255, 255, 255, 0.7)';
 
-export default class TabBarItem<T extends Route> extends React.Component<
+export default class TabBarItem<T extends Route> extends React.PureComponent<
   Props<T>
 > {
   private getActiveOpacity = memoize(
@@ -64,18 +66,20 @@ export default class TabBarItem<T extends Route> extends React.Component<
     }
   );
 
-  private getInactiveOpacity = memoize((position, routes, tabIndex) => {
-    if (routes.length > 1) {
-      const inputRange = routes.map((_: Route, i: number) => i);
+  private getInactiveOpacity = memoize(
+    (position: Animated.Node<number>, routes: Route[], tabIndex: number) => {
+      if (routes.length > 1) {
+        const inputRange = routes.map((_: Route, i: number) => i);
 
-      return Animated.interpolate(position, {
-        inputRange,
-        outputRange: inputRange.map((i: number) => (i === tabIndex ? 0 : 1)),
-      });
-    } else {
-      return 0;
+        return Animated.interpolate(position, {
+          inputRange,
+          outputRange: inputRange.map((i: number) => (i === tabIndex ? 0 : 1)),
+        });
+      } else {
+        return 0;
+      }
     }
-  });
+  );
 
   render() {
     const {
@@ -98,6 +102,7 @@ export default class TabBarItem<T extends Route> extends React.Component<
       labelStyle,
       style,
       tabWidth,
+      onLayout,
       onPress,
       onLongPress,
     } = this.props;
@@ -236,6 +241,7 @@ export default class TabBarItem<T extends Route> extends React.Component<
         pressColor={pressColor}
         pressOpacity={pressOpacity}
         delayPressIn={0}
+        onLayout={onLayout}
         onPress={onPress}
         onLongPress={onLongPress}
         style={tabContainerStyle}
