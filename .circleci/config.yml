@@ -19,20 +19,16 @@ jobs:
       - rn/yarn_install
       - run:
           name: Lint
-          command: yarn lint
+          command: yarn run lint
       - run:
           name: Typecheck
-          command: yarn typescript
-      # Fix example jest test
-      # - run:
-      #     name: Jest
-      #     command: yarn test:jest
+          command: yarn run typescript
       - run:
           name: Build Android JavaScript Bundle
-          command: yarn test:detox:android:bundle:release
+          command: yarn run test:detox:android:bundle:release
       - run:
           name: Build iOS JavaScript Bundle
-          command: yarn test:detox:ios:bundle:release
+          command: yarn run test:detox:ios:bundle:release
 
 workflows:
   test:
