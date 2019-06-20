@@ -1,12 +1,11 @@
-/* @flow */
-
 import * as React from 'react';
 import { StyleSheet } from 'react-native';
 import {
   TabView,
   TabBar,
   SceneMap,
-  type NavigationState,
+  NavigationState,
+  SceneRendererProps,
 } from 'react-native-tab-view';
 import Article from './Shared/Article';
 import Albums from './Shared/Albums';
@@ -14,12 +13,12 @@ import Chat from './Shared/Chat';
 import Contacts from './Shared/Contacts';
 
 type State = NavigationState<{
-  key: string,
-  title: string,
+  key: string;
+  title: string;
 }>;
 
 export default class DynamicWidthTabBarExample extends React.Component<
-  *,
+  {},
   State
 > {
   static title = 'Dynamic width tab bar';
@@ -38,12 +37,14 @@ export default class DynamicWidthTabBarExample extends React.Component<
     ],
   };
 
-  _handleIndexChange = index =>
+  private handleIndexChange = (index: number) =>
     this.setState({
       index,
     });
 
-  _renderTabBar = props => (
+  private renderTabBar = (
+    props: SceneRendererProps & { navigationState: State }
+  ) => (
     <TabBar
       {...props}
       dynamicWidth
@@ -54,7 +55,7 @@ export default class DynamicWidthTabBarExample extends React.Component<
     />
   );
 
-  _renderScene = SceneMap({
+  private renderScene = SceneMap({
     albums: Albums,
     contacts: Contacts,
     article: Article,
@@ -66,11 +67,10 @@ export default class DynamicWidthTabBarExample extends React.Component<
   render() {
     return (
       <TabView
-        style={this.props.style}
         navigationState={this.state}
-        renderScene={this._renderScene}
-        renderTabBar={this._renderTabBar}
-        onIndexChange={this._handleIndexChange}
+        renderScene={this.renderScene}
+        renderTabBar={this.renderTabBar}
+        onIndexChange={this.handleIndexChange}
       />
     );
   }
