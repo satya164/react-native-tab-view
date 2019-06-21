@@ -20,9 +20,7 @@ jobs:
           keys:
             - v1-dependencies-example-{{ checksum "example/package.json" }}
             - v1-dependencies-example-
-      - run: |
-          yarn install --cwd example
-          yarn install
+      - run: yarn bootstrap
       - save_cache:
           key: v1-dependencies-{{ checksum "package.json" }}
           paths: node_modules
