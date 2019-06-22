@@ -55,6 +55,7 @@ export type Props<T extends Route> = SceneRendererProps & {
   labelStyle?: StyleProp<TextStyle>;
   contentContainerStyle?: StyleProp<ViewStyle>;
   style?: StyleProp<ViewStyle>;
+  indicatorContainerStyle?: StyleProp<ViewStyle>;
 };
 
 type State = {
@@ -226,6 +227,7 @@ export default class TabBar<T extends Route> extends React.Component<
       indicatorStyle,
       contentContainerStyle,
       style,
+      indicatorContainerStyle,
     } = this.props;
     const { layout } = this.state;
     const { routes } = navigationState;
@@ -248,6 +250,7 @@ export default class TabBar<T extends Route> extends React.Component<
             scrollEnabled
               ? { width: tabBarWidth, transform: [{ translateX }] as any }
               : null,
+            indicatorContainerStyle
           ]}
         >
           {this.props.renderIndicator({
