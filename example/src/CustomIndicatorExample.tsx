@@ -1,6 +1,6 @@
 // tslint:disable: ordered-imports
 import * as React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, I18nManager } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
   TabView,
@@ -95,8 +95,10 @@ export default class CustomIndicatorExample extends React.Component<{}, State> {
     });
 
     const translateX = Animated.interpolate(position, {
-      inputRange,
-      outputRange: inputRange.map(x => Math.round(x) * width),
+      inputRange: inputRange,
+      outputRange: inputRange.map(
+        x => Math.round(x) * width * (I18nManager.isRTL ? -1 : 1)
+      ),
     });
 
     const backgroundColor = Animated.interpolate(position, {
