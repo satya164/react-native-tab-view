@@ -360,19 +360,13 @@ export default class TabBar<T extends Route> extends React.Component<
                   if (!dynamicWidth) return;
 
                   this._actualTabWidths.push(layout.width || tabWidth);
-
                   // check if this is the last onLayout call
-                  if (
-                    this._actualTabWidths.length ===
-                    navigationState.routes.length
-                  ) {
-                    this.setState(
-                      { tabWidths: [...this._actualTabWidths] },
-                      () => {
-                        this._actualTabWidths = [];
-                      }
-                    );
-                  }
+                  if (this._actualTabWidths.length !== routes.length) return;
+
+                  // all onLayout's have been fired
+                  this.setState({ tabWidths: [...this._actualTabWidths] });
+                  // clear
+                  this._actualTabWidths = [];
                 }}
                 key={route.key}
                 dynamicWidth={dynamicWidth}
