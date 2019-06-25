@@ -102,6 +102,10 @@ export default class TabBar<T extends Route> extends React.Component<
     }
   }
 
+  // to store the layout.width of each tab
+  // when all onLayout's are fired, this would be set in state
+  private _actualTabWidths: number[] = [];
+
   private scrollAmount = new Animated.Value(0);
 
   private scrollView: ScrollView | undefined;
@@ -350,18 +354,26 @@ export default class TabBar<T extends Route> extends React.Component<
               this.scrollView = el && el.getNode();
             }}
           >
-            {routes.map((route: T, i: number) => (
+            {routes.map((route: T) => (
               <TabBarItem
-                onLayout={({ nativeEvent: { layout } }) =>
-                  this.setState(prevState => {
-                    if (!dynamicWidth) return;
-                    const tabWidths = [...prevState.tabWidths];
-                    tabWidths[i] = layout.width || tabWidth;
-                    return {
-                      tabWidths,
-                    };
-                  })
-                }
+                onLayout={({ nativeEvent: { layout } }) => {
+                  if (!dynamicWidth) return;
+
+                  this._actualTabWidths.push(layout.width || tabWidth);
+
+                  // check if this is the last onLayout call
+                  if (
+                    this._actualTabWidths.length ===
+                    navigationState.routes.length
+                  ) {
+                    this.setState(
+                      { tabWidths: [...this._actualTabWidths] },
+                      () => {
+                        this._actualTabWidths = [];
+                      }
+                    );
+                  }
+                }}
                 key={route.key}
                 dynamicWidth={dynamicWidth}
                 position={position}
