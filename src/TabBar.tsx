@@ -64,6 +64,12 @@ type State = {
   tabWidths: number[];
 };
 
+const allDone = (arr: number[], total: number) => {
+  return Array.from({ length: total }).reduce<boolean>((result, _, i) => {
+    return result && !!arr[i];
+  }, true);
+};
+
 export default class TabBar<T extends Route> extends React.Component<
   Props<T>,
   State
@@ -354,15 +360,15 @@ export default class TabBar<T extends Route> extends React.Component<
               this.scrollView = el && el.getNode();
             }}
           >
-            {routes.map((route: T) => (
+            {routes.map((route: T, i: number) => (
               <TabBarItem
                 onLayout={({ nativeEvent: { layout } }) => {
                   if (!dynamicWidth) return;
 
-                  this._actualTabWidths.push(layout.width || tabWidth);
-                  // check if this is the last onLayout call
-                  if (this._actualTabWidths.length !== routes.length) return;
+                  this._actualTabWidths[i] = layout.width || tabWidth;
 
+                  // check if this is the last onLayout call
+                  if (!allDone(this._actualTabWidths, routes.length)) return;
                   // all onLayout's have been fired
                   this.setState({ tabWidths: [...this._actualTabWidths] });
                   // clear
