@@ -181,42 +181,23 @@ export default class TabBar<T extends Route> extends React.Component<
   private getScrollAmount = (props: Props<T>, state: State, i: number) => {
     const { layout, tabWidths } = state;
 
+    let scrollAmount = 0;
     if (props.dynamicWidth) {
-      const targetIndex =
-        i > props.navigationState.index &&
-        i < props.navigationState.routes.length - 1
-          ? Math.ceil(i)
-          : Math.floor(i);
-      let dynamicAmount = tabWidths
-        .slice(0, targetIndex)
+      // Since the tabs have a dynamic width, to get the tab at
+      // index i centered we adjust scroll amount by with of indexes
+      // 0 through (i - 1) and add half the width of current index i
+      const dynamicAmount = tabWidths
+        .slice(0, i)
         .reduce(
           (acc: number, tabWidth: number) => (acc += tabWidth),
-          tabWidths[targetIndex] * 0.5
+          tabWidths[i] * 0.5
         );
-
-      let diff =
-        tabWidths[targetIndex] * 0.5 +
-        tabWidths[props.navigationState.index] * 0.5;
-
-      if (i > props.navigationState.index) {
-        diff = diff * (targetIndex - i || 0.001);
-
-        dynamicAmount -= diff;
-      } else if (i < props.navigationState.index) {
-        diff = diff * (i - targetIndex || 0.001);
-        dynamicAmount += diff;
-      }
-
-      return this.normalizeScrollValue(
-        props,
-        state,
-        dynamicAmount - layout.width / 2
-      );
+      scrollAmount = dynamicAmount - layout.width / 2;
+    } else {
+      const tabWidth = this.getTabWidth(props, state);
+      const centerDistance = tabWidth * (i + 1 / 2);
+      scrollAmount = centerDistance - layout.width / 2;
     }
-
-    const tabWidth = this.getTabWidth(props, state);
-    const centerDistance = tabWidth * (i + 1 / 2);
-    const scrollAmount = centerDistance - layout.width / 2;
 
     return this.normalizeScrollValue(props, state, scrollAmount);
   };
