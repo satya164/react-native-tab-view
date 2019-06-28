@@ -58,12 +58,11 @@ export default class TabBarIndicator<
       dynamicWidth?: boolean
     ) => {
       if (dynamicWidth) {
-        let inputRange: number[] = [];
-        let outputRange: number[] = [];
-        routes.forEach((_route: Route, i: number) => {
-          inputRange.push(i);
-          outputRange.push(tabWidths[i]);
-        });
+        const inputRange = routes.map((_, i) => i);
+        const outputRange = routes.reduce<number[]>(
+          (acc, _, i) => [...acc, tabWidths[i]],
+          []
+        );
         return Animated.interpolate(position, {
           inputRange,
           outputRange,

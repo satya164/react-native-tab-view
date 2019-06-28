@@ -64,12 +64,13 @@ type State = {
   tabWidths: number[];
 };
 
-const allDone = (arr: number[], total: number) => {
-  return Array.from({ length: total }).reduce<boolean>((result, _, i) => {
-    return result && !!arr[i];
-  }, true);
+const didAllOnLayoutsFire = (widths: number[], totalTabs: number) => {
+  let fired = true;
+  for (let i = 0; i < totalTabs; i++) {
+    fired = fired && !!widths[i];
+  }
+  return fired;
 };
-
 export default class TabBar<T extends Route> extends React.Component<
   Props<T>,
   State
@@ -110,7 +111,7 @@ export default class TabBar<T extends Route> extends React.Component<
 
   // to store the layout.width of each tab
   // when all onLayout's are fired, this would be set in state
-  private _actualTabWidths: number[] = [];
+  private actualTabWidths: number[] = [];
 
   private scrollAmount = new Animated.Value(0);
 
@@ -346,14 +347,16 @@ export default class TabBar<T extends Route> extends React.Component<
                 onLayout={({ nativeEvent: { layout } }) => {
                   if (!dynamicWidth) return;
 
-                  this._actualTabWidths[i] = layout.width || tabWidth;
+                  this.actualTabWidths[i] = layout.width || tabWidth;
 
                   // check if this is the last onLayout call
-                  if (!allDone(this._actualTabWidths, routes.length)) return;
+                  if (!didAllOnLayoutsFire(this.actualTabWidths, routes.length))
+                    return;
+
                   // all onLayout's have been fired
-                  this.setState({ tabWidths: [...this._actualTabWidths] });
+                  this.setState({ tabWidths: [...this.actualTabWidths] });
                   // clear
-                  this._actualTabWidths = [];
+                  this.actualTabWidths = [];
                 }}
                 key={route.key}
                 dynamicWidth={dynamicWidth}
