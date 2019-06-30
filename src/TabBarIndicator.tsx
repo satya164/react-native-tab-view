@@ -27,16 +27,17 @@ export default class TabBarIndicator<
       dynamicWidth?: boolean
     ) => {
       if (dynamicWidth) {
-        let inputRange: number[] = [];
-        let outputRange: number[] = [];
-        let totalWidth = 0;
-        routes.forEach((_route: Route, i: number) => {
-          if (i !== 0) {
-            totalWidth += tabWidths[i - 1];
-          }
-          inputRange.push(i);
-          outputRange.push(totalWidth + tabWidths[i] * 0.5);
-        });
+        const inputRange = routes.map((_, i) => i);
+
+        // every index contains widths at all previous indices
+        const accumulatedWidths = tabWidths.reduce<number[]>((acc, _, i) => {
+          if (i === 0) return [0];
+          return [...acc, acc[i - 1] + tabWidths[i - 1]];
+        }, []);
+        const outputRange = routes.reduce<number[]>(
+          (acc, _, i) => [...acc, accumulatedWidths[i] + tabWidths[i] * 0.5],
+          []
+        );
 
         return Animated.interpolate(position, {
           inputRange,
