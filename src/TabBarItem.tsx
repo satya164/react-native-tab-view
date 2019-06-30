@@ -46,7 +46,7 @@ type Props<T extends Route> = {
 const DEFAULT_ACTIVE_COLOR = 'rgba(255, 255, 255, 1)';
 const DEFAULT_INACTIVE_COLOR = 'rgba(255, 255, 255, 0.7)';
 
-export default class TabBarItem<T extends Route> extends React.PureComponent<
+export default class TabBarItem<T extends Route> extends React.Component<
   Props<T>
 > {
   private getActiveOpacity = memoize(
@@ -64,20 +64,18 @@ export default class TabBarItem<T extends Route> extends React.PureComponent<
     }
   );
 
-  private getInactiveOpacity = memoize(
-    (position: Animated.Node<number>, routes: Route[], tabIndex: number) => {
-      if (routes.length > 1) {
-        const inputRange = routes.map((_: Route, i: number) => i);
+  private getInactiveOpacity = memoize((position, routes, tabIndex) => {
+    if (routes.length > 1) {
+      const inputRange = routes.map((_: Route, i: number) => i);
 
-        return Animated.interpolate(position, {
-          inputRange,
-          outputRange: inputRange.map((i: number) => (i === tabIndex ? 0 : 1)),
-        });
-      } else {
-        return 0;
-      }
+      return Animated.interpolate(position, {
+        inputRange,
+        outputRange: inputRange.map((i: number) => (i === tabIndex ? 0 : 1)),
+      });
+    } else {
+      return 0;
     }
-  );
+  });
 
   render() {
     const {
