@@ -47,11 +47,11 @@ export default class DynamicWidthTabBarExample extends React.Component<
   ) => (
     <TabBar
       {...props}
-      dynamicWidth
       scrollEnabled
       indicatorStyle={styles.indicator}
       style={styles.tabbar}
       labelStyle={styles.label}
+      tabStyle={styles.tabStyle}
     />
   );
 
@@ -85,5 +85,8 @@ const styles = StyleSheet.create({
   },
   label: {
     fontWeight: '400',
+  },
+  tabStyle: {
+    width: 'auto',
   },
 });

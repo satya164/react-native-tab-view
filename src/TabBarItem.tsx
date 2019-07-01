@@ -13,7 +13,6 @@ import Animated from 'react-native-reanimated';
 import memoize from './memoize';
 
 type Props<T extends Route> = {
-  dynamicWidth?: boolean;
   position: Animated.Node<number>;
   route: T;
   navigationState: NavigationState<T>;
@@ -79,7 +78,6 @@ export default class TabBarItem<T extends Route> extends React.Component<
 
   render() {
     const {
-      dynamicWidth,
       route,
       position,
       navigationState,
@@ -205,6 +203,8 @@ export default class TabBarItem<T extends Route> extends React.Component<
     // const isWidthSet =
     //   (tabStyle && typeof tabStyle.width !== 'undefined') ||
     //   scrollEnabled === true;
+    const tabContainerStyle: ViewStyle = {};
+    const itemStyle = isWidthSet ? { width: tabWidth } : { width: 'auto' };
 
     // const tabContainerStyle: ViewStyle = {};
     // const itemStyle = isWidthSet && !dynamicWidth ? { width: tabWidth } : null;
