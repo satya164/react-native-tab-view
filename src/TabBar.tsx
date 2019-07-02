@@ -284,7 +284,6 @@ export default class TabBar<T extends Route> extends React.Component<
                   },
                 },
               ],
-              { useNativeDriver: true }
             )}
             ref={el => {
               // @ts-ignore
