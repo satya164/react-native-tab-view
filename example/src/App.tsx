@@ -20,7 +20,6 @@ import CustomIndicatorExample from './CustomIndicatorExample';
 import CustomTabBarExample from './CustomTabBarExample';
 import CoverflowExample from './CoverflowExample';
 import DynamicWidthTabBarExample from './DynamicWidthTabBarExample';
-import RegularTabBarExample from './RegularTabBarExample';
 
 type State = {
   title: string;
@@ -41,7 +40,6 @@ YellowBox.ignoreWarnings(['bind():']);
 const PERSISTENCE_KEY = 'index_persistence';
 
 const EXAMPLE_COMPONENTS: ExampleComponentType[] = [
-  RegularTabBarExample,
   ScrollableTabBarExample,
   TabBarIconExample,
   CustomIndicatorExample,
