@@ -12,6 +12,7 @@ import Animated from 'react-native-reanimated';
 import Albums from './Shared/Albums';
 import Article from './Shared/Article';
 import Contacts from './Shared/Contacts';
+import { GetTabWidth } from '../../src/TabBarIndicator';
 
 type Route = {
   key: string;
@@ -53,9 +54,12 @@ export default class CustomIndicatorExample extends React.Component<{}, State> {
     });
 
   private renderIndicator = (
-    props: SceneRendererProps & { navigationState: State; width: number }
+    props: SceneRendererProps & {
+      navigationState: State;
+      getTabWidth: GetTabWidth;
+    }
   ) => {
-    const { width, position, navigationState } = props;
+    const { position, navigationState, getTabWidth } = props;
     const inputRange = [
       0,
       0.48,
@@ -85,9 +89,10 @@ export default class CustomIndicatorExample extends React.Component<{}, State> {
 
     const translateX = Animated.interpolate(position, {
       inputRange: inputRange,
-      outputRange: inputRange.map(
-        x => Math.round(x) * width * (I18nManager.isRTL ? -1 : 1)
-      ),
+      outputRange: inputRange.map(x => {
+        const roundedX = Math.round(x);
+        return roundedX * getTabWidth(roundedX) * (I18nManager.isRTL ? -1 : 1);
+      }),
     });
 
     const backgroundColor = Animated.interpolate(position, {

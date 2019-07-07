@@ -5,49 +5,43 @@ import Animated from 'react-native-reanimated';
 import memoize from './memoize';
 import { Route, SceneRendererProps, NavigationState } from './types';
 
+export type GetTabWidth = (tabIndex: number) => number;
+
 export type Props<T extends Route> = SceneRendererProps & {
-  dynamicWidth?: boolean;
   navigationState: NavigationState<T>;
-  tabWidths: number[];
-  width: number;
   style?: StyleProp<ViewStyle>;
+  getTabWidth: GetTabWidth;
 };
 
-const { max, min, multiply } = Animated;
+const { multiply } = Animated;
 
-export default class TabBarIndicator<
-  T extends Route
-> extends React.PureComponent<Props<T>> {
+export default class TabBarIndicator<T extends Route> extends React.Component<
+  Props<T>
+> {
   private getTranslateX = memoize(
     (
       position: Animated.Node<number>,
       routes: Route[],
-      tabWidths: number[],
-      width: number,
-      dynamicWidth?: boolean
+      getTabWidth: GetTabWidth
     ) => {
-      if (dynamicWidth) {
-        const inputRange = routes.map((_, i) => i);
+      const inputRange = routes.map((_, i) => i);
 
-        // every index contains widths at all previous indices
-        const accumulatedWidths = tabWidths.reduce<number[]>((acc, _, i) => {
-          if (i === 0) return [0];
-          return [...acc, acc[i - 1] + tabWidths[i - 1]];
-        }, []);
-        const outputRange = routes.reduce<number[]>(
-          (acc, _, i) => [...acc, accumulatedWidths[i] + tabWidths[i] * 0.5],
-          []
-        );
-
-        return Animated.interpolate(position, {
-          inputRange,
-          outputRange,
-        });
-      }
-      return multiply(
-        max(min(position, routes.length - 1), 0),
-        width * (I18nManager.isRTL ? -1 : 1)
+      // every index contains widths at all previous indices
+      const accumulatedWidths = routes.reduce<number[]>((acc, _, i) => {
+        if (i === 0) return [0];
+        return [...acc, acc[i - 1] + getTabWidth(i - 1)];
+      }, []);
+      const outputRange = routes.reduce<number[]>(
+        (acc, _, i) => [...acc, accumulatedWidths[i]],
+        []
       );
+
+      const transalteX = Animated.interpolate(position, {
+        inputRange,
+        outputRange,
+      });
+
+      return multiply(transalteX, I18nManager.isRTL ? -1 : 1);
     }
   );
 
@@ -55,58 +49,42 @@ export default class TabBarIndicator<
     (
       position: Animated.Node<number>,
       routes: Route[],
-      tabWidths: number[],
-      dynamicWidth?: boolean
+      getTabWidth: GetTabWidth
     ) => {
-      if (dynamicWidth) {
-        const inputRange = routes.map((_, i) => i);
-        const outputRange = routes.reduce<number[]>(
-          (acc, _, i) => [...acc, tabWidths[i]],
-          []
-        );
-        return Animated.interpolate(position, {
-          inputRange,
-          outputRange,
-        });
-      }
-      return 1;
-    }
-  );
+      const inputRange = routes.map((_, i) => i);
+      const outputRange = routes.reduce<number[]>(
+        (acc, _, i) => [...acc, getTabWidth(i)],
+        []
+      );
 
-  private getStyle = memoize((routes: Route[], dynamicWidth?: boolean) =>
-    dynamicWidth ? { width: 1 } : { width: `${100 / routes.length}%` }
+      return Animated.interpolate(position, {
+        inputRange,
+        outputRange,
+      });
+    }
   );
 
   render() {
     const {
-      dynamicWidth,
-      width,
       position,
       navigationState,
-      tabWidths,
       style,
+      getTabWidth,
+      layout,
     } = this.props;
     const { routes } = navigationState;
 
-    const translateX = this.getTranslateX(
-      position,
-      routes,
-      tabWidths,
-      width,
-      dynamicWidth
-    );
-    const scaleX = this.getScaleX(position, routes, tabWidths, dynamicWidth);
-    const dynamicStyle = this.getStyle(routes, dynamicWidth);
-
+    const translateX = this.getTranslateX(position, routes, getTabWidth);
+    const scaleX = this.getScaleX(position, routes, getTabWidth);
     return (
       <Animated.View
         style={[
           styles.indicator,
-          dynamicStyle,
           // If layout is not available, use `left` property for positioning the indicator
           // This avoids rendering delay until we are able to calculate translateX
+          { width: scaleX },
           layout.width
-            ? { transform: [{ translateX }] as any }
+            ? [{ transform: [{ translateX }] as any }]
             : { left: `${(100 / routes.length) * navigationState.index}%` },
           style,
         ]}

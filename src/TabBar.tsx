@@ -63,13 +63,6 @@ type State = {
   tabWidths: number[];
 };
 
-const didAllOnLayoutsFire = (widths: number[], totalTabs: number) => {
-  let fired = true;
-  for (let i = 0; i < totalTabs; i++) {
-    fired = fired && !!widths[i];
-  }
-  return fired;
-};
 export default class TabBar<T extends Route> extends React.Component<
   Props<T>,
   State
@@ -102,7 +95,8 @@ export default class TabBar<T extends Route> extends React.Component<
         this.props.navigationState.routes.length ||
       prevProps.navigationState.index !== this.props.navigationState.index ||
       prevState.layout.width !== this.state.layout.width ||
-      this.isWidthDynamic(this.props)
+      prevState.tabWidths !== this.state.tabWidths ||
+      this.isWidthDynamic(prevProps) !== this.isWidthDynamic(this.props)
     ) {
       this.resetScroll(this.props.navigationState.index);
     }
@@ -121,10 +115,15 @@ export default class TabBar<T extends Route> extends React.Component<
     return tabStyle.width === 'auto';
   };
 
-  private getTabWidth = (props: Props<T>, state: State) => {
+  private getTabWidth = (props: Props<T>, state: State, index: number) => {
     const { layout } = state;
     const { navigationState, tabStyle } = props;
-    const flattened: ViewStyle = StyleSheet.flatten(tabStyle);
+    const flattened = StyleSheet.flatten(tabStyle);
+    if (this.isWidthDynamic(props)) {
+      // what if scrollEnabled? what's 2/5?
+      const width = state.tabWidths[index] || this.actualTabWidths[index] || 0;
+      return width;
+    }
 
     if (flattened) {
       switch (typeof flattened.width) {
@@ -150,27 +149,27 @@ export default class TabBar<T extends Route> extends React.Component<
   private getMaxScrollDistance = (tabBarWidth: number, layoutWidth: number) =>
     tabBarWidth - layoutWidth;
 
+  private getTabBarWidth = (props: Props<T>, state: State) => {
+    const { layout } = state;
+    const {
+      navigationState: { routes },
+    } = props;
+    return Math.max(
+      routes.reduce<number>(
+        (acc, _, i) => acc + this.getTabWidth(props, state, i),
+        0
+      ),
+      layout.width
+    );
+  };
+
   private normalizeScrollValue = (
     props: Props<T>,
     state: State,
     value: number
   ) => {
-    const { layout, tabWidths } = state;
-    const { navigationState } = props;
-
-    if (this.isWidthDynamic(props)) {
-      const dynamicTabBarWidth = tabWidths.reduce(
-        (acc: number, tabWidth: number) => acc + tabWidth,
-        0
-      );
-      return Math.max(Math.min(value, dynamicTabBarWidth - layout.width), 0);
-    }
-
-    const tabWidth = this.getTabWidth(props, state);
-    const tabBarWidth = Math.max(
-      tabWidth * navigationState.routes.length,
-      layout.width
-    );
+    const { layout } = state;
+    const tabBarWidth = this.getTabBarWidth(props, state);
     const maxDistance = this.getMaxScrollDistance(tabBarWidth, layout.width);
     const scrollValue = Math.max(Math.min(value, maxDistance), 0);
 
@@ -184,26 +183,17 @@ export default class TabBar<T extends Route> extends React.Component<
   };
 
   private getScrollAmount = (props: Props<T>, state: State, i: number) => {
-    const { layout, tabWidths } = state;
-
-    let scrollAmount = 0;
-    if (this.isWidthDynamic(props)) {
-      // Since the tabs have a dynamic width, to get the tab at
-      // index i centered we adjust scroll amount by with of indexes
-      // 0 through (i - 1) and add half the width of current index i
-      const dynamicAmount = tabWidths
-        .slice(0, i)
-        .reduce(
-          (acc: number, tabWidth: number) => (acc += tabWidth),
-          tabWidths[i] * 0.5
-        );
-      scrollAmount = dynamicAmount - layout.width / 2;
-    } else {
-      const tabWidth = this.getTabWidth(props, state);
-      const centerDistance = tabWidth * (i + 1 / 2);
-      scrollAmount = centerDistance - layout.width / 2;
-    }
-
+    const { layout } = state;
+    const centerDistance = Array.from({ length: i }).reduce<number>(
+      (total, _, index) => {
+        const tabWidth = this.getTabWidth(props, state, i);
+        // To get the current index centered we adjust scroll amount by width of indexes
+        // 0 through (i - 1) and add half the width of current index i
+        return total + (index === i ? tabWidth / 2 : tabWidth);
+      },
+      0
+    );
+    const scrollAmount = centerDistance - layout.width / 2;
     return this.normalizeScrollValue(props, state, scrollAmount);
   };
 
@@ -272,11 +262,10 @@ export default class TabBar<T extends Route> extends React.Component<
       style,
       indicatorContainerStyle,
     } = this.props;
-    const { layout, tabWidths } = this.state;
-    const { routes } = navigationState;
-    const tabWidth = this.getTabWidth(this.props, this.state);
-    const tabBarWidth = tabWidth * routes.length;
-    const tabBarWidthPercent = `${routes.length * 40}%`;
+    const { layout } = this.state;
+    const { routes, index } = navigationState;
+    const tabWidth = this.getTabWidth(this.props, this.state, index);
+    const tabBarWidth = this.getTabBarWidth(this.props, this.state);
     const translateX = this.getTranslateX(
       this.scrollAmount,
       this.getMaxScrollDistance(tabBarWidth, layout.width)
@@ -301,14 +290,12 @@ export default class TabBar<T extends Route> extends React.Component<
           ]}
         >
           {this.props.renderIndicator({
-            dynamicWidth: this.isWidthDynamic(this.props),
-            tabWidths,
             position,
             layout,
             navigationState,
             jumpTo,
-            width: tabWidth,
             style: indicatorStyle,
+            getTabWidth: i => this.getTabWidth(this.props, this.state, i),
           })}
         </Animated.View>
         <View style={styles.scroll}>
@@ -353,13 +340,13 @@ export default class TabBar<T extends Route> extends React.Component<
                   this.actualTabWidths[i] = layout.width || tabWidth;
 
                   // check if this is the last onLayout call
-                  if (!didAllOnLayoutsFire(this.actualTabWidths, routes.length))
-                    return;
+                  const allOnLayoutsFired =
+                    this.actualTabWidths.length === routes.length &&
+                    Array.from(this.actualTabWidths).every(Boolean);
+                  if (!allOnLayoutsFired) return;
 
                   // all onLayout's have been fired
                   this.setState({ tabWidths: [...this.actualTabWidths] });
-                  // clear
-                  this.actualTabWidths = [];
                 }}
                 key={route.key}
                 position={position}
