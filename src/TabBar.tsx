@@ -250,7 +250,7 @@ export default class TabBar<T extends Route> extends React.Component<
             scrollEnabled
               ? { width: tabBarWidth, transform: [{ translateX }] as any }
               : null,
-            indicatorContainerStyle
+            indicatorContainerStyle,
           ]}
         >
           {this.props.renderIndicator({
