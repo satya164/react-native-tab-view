@@ -266,6 +266,7 @@ export default class TabBar<T extends Route> extends React.Component<
     const { routes, index } = navigationState;
     const tabWidth = this.getTabWidth(this.props, this.state, index);
     const tabBarWidth = this.getTabBarWidth(this.props, this.state);
+    const tabBarWidthPercent = `${routes.length * 40}%`;
     const translateX = this.getTranslateX(
       this.scrollAmount,
       this.getMaxScrollDistance(tabBarWidth, layout.width)

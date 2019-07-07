@@ -94,7 +94,6 @@ export default class TabBarItem<T extends Route> extends React.Component<
       pressOpacity,
       labelStyle,
       style,
-      tabWidth,
       onLayout,
       onPress,
       onLongPress,
@@ -199,21 +198,6 @@ export default class TabBarItem<T extends Route> extends React.Component<
     const tabStyle = StyleSheet.flatten(style);
     const isWidthSet = tabStyle && tabStyle.width !== undefined;
     const tabContainerStyle: ViewStyle | null = isWidthSet ? null : { flex: 1 };
-
-    // const isWidthSet =
-    //   (tabStyle && typeof tabStyle.width !== 'undefined') ||
-    //   scrollEnabled === true;
-    const tabContainerStyle: ViewStyle = {};
-    const itemStyle = isWidthSet ? { width: tabWidth } : { width: 'auto' };
-
-    // const tabContainerStyle: ViewStyle = {};
-    // const itemStyle = isWidthSet && !dynamicWidth ? { width: tabWidth } : null;
-
-    // if (tabStyle && typeof tabStyle.flex === 'number') {
-    //   tabContainerStyle.flex = tabStyle.flex;
-    // } else if (!isWidthSet) {
-    //   tabContainerStyle.flex = 1;
-    // }
 
     const scene = { route };
 
