@@ -142,7 +142,7 @@ export default class Pager<T extends Route> extends React.Component<Props<T>> {
 
     if (prevProps.swipeVelocityImpact !== swipeVelocityImpact) {
       this.swipeVelocityImpact.setValue(
-        swipeVelocityImpact != null
+        swipeVelocityImpact !== undefined
           ? swipeVelocityImpact
           : SWIPE_VELOCITY_IMPACT
       );
@@ -150,7 +150,7 @@ export default class Pager<T extends Route> extends React.Component<Props<T>> {
 
     if (prevProps.springVelocityScale !== springVelocityScale) {
       this.springVelocityScale.setValue(
-        springVelocityScale != null
+        springVelocityScale !== undefined
           ? springVelocityScale
           : SPRING_VELOCITY_SCALE
       );
