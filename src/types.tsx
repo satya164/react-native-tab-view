@@ -42,6 +42,7 @@ export type PagerCommonProps = {
   swipeVelocityImpact?: number;
   onSwipeStart?: () => void;
   onSwipeEnd?: () => void;
+  toss?: number;
   springConfig: {
     damping?: number;
     mass?: number;

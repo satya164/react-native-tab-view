@@ -91,6 +91,8 @@ const SPRING_CONFIG = {
   restSpeedThreshold: 0.01,
 };
 
+const TOSS = 1;
+
 const TIMING_CONFIG = {
   duration: 200,
   easing: Easing.out(Easing.cubic),
@@ -277,6 +279,8 @@ export default class Pager<T extends Route> extends React.Component<Props<T>> {
     ),
   };
 
+  private toss = this.props.toss !== undefined ? this.props.toss : TOSS;
+
   // The reason for using this value instead of simply passing `this._velocity`
   // into a spring animation is that we need to reverse it if we're using RTL mode.
   // Also, it's not possible to pass multiplied value there, because
@@ -381,7 +385,6 @@ export default class Pager<T extends Route> extends React.Component<Props<T>> {
         set(state.time, 0),
         set(state.finished, FALSE),
         set(this.index, index),
-        startClock(this.clock),
       ]),
       cond(
         this.isSwipeGesture,
@@ -390,8 +393,14 @@ export default class Pager<T extends Route> extends React.Component<Props<T>> {
           cond(
             not(clockRunning(this.clock)),
             I18nManager.isRTL
-              ? set(this.initialVelocityForSpring, multiply(-1, this.velocityX))
-              : set(this.initialVelocityForSpring, this.velocityX)
+              ? set(
+                  this.initialVelocityForSpring,
+                  multiply(-1, this.velocityX, this.toss)
+                )
+              : set(
+                  this.initialVelocityForSpring,
+                  multiply(this.velocityX, this.toss)
+                )
           ),
           spring(
             this.clock,
@@ -406,6 +415,7 @@ export default class Pager<T extends Route> extends React.Component<Props<T>> {
           { ...TIMING_CONFIG, ...this.timingConfig, toValue }
         )
       ),
+      cond(not(clockRunning(this.clock)), startClock(this.clock)),
       cond(state.finished, [
         // Reset values
         set(this.isSwipeGesture, FALSE),

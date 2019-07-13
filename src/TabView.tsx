@@ -117,6 +117,7 @@ export default class TabView<T extends Route> extends React.Component<
       sceneContainerStyle,
       style,
       gestureHandlerProps,
+      toss,
     } = this.props;
     const { layout } = this.state;
 
@@ -133,6 +134,7 @@ export default class TabView<T extends Route> extends React.Component<
           onSwipeStart={onSwipeStart}
           onSwipeEnd={onSwipeEnd}
           onIndexChange={this.jumpToIndex}
+          toss={toss}
           removeClippedSubviews={removeClippedSubviews}
           gestureHandlerProps={gestureHandlerProps}
         >
