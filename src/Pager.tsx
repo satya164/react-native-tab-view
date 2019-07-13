@@ -240,11 +240,15 @@ export default class Pager<T extends Route> extends React.Component<Props<T>> {
 
   // Determines how relevant is a velocity while calculating next position while swiping
   private swipeVelocityImpact = new Value(
-    this.props.swipeVelocityImpact || SWIPE_VELOCITY_IMPACT
+    this.props.swipeVelocityImpact !== undefined
+      ? this.props.swipeVelocityImpact
+      : SWIPE_VELOCITY_IMPACT
   );
 
   private springVelocityScale = new Value(
-    this.props.springVelocityScale || SPRING_VELOCITY_SCALE
+    this.props.springVelocityScale !== undefined
+      ? this.props.springVelocityScale
+      : SPRING_VELOCITY_SCALE
   );
 
   // The position value represent the position of the pager on a scale of 0 - routes.length-1
