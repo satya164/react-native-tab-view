@@ -101,6 +101,7 @@ const TIMING_CONFIG = {
 export default class Pager<T extends Route> extends React.Component<Props<T>> {
   static defaultProps = {
     swipeVelocityImpact: SWIPE_VELOCITY_IMPACT,
+    springVelocityScale: SPRING_VELOCITY_SCALE,
   };
 
   componentDidUpdate(prevProps: Props<T>) {
@@ -108,6 +109,7 @@ export default class Pager<T extends Route> extends React.Component<Props<T>> {
       navigationState,
       layout,
       swipeVelocityImpact,
+      springVelocityScale,
       springConfig,
       timingConfig,
     } = this.props;
@@ -143,6 +145,14 @@ export default class Pager<T extends Route> extends React.Component<Props<T>> {
         swipeVelocityImpact != null
           ? swipeVelocityImpact
           : SWIPE_VELOCITY_IMPACT
+      );
+    }
+
+    if (prevProps.springVelocityScale !== springVelocityScale) {
+      this.springVelocityScale.setValue(
+        springVelocityScale != null
+          ? springVelocityScale
+          : SPRING_VELOCITY_SCALE
       );
     }
 
@@ -233,6 +243,10 @@ export default class Pager<T extends Route> extends React.Component<Props<T>> {
     this.props.swipeVelocityImpact || SWIPE_VELOCITY_IMPACT
   );
 
+  private springVelocityScale = new Value(
+    this.props.springVelocityScale || SPRING_VELOCITY_SCALE
+  );
+
   // The position value represent the position of the pager on a scale of 0 - routes.length-1
   // It is calculated based on the translate value and layout width
   // If we don't have the layout yet, we should return the current index
@@ -278,11 +292,6 @@ export default class Pager<T extends Route> extends React.Component<Props<T>> {
         : TIMING_CONFIG.duration
     ),
   };
-
-  private springVelocityScale =
-    this.props.springVelocityScale !== undefined
-      ? this.props.springVelocityScale
-      : SPRING_VELOCITY_SCALE;
 
   // The reason for using this value instead of simply passing `this._velocity`
   // into a spring animation is that we need to reverse it if we're using RTL mode.
