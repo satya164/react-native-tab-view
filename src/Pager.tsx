@@ -91,7 +91,7 @@ const SPRING_CONFIG = {
   restSpeedThreshold: 0.01,
 };
 
-const TOSS = 1;
+const SPRING_VELOCITY_SCALE = 1;
 
 const TIMING_CONFIG = {
   duration: 200,
@@ -279,7 +279,10 @@ export default class Pager<T extends Route> extends React.Component<Props<T>> {
     ),
   };
 
-  private toss = this.props.toss !== undefined ? this.props.toss : TOSS;
+  private springVelocityScale =
+    this.props.springVelocityScale !== undefined
+      ? this.props.springVelocityScale
+      : SPRING_VELOCITY_SCALE;
 
   // The reason for using this value instead of simply passing `this._velocity`
   // into a spring animation is that we need to reverse it if we're using RTL mode.
@@ -395,11 +398,11 @@ export default class Pager<T extends Route> extends React.Component<Props<T>> {
             I18nManager.isRTL
               ? set(
                   this.initialVelocityForSpring,
-                  multiply(-1, this.velocityX, this.toss)
+                  multiply(-1, this.velocityX, this.springVelocityScale)
                 )
               : set(
                   this.initialVelocityForSpring,
-                  multiply(this.velocityX, this.toss)
+                  multiply(this.velocityX, this.springVelocityScale)
                 )
           ),
           spring(

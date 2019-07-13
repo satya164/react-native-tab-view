@@ -316,7 +316,7 @@ Configuration object for the spring animation which occurs after swiping. Suppor
 - `restSpeedThreshold` (`number`)
 - `restDisplacementThreshold` (`number`)
 
-##### `initialLayout`
+##### `springVelocityScale`
 
 Number for determining how meaningful is gesture velocity for calculating initial velocity of spring animation. Defaults to `0`.
 
