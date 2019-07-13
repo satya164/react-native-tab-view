@@ -318,6 +318,10 @@ Configuration object for the spring animation which occurs after swiping. Suppor
 
 ##### `initialLayout`
 
+Number for determining how meaningful is gesture velocity for calculating initial velocity of spring animation. Defaults to `0`.
+
+##### `initialLayout
+
 Object containing the initial height and width of the screens. Passing this will improve the initial rendering performance. For most apps, this is a good default:
 
 ```js
