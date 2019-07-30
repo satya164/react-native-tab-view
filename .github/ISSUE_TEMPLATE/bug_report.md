@@ -20,6 +20,8 @@ assignees: ''
 
 ### Code sample
 
+For Syntax Highlighting check this [link](https://help.github.com/en/articles/creating-and-highlighting-code-blocks)
+
 <!-- Provide a complete code sample that could be run to reproduce the issue, ideally on snack.expo.io or in a github repo. -->
 
 ### Screenshots (if applicable)
