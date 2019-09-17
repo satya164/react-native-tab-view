@@ -38,7 +38,7 @@ type Props<T extends Route> = PagerCommonProps & {
   gestureHandlerProps: React.ComponentProps<typeof PanGestureHandler>;
 };
 
-type State = {
+type ComponentState = {
   enabled: boolean;
   childPanGestureHandlerRefs: React.RefObject<PanGestureHandler>[];
 };
@@ -108,7 +108,7 @@ const TIMING_CONFIG = {
 
 export default class Pager<T extends Route> extends React.Component<
   Props<T>,
-  State
+  ComponentState
 > {
   static defaultProps = {
     swipeVelocityImpact: SWIPE_VELOCITY_IMPACT,
@@ -224,7 +224,7 @@ export default class Pager<T extends Route> extends React.Component<
   private providerVal = {
     addGestureHandlerRef: (ref: React.RefObject<PanGestureHandler>) => {
       if (!this.state.childPanGestureHandlerRefs.includes(ref)) {
-        this.setState((prevState: State) => ({
+        this.setState((prevState: ComponentState) => ({
           childPanGestureHandlerRefs: [
             ...prevState.childPanGestureHandlerRefs,
             ref,
@@ -235,7 +235,9 @@ export default class Pager<T extends Route> extends React.Component<
   };
 
   // PanGestureHandler ref used for coordination with parent handlers
-  private gestureHandlerRef = React.createRef();
+  private gestureHandlerRef: React.RefObject<
+    PanGestureHandler
+  > = React.createRef();
 
   // Clock used for tab transition animations
   private clock = new Clock();
