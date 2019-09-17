@@ -4,8 +4,6 @@ import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import Animated, { Easing } from 'react-native-reanimated';
 import memoize from './memoize';
 
-const PagerContext = React.createContext({})
-
 import {
   Layout,
   NavigationState,
@@ -41,9 +39,9 @@ type Props<T extends Route> = PagerCommonProps & {
 };
 
 type State = {
-  enabled: boolean
-  childPanGestureHandlerRefs: React.RefObject<PanGestureHandler>[]
-}
+  enabled: boolean;
+  childPanGestureHandlerRefs: React.RefObject<PanGestureHandler>[];
+};
 
 const {
   Clock,
@@ -78,6 +76,8 @@ const {
   timing,
 } = Animated;
 
+const PagerContext = React.createContext({});
+
 const TRUE = 1;
 const FALSE = 0;
 const NOOP = 0;
@@ -106,34 +106,27 @@ const TIMING_CONFIG = {
   easing: Easing.out(Easing.cubic),
 };
 
-export default class Pager<T extends Route> extends React.Component<Props<T>, State> {
+export default class Pager<T extends Route> extends React.Component<
+  Props<T>,
+  State
+> {
   static defaultProps = {
     swipeVelocityImpact: SWIPE_VELOCITY_IMPACT,
     springVelocityScale: SPRING_VELOCITY_SCALE,
   };
 
-  static contextType = PagerContext
-  
-  gestureHandlerRef = React.createRef()
+  static contextType = PagerContext;
 
   state = {
     enabled: true,
     childPanGestureHandlerRefs: [] as React.RefObject<PanGestureHandler>[],
-  }
-  
-  providerVal = {
-    addGestureHandlerRef: (ref: React.RefObject<PanGestureHandler>) => {
-      if (!this.state.childPanGestureHandlerRefs.includes(ref)) {
-        this.setState((prevState: State) => ({
-          childPanGestureHandlerRefs: [...prevState.childPanGestureHandlerRefs, ref]
-        }))
-      }
-    }
-  }
+  };
 
   componentDidMount() {
+    // Register this PanGestureHandler with the parent (if parent exists)
+    // so swipe gesture may be passed from child to parent if necessary.
     if (this.context && this.context.addGestureHandlerRef) {
-      this.context.addGestureHandlerRef(this.gestureHandlerRef)
+      this.context.addGestureHandlerRef(this.gestureHandlerRef);
     }
   }
 
@@ -227,6 +220,22 @@ export default class Pager<T extends Route> extends React.Component<Props<T>, St
       );
     }
   }
+
+  private providerVal = {
+    addGestureHandlerRef: (ref: React.RefObject<PanGestureHandler>) => {
+      if (!this.state.childPanGestureHandlerRefs.includes(ref)) {
+        this.setState((prevState: State) => ({
+          childPanGestureHandlerRefs: [
+            ...prevState.childPanGestureHandlerRefs,
+            ref,
+          ],
+        }));
+      }
+    },
+  };
+
+  // PanGestureHandler ref used for coordination with parent handlers
+  private gestureHandlerRef = React.createRef();
 
   // Clock used for tab transition animations
   private clock = new Clock();
@@ -443,13 +452,13 @@ export default class Pager<T extends Route> extends React.Component<Props<T>, St
             not(clockRunning(this.clock)),
             I18nManager.isRTL
               ? set(
-                this.initialVelocityForSpring,
-                multiply(-1, this.velocityX, this.springVelocityScale)
-              )
+                  this.initialVelocityForSpring,
+                  multiply(-1, this.velocityX, this.springVelocityScale)
+                )
               : set(
-                this.initialVelocityForSpring,
-                multiply(this.velocityX, this.springVelocityScale)
-              )
+                  this.initialVelocityForSpring,
+                  multiply(this.velocityX, this.springVelocityScale)
+                )
           ),
           spring(
             this.clock,
@@ -492,21 +501,22 @@ export default class Pager<T extends Route> extends React.Component<Props<T>, St
   );
 
   private maybeCancel = block([
-    cond(or(
-      and(
-        eq(this.index, sub(this.routesLength, 1)),
-        lessThan(this.gestureX, 0),
+    cond(
+      or(
+        and(
+          eq(this.index, sub(this.routesLength, 1)),
+          lessThan(this.gestureX, 0)
+        ),
+        and(eq(this.index, 0), greaterThan(this.gestureX, 0))
       ),
-      and(
-        eq(this.index, 0),
-        greaterThan(this.gestureX, 0),
-      )
-    ),
       call([this.gestureX], () => {
-        if (this.state.enabled) this.setState({ enabled: false }, () => this.setState({ enabled: true }))
+        if (this.state.enabled)
+          this.setState({ enabled: false }, () =>
+            this.setState({ enabled: true })
+          );
       })
-    )
-  ])
+    ),
+  ]);
 
   private translateX = block([
     onChange(
@@ -723,9 +733,9 @@ export default class Pager<T extends Route> extends React.Component<Props<T>, St
               styles.container,
               layout.width
                 ? {
-                  width: layout.width * navigationState.routes.length,
-                  transform: [{ translateX }] as any,
-                }
+                    width: layout.width * navigationState.routes.length,
+                    transform: [{ translateX }] as any,
+                  }
                 : null,
             ]}
           >
