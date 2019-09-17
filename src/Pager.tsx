@@ -42,7 +42,7 @@ type Props<T extends Route> = PagerCommonProps & {
 
 type State = {
   enabled: boolean
-  childPanGestureHandlerRefs: any[]
+  childPanGestureHandlerRefs: React.RefObject<PanGestureHandler>[]
 }
 
 const {
@@ -113,22 +113,22 @@ export default class Pager<T extends Route> extends React.Component<Props<T>, St
   };
 
   static contextType = PagerContext
-
+  
   gestureHandlerRef = React.createRef()
+
+  state = {
+    enabled: true,
+    childPanGestureHandlerRefs: [] as React.RefObject<PanGestureHandler>[],
+  }
   
   providerVal = {
-    addGestureHandlerRef: (ref) => {
+    addGestureHandlerRef: (ref: React.RefObject<PanGestureHandler>) => {
       if (!this.state.childPanGestureHandlerRefs.includes(ref)) {
         this.setState((prevState: State) => ({
           childPanGestureHandlerRefs: [...prevState.childPanGestureHandlerRefs, ref]
         }))
       }
     }
-  }
-
-  state = {
-    enabled: true,
-    childPanGestureHandlerRefs: [],
   }
 
   componentDidMount() {
