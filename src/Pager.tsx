@@ -124,7 +124,7 @@ export default class Pager<T extends Route> extends React.Component<
 
   componentDidMount() {
     // Register this PanGestureHandler with the parent (if parent exists)
-    // so swipe gesture may be passed from child to parent if necessary.
+    // in order to coordinate gestures between handlers.
     if (this.context && this.context.addGestureHandlerRef) {
       this.context.addGestureHandlerRef(this.gestureHandlerRef);
     }
@@ -221,6 +221,8 @@ export default class Pager<T extends Route> extends React.Component<
     }
   }
 
+  // Mechanism to add child PanGestureHandler refs in the case that this
+  // Pager is a parent to child Pagers. Allows for coordination between handlers
   private providerVal = {
     addGestureHandlerRef: (ref: React.RefObject<PanGestureHandler>) => {
       if (!this.state.childPanGestureHandlerRefs.includes(ref)) {
@@ -502,6 +504,8 @@ export default class Pager<T extends Route> extends React.Component<
     multiply(this.velocityX, this.swipeVelocityImpact)
   );
 
+  // Cancel gesture if swiping back from initial tab or forward from last tab.
+  // Enables parent Pager to pick up the gesture, if one exists.
   private maybeCancel = block([
     cond(
       or(
