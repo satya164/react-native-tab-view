@@ -4,6 +4,8 @@ import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import Animated, { Easing } from 'react-native-reanimated';
 import memoize from './memoize';
 
+const PagerContext = React.createContext({})
+
 import {
   Layout,
   NavigationState,
@@ -38,11 +40,17 @@ type Props<T extends Route> = PagerCommonProps & {
   gestureHandlerProps: React.ComponentProps<typeof PanGestureHandler>;
 };
 
+type State = {
+  enabled: boolean
+  childPanGestureHandlerRefs: any[]
+}
+
 const {
   Clock,
   Value,
   onChange,
   and,
+  or,
   abs,
   add,
   block,
@@ -98,11 +106,36 @@ const TIMING_CONFIG = {
   easing: Easing.out(Easing.cubic),
 };
 
-export default class Pager<T extends Route> extends React.Component<Props<T>> {
+export default class Pager<T extends Route> extends React.Component<Props<T>, State> {
   static defaultProps = {
     swipeVelocityImpact: SWIPE_VELOCITY_IMPACT,
     springVelocityScale: SPRING_VELOCITY_SCALE,
   };
+
+  static contextType = PagerContext
+
+  gestureHandlerRef = React.createRef()
+  
+  providerVal = {
+    addGestureHandlerRef: (ref) => {
+      if (!this.state.childPanGestureHandlerRefs.includes(ref)) {
+        this.setState((prevState: State) => ({
+          childPanGestureHandlerRefs: [...prevState.childPanGestureHandlerRefs, ref]
+        }))
+      }
+    }
+  }
+
+  state = {
+    enabled: true,
+    childPanGestureHandlerRefs: [],
+  }
+
+  componentDidMount() {
+    if (this.context && this.context.addGestureHandlerRef) {
+      this.context.addGestureHandlerRef(this.gestureHandlerRef)
+    }
+  }
 
   componentDidUpdate(prevProps: Props<T>) {
     const {
@@ -410,13 +443,13 @@ export default class Pager<T extends Route> extends React.Component<Props<T>> {
             not(clockRunning(this.clock)),
             I18nManager.isRTL
               ? set(
-                  this.initialVelocityForSpring,
-                  multiply(-1, this.velocityX, this.springVelocityScale)
-                )
+                this.initialVelocityForSpring,
+                multiply(-1, this.velocityX, this.springVelocityScale)
+              )
               : set(
-                  this.initialVelocityForSpring,
-                  multiply(this.velocityX, this.springVelocityScale)
-                )
+                this.initialVelocityForSpring,
+                multiply(this.velocityX, this.springVelocityScale)
+              )
           ),
           spring(
             this.clock,
@@ -458,12 +491,28 @@ export default class Pager<T extends Route> extends React.Component<Props<T>> {
     multiply(this.velocityX, this.swipeVelocityImpact)
   );
 
+  private maybeCancel = block([
+    cond(or(
+      and(
+        eq(this.index, sub(this.routesLength, 1)),
+        lessThan(this.gestureX, 0),
+      ),
+      and(
+        eq(this.index, 0),
+        greaterThan(this.gestureX, 0),
+      )
+    ),
+      call([this.gestureX], () => {
+        if (this.state.enabled) this.setState({ enabled: false }, () => this.setState({ enabled: true }))
+      })
+    )
+  ])
+
   private translateX = block([
     onChange(
       this.index,
       call([this.index], ([value]) => {
         this.currentIndexValue = value;
-
         // Without this check, the pager can go to an infinite update <-> animate loop for sync updates
         if (value !== this.props.navigationState.index) {
           // If the index changed, and previous animation has finished, update state
@@ -554,6 +603,7 @@ export default class Pager<T extends Route> extends React.Component<Props<T>> {
     cond(
       eq(this.gestureState, State.ACTIVE),
       [
+        this.maybeCancel,
         cond(this.isSwiping, NOOP, [
           // We weren't dragging before, set it to true
           set(this.isSwiping, TRUE),
@@ -657,7 +707,10 @@ export default class Pager<T extends Route> extends React.Component<Props<T>> {
       jumpTo: this.jumpTo,
       render: children => (
         <PanGestureHandler
-          enabled={layout.width !== 0 && swipeEnabled}
+          ref={this.gestureHandlerRef}
+          simultaneousHandlers={this.state.childPanGestureHandlerRefs}
+          waitFor={this.state.childPanGestureHandlerRefs}
+          enabled={layout.width !== 0 && swipeEnabled && this.state.enabled}
           onGestureEvent={this.handleGestureEvent}
           onHandlerStateChange={this.handleGestureEvent}
           activeOffsetX={[-SWIPE_DISTANCE_MINIMUM, SWIPE_DISTANCE_MINIMUM]}
@@ -670,13 +723,15 @@ export default class Pager<T extends Route> extends React.Component<Props<T>> {
               styles.container,
               layout.width
                 ? {
-                    width: layout.width * navigationState.routes.length,
-                    transform: [{ translateX }] as any,
-                  }
+                  width: layout.width * navigationState.routes.length,
+                  transform: [{ translateX }] as any,
+                }
                 : null,
             ]}
           >
-            {children}
+            <PagerContext.Provider value={this.providerVal}>
+              {children}
+            </PagerContext.Provider>
           </Animated.View>
         </PanGestureHandler>
       ),
