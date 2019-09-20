@@ -113,6 +113,8 @@ export default class TabBarIndicator<T extends Route> extends React.Component<
           : getTabWidth(0)
         : width;
 
+    //@ts-ignore
+    const { transform, ...styleRest } = style || {};
     return (
       <Animated.View
         style={[
@@ -121,10 +123,10 @@ export default class TabBarIndicator<T extends Route> extends React.Component<
           // This avoids rendering delay until we are able to calculate translateX
           { width: indicatorWidth },
           layout.width
-            ? { transform: [{ translateX }] as any }
+            ? { transform: [{ translateX }, ...(transform || [])] as any }
             : { left: `${(100 / routes.length) * navigationState.index}%` },
           width === 'auto' ? { opacity: this.opacity } : null,
-          style,
+          layout.width ? styleRest : style,
         ]}
       />
     );
