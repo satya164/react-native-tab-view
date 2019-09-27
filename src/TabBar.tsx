@@ -271,12 +271,14 @@ export default class TabBar<T extends Route> extends React.Component<
       return;
     }
 
-    this.setState({
-      layout: {
-        height,
-        width,
-      },
-    });
+    setTimeout(() => {
+      this.setState({
+        layout: {
+          height,
+          width,
+        },
+      });
+    }, 1);
   };
 
   private getTranslateX = memoize(
