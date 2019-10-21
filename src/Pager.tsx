@@ -1,5 +1,11 @@
 import * as React from 'react';
-import { StyleSheet, TextInput, Keyboard, I18nManager } from 'react-native';
+import {
+  StyleSheet,
+  TextInput,
+  Keyboard,
+  I18nManager,
+  InteractionManager,
+} from 'react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import Animated, { Easing } from 'react-native-reanimated';
 import memoize from './memoize';
@@ -195,6 +201,12 @@ export default class Pager<T extends Route> extends React.Component<Props<T>> {
     }
   }
 
+  componentWillUnmount() {
+    if (this.interactionHandle !== null) {
+      InteractionManager.clearInteractionHandle(this.interactionHandle);
+    }
+  }
+
   // Clock used for tab transition animations
   private clock = new Clock();
 
@@ -323,6 +335,9 @@ export default class Pager<T extends Route> extends React.Component<Props<T>> {
 
   // Listeners for the entered screen
   private enterListeners: Listener[] = [];
+
+  // InteractionHandle to handle tasks around animations
+  private interactionHandle: number | null = null;
 
   private jumpToIndex = (index: number) => {
     // If the index changed, we need to trigger a tab switch
@@ -510,6 +525,7 @@ export default class Pager<T extends Route> extends React.Component<Props<T>> {
           if (isSwiping === TRUE) {
             onSwipeStart && onSwipeStart();
 
+            this.interactionHandle = InteractionManager.createInteractionHandle();
             if (keyboardDismissMode === 'auto') {
               const input = TextInput.State.currentlyFocusedField();
 
@@ -524,6 +540,9 @@ export default class Pager<T extends Route> extends React.Component<Props<T>> {
           } else {
             onSwipeEnd && onSwipeEnd();
 
+            if (this.interactionHandle !== null) {
+              InteractionManager.clearInteractionHandle(this.interactionHandle);
+            }
             if (keyboardDismissMode === 'auto') {
               if (indexAtSwipeEnd === currentIndex) {
                 // The index didn't change, we should restore the focus of text input
