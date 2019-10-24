@@ -315,8 +315,9 @@ export default class TabBar<T extends Route> extends React.Component<
       contentContainerStyle,
       style,
       indicatorContainerStyle,
+      layout,
     } = this.props;
-    const { layout, tabWidths } = this.state;
+    const { tabWidths } = this.state;
     const { routes } = navigationState;
 
     const isWidthDynamic = this.getFlattenedTabWidth(tabStyle) === 'auto';
