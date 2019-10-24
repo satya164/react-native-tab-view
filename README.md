@@ -199,9 +199,9 @@ Callback which returns a react element to render as the page for the tab. Receiv
 renderScene = ({ route, jumpTo }) => {
   switch (route.key) {
     case 'music':
-      return <MusicRoute jumpTo={jumpTo} />;
+      return <MusicRoute jumpTo={jumpTo} key={route.key} />;
     case 'albums':
-      return <AlbumsRoute jumpTo={jumpTo} />;
+      return <AlbumsRoute jumpTo={jumpTo} key={route.key} />;
   }
 };
 ```
@@ -254,9 +254,9 @@ If you need to pass additional props, use a custom `renderScene` function:
 renderScene = ({ route }) => {
   switch (route.key) {
     case 'first':
-      return <FirstRoute foo={this.props.foo} />;
+      return <FirstRoute foo={this.props.foo} key={route.key} />;
     case 'second':
-      return <SecondRoute />;
+      return <SecondRoute key={route.key} />;
     default:
       return null;
   }
@@ -585,7 +585,7 @@ Do the following:
 renderScene = ({ route }) => {
   switch (route.key) {
     case 'home':
-      return <HomeComponent />;
+      return <HomeComponent key={route.key} />;
     default:
       return null;
   }
