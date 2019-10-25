@@ -6,6 +6,7 @@
     "privacy": "public",
     "sdkVersion": "35.0.0",
     "version": "1.0.0",
+    "entryPoint": "node_modules/expo/AppEntry.js",
     "primaryColor": "#2196f3",
     "icon": "assets/icon.png",
     "loading": {

@@ -12,6 +12,7 @@ import {
   YellowBox,
   I18nManager,
 } from 'react-native';
+import { registerRootComponent } from 'expo';
 import { Asset } from 'expo-asset';
 import { useKeepAwake } from 'expo-keep-awake';
 import Constants from 'expo-constants';
@@ -22,7 +23,6 @@ import TabBarIconExample from './TabBarIconExample';
 import CustomIndicatorExample from './CustomIndicatorExample';
 import CustomTabBarExample from './CustomTabBarExample';
 import CoverflowExample from './CoverflowExample';
-import NativePagerExample from './NativePagerExample';
 
 type State = {
   title: string;
@@ -51,7 +51,6 @@ const EXAMPLE_COMPONENTS: ExampleComponentType[] = [
   CustomIndicatorExample,
   CustomTabBarExample,
   CoverflowExample,
-  NativePagerExample,
 ];
 
 const KeepAwake = () => {
@@ -265,3 +264,5 @@ const styles = StyleSheet.create({
     color: '#333',
   },
 });
+
+registerRootComponent(ExampleList);
