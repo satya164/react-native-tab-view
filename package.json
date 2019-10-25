@@ -47,6 +47,7 @@
     "@commitlint/config-conventional": "^8.2.0",
     "@expo/vector-icons": "^10.0.6",
     "@react-native-community/bob": "^0.7.0",
+    "@react-native-community/viewpager": "^2.0.1",
     "@release-it/conventional-changelog": "^1.1.0",
     "@types/expo": "^32.0.13",
     "@types/react": "^16.9.5",
@@ -57,6 +58,9 @@
     "eslint": "^6.5.1",
     "eslint-config-satya164": "^3.1.2",
     "eslint-plugin-react-native-globals": "^0.1.2",
+    "expo-asset": "^7.0.0",
+    "expo-constants": "^7.0.1",
+    "expo-keep-awake": "^7.0.0",
     "husky": "^3.0.8",
     "jest": "^24.9.0",
     "prettier": "^1.18.2",
@@ -72,7 +76,8 @@
     "react": "*",
     "react-native": "*",
     "react-native-gesture-handler": "*",
-    "react-native-reanimated": "*"
+    "react-native-reanimated": "*",
+    "@react-native-community/viewpager": "*"
   },
   "husky": {
     "hooks": {
@@ -95,5 +100,6 @@
       "module",
       "typescript"
     ]
-  }
+  },
+  "dependencies": {}
 }
