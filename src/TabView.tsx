@@ -9,15 +9,39 @@ import {
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import TabBar, { Props as TabBarProps } from './TabBar';
-import Pager from './Pager';
+import ViewPagerBackend from './ViewPagerBackend';
 import SceneView from './SceneView';
 import {
   Layout,
   NavigationState,
   Route,
   SceneRendererProps,
+  EventEmitterProps,
   PagerCommonProps,
 } from './types';
+
+type ChildProps<T extends Route> = PagerCommonProps & {
+  onIndexChange: (index: number) => void;
+  navigationState: NavigationState<T>;
+  layout: Layout;
+  // Clip unfocused views to improve memory usage
+  // Don't enable this on iOS where this is buggy and views don't re-appear
+  removeClippedSubviews?: boolean;
+  children: (
+    props: EventEmitterProps & {
+      // Animated value which represents the state of current index
+      // It can include fractional digits as it represents the intermediate value
+      position: Animated.Node<number>;
+      // Function to actually render the content of the pager
+      // The parent component takes care of rendering
+      render: (children: React.ReactNode) => React.ReactNode;
+      // Callback to call when switching the tab
+      // The tab switch animation is performed even if the index in state is unchanged
+      jumpTo: (key: string) => void;
+    }
+  ) => React.ReactNode;
+  gestureHandlerProps: React.ComponentProps<typeof PanGestureHandler>;
+};
 
 type Props<T extends Route> = PagerCommonProps & {
   position?: Animated.Value<number>;
@@ -42,6 +66,7 @@ type Props<T extends Route> = PagerCommonProps & {
   sceneContainerStyle?: StyleProp<ViewStyle>;
   style?: StyleProp<ViewStyle>;
   gestureHandlerProps: React.ComponentProps<typeof PanGestureHandler>;
+  backend: React.ComponentType<ChildProps<T>>;
 };
 
 type State = {
@@ -66,6 +91,7 @@ export default class TabView<T extends Route> extends React.Component<
     springConfig: {},
     timingConfig: {},
     gestureHandlerProps: {},
+    backend: ViewPagerBackend,
   };
 
   state = {
@@ -118,12 +144,13 @@ export default class TabView<T extends Route> extends React.Component<
       style,
       gestureHandlerProps,
       springVelocityScale,
+      backend: Backend,
     } = this.props;
     const { layout } = this.state;
 
     return (
       <View onLayout={this.handleLayout} style={[styles.pager, style]}>
-        <Pager
+        <Backend
           navigationState={navigationState}
           layout={layout}
           keyboardDismissMode={keyboardDismissMode}
@@ -193,7 +220,7 @@ export default class TabView<T extends Route> extends React.Component<
               </React.Fragment>
             );
           }}
-        </Pager>
+        </Backend>
       </View>
     );
   }
