@@ -4,9 +4,7 @@ import { View, Text } from 'react-native';
 export default function MyPager() {
   return (
     <View>
-      <Text>
-        It is not in Expo... yet!
-      </Text>
+      <Text>It is not in Expo... yet!</Text>
     </View>
   );
 }

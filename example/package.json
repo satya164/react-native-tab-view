@@ -20,7 +20,8 @@
     "react-native-reanimated": "~1.2.0",
     "react-native-screens": "1.0.0-alpha.23",
     "react-native-unimodules": "~0.5.4",
-    "react-native-web": "^0.11.7"
+    "react-native-web": "^0.11.7",
+    "@react-native-community/viewpager": "^2.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",

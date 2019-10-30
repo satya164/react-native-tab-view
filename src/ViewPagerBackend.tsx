@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Keyboard } from 'react-native';
+import { Keyboard, ScrollView as ReactNativeScrollView, ScrollViewProps, ViewStyle } from 'react-native';
 import ViewPager from '@react-native-community/viewpager';
-import Animated from 'react-native-reanimated';
+import Animated, { AnimateProps } from 'react-native-reanimated';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 
 import {
@@ -12,6 +12,9 @@ import {
   PagerCommonProps,
   EventEmitterProps,
 } from './types';
+import { Component } from 'react';
+
+const AnimatedViewPager = Animated.createAnimatedComponent(ViewPager);
 
 type Props<T extends Route> = PagerCommonProps & {
   onIndexChange: (index: number) => void;
@@ -36,7 +39,7 @@ type Props<T extends Route> = PagerCommonProps & {
   gestureHandlerProps: React.ComponentProps<typeof PanGestureHandler>;
 };
 
-const { Value, cond, divide, multiply } = Animated;
+const { Value, cond, divide, multiply, event, add } = Animated;
 
 const UNSET = -1;
 
@@ -64,38 +67,30 @@ export default class ViewPagerBackend<T extends Route> extends React.Component<
     this.props.navigationState.index * this.props.layout.width * DIRECTION_RIGHT
   );
 
-  // The position value represent the position of the pager on a scale of 0 - routes.length-1
-  // It is calculated based on the translate value and layout width
-  // If we don't have the layout yet, we should return the current index
-  private position = cond(
-    this.layoutWidth,
-    divide(multiply(this.progress, -1), this.layoutWidth),
-    this.index
-  );
-
   // Listeners for the entered screen
   private enterListeners: Listener[] = [];
 
   private jumpToIndex = (index: number) => {
     // If the index changed, we need to trigger a tab switch
     // this.isSwipeGesture.setValue(FALSE);
-    this.nextIndex.setValue(index);
+    console.warn(index)
+    this.ref.current.getNode().setPage(index);
   };
 
   private jumpTo = (key: string) => {
     const { navigationState, keyboardDismissMode, onIndexChange } = this.props;
-
+    console.warn(key)
     const index = navigationState.routes.findIndex(
       (route: { key: string }) => route.key === key
     );
+    console.warn()
 
     // A tab switch might occur when we're in the middle of a transition
     // In that case, the index might be same as before
     // So we conditionally make the pager to update the position
-    if (navigationState.index === index) {
-      this.jumpToIndex(index);
-    } else {
+    if (navigationState.index !== index) {
       onIndexChange(index);
+      this.jumpToIndex(index);
 
       // When the index changes, the focused input will no longer be in current tab
       // So we should dismiss the keyboard
@@ -127,13 +122,17 @@ export default class ViewPagerBackend<T extends Route> extends React.Component<
     }
   };
 
-  updatePosition = () => {
-    this.position = cond(
-      this.layoutWidth,
-      divide(multiply(this.progress, -1), this.layoutWidth),
-      this.index
-    );
-  };
+  private currentIndex = new Animated.Value(this.props.navigationState.index);
+  private offset = new Animated.Value(0);
+
+  private onPageScroll = event([
+    {
+      nativeEvent: {
+        position: this.currentIndex,
+        offset: this.offset,
+      },
+    },
+  ]);
 
   onPageScrollStateChanged = (state: 'Idle' | 'Dragging' | 'Settling') => {
     switch (state) {
@@ -146,6 +145,8 @@ export default class ViewPagerBackend<T extends Route> extends React.Component<
     }
   };
 
+  ref = React.createRef<any>()
+
   render() {
     const {
       keyboardDismissMode,
@@ -156,18 +157,21 @@ export default class ViewPagerBackend<T extends Route> extends React.Component<
     } = this.props;
 
     return children({
-      position: this.position,
+      position: add(this.currentIndex, this.offset),
       addListener: this.addListener,
       removeListener: this.removeListener,
       jumpTo: this.jumpTo,
       render: children => (
-        <ViewPager
-          initialPage={0}
+        <AnimatedViewPager
+          ref={this.ref}
+          lazy={false}
+          style={{ flex: 1 }}
+          initialPage={this.props.navigationState.index}
           keyboardDismissMode={
             // ViewPager does not accept auto mode
             keyboardDismissMode === 'auto' ? 'on-drag' : keyboardDismissMode
           }
-          onPageScroll={this.updatePosition}
+          onPageScroll={this.onPageScroll}
           onPageSelected={e => onIndexChange(e.nativeEvent.position)}
           onPageScrollStateChanged={this.onPageScrollStateChanged}
           scrollEnabled={swipeEnabled}
@@ -175,7 +179,7 @@ export default class ViewPagerBackend<T extends Route> extends React.Component<
           // transitionStyle="scroll"
         >
           {children}
-        </ViewPager>
+        </AnimatedViewPager>
       ),
     });
   }

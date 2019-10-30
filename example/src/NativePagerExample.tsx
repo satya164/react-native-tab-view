@@ -1,11 +1,17 @@
 import React from 'react';
-import { Stylesheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
+import ViewPager from '@react-native-community/viewpager';
 
 export default function MyPager() {
   return (
-    <View style={styles.viewPager} key="1">
-      <Text>Second page</Text>
-    </View>
+    <ViewPager style={styles.viewPager} initialPage={0}>
+      <View key="1">
+        <Text>First page</Text>
+      </View>
+      <View key="2">
+        <Text>Second page</Text>
+      </View>
+    </ViewPager>
   );
 }
 

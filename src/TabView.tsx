@@ -19,6 +19,7 @@ import {
   EventEmitterProps,
   PagerCommonProps,
 } from './types';
+import Pager from './Pager';
 
 type ChildProps<T extends Route> = PagerCommonProps & {
   onIndexChange: (index: number) => void;
