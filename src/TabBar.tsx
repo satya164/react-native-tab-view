@@ -264,10 +264,6 @@ export default class TabBar<T extends Route> extends React.Component<
   private handleLayout = (e: LayoutChangeEvent) => {
     const { height, width } = e.nativeEvent.layout;
 
-    if (this.layout.width === width && this.layout.height === height) {
-      return;
-    }
-
     // Decided not to place layout in state because
     // onLayout is often called before applying changes
     // (according to https://facebook.github.io/react-native/docs/view.html#onlayout)
