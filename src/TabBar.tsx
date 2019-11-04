@@ -322,7 +322,6 @@ export default class TabBar<T extends Route> extends React.Component<
     const isWidthDynamic = this.getFlattenedTabWidth(tabStyle) === 'auto';
     const tabBarWidth = this.getTabBarWidth(this.props, this.state);
     const tabBarWidthPercent = `${routes.length * 40}%`;
-    console.log(layout.width, 'rendering with');
     const translateX = this.getTranslateX(
       this.scrollAmount,
       this.getMaxScrollDistance(tabBarWidth, layout.width)
