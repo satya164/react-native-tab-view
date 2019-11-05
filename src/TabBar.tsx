@@ -273,8 +273,11 @@ export default class TabBar<T extends Route> extends React.Component<
     // Furthermore, component gets updated anyway after changing orientation
     // so having it stored as a class member is good enough and new values will
     // be consider in a new render.
+    // Anyway, we call forceUpdate because handleLayout can
+    // be invoked not only as a result of orientation's change.
     this.layout.height = height;
     this.layout.width = width;
+    this.forceUpdate();
   };
 
   private getTranslateX = memoize(
