@@ -9,7 +9,6 @@ import {
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import TabBar, { Props as TabBarProps } from './TabBar';
-import ViewPagerBackend from './ViewPagerBackend';
 import SceneView from './SceneView';
 import {
   Layout,
@@ -77,7 +76,7 @@ type State = {
 export default class TabView<T extends Route> extends React.Component<
   Props<T>,
   State
-> {
+  > {
   static defaultProps = {
     tabBarPosition: 'top',
     renderTabBar: <P extends Route>(props: TabBarProps<P>) => (
@@ -92,7 +91,7 @@ export default class TabView<T extends Route> extends React.Component<
     springConfig: {},
     timingConfig: {},
     gestureHandlerProps: {},
-    backend: ViewPagerBackend,
+    backend: Pager,
   };
 
   state = {
@@ -205,9 +204,9 @@ export default class TabView<T extends Route> extends React.Component<
                           loading
                             ? renderLazyPlaceholder({ route })
                             : renderScene({
-                                ...sceneRendererProps,
-                                route,
-                              })
+                              ...sceneRendererProps,
+                              route,
+                            })
                         }
                       </SceneView>
                     );

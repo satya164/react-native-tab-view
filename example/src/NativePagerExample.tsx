@@ -1,17 +1,54 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
-import ViewPager from '@react-native-community/viewpager';
-
+import {
+  TabView,
+  TabBar,
+  SceneMap,
+  NavigationState,
+  SceneRendererProps,
+  ViewPagerBackend
+} from 'react-native-tab-view';
+import Albums from './Shared/Albums';
+import Article from './Shared/Article';
+import Contacts from './Shared/Contacts';
 export default function MyPager() {
+  const [navigation, setNavigation] = useState({
+    index: 0,
+    routes: [
+      {
+        key: 'article',
+        icon: 'ios-paper',
+        color: [244, 67, 54],
+      },
+      {
+        key: 'contacts',
+        icon: 'ios-people',
+        color: [0, 132, 255],
+      },
+      {
+        key: 'albums',
+        icon: 'ios-albums',
+        color: [76, 175, 80],
+      },
+    ],
+  })
+
+  const renderScene = SceneMap({
+    article: Article,
+    contacts: Contacts,
+    albums: Albums,
+  });
+
   return (
-    <ViewPager style={styles.viewPager} initialPage={0}>
-      <View key="1">
-        <Text>First page</Text>
-      </View>
-      <View key="2">
-        <Text>Second page</Text>
-      </View>
-    </ViewPager>
+    <TabView
+      navigationState={navigation}
+      renderScene={renderScene}
+      renderTabBar={() => { return null }}
+      onIndexChange={index => {
+        setNavigation({ ...navigation, index: index })
+      }}
+      backend={ViewPagerBackend}
+    />
   );
 }
 
