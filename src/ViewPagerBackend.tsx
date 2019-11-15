@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Keyboard, ScrollView as ReactNativeScrollView, ScrollViewProps, ViewStyle } from 'react-native';
+import { Keyboard } from 'react-native';
 import ViewPager from '@react-native-community/viewpager';
-import Animated, { AnimateProps } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 
 import {
@@ -12,7 +12,6 @@ import {
   PagerCommonProps,
   EventEmitterProps,
 } from './types';
-import { Component } from 'react';
 
 const AnimatedViewPager = Animated.createAnimatedComponent(ViewPager);
 
@@ -37,13 +36,20 @@ type Props<T extends Route> = PagerCommonProps & {
     }
   ) => React.ReactNode;
   gestureHandlerProps: React.ComponentProps<typeof PanGestureHandler>;
+  extraBackendProps?: {
+    orientation?: 'vertical' | 'horizontal';
+    transitionStyle?: 'scroll' | 'curl';
+  };
+  // orientation: 'vertical' | 'horizontal';
+  // transitionStyle: 'scroll' | 'curl';
 };
 
-const { Value, cond, divide, multiply, event, add } = Animated;
-
-const UNSET = -1;
-
-const DIRECTION_RIGHT = -1;
+const { event, add } = Animated;
+// Value, cond, divide, multiply,
+//
+// const UNSET = -1;
+//
+// const DIRECTION_RIGHT = -1;
 
 export default class ViewPagerBackend<T extends Route> extends React.Component<
   Props<T>
@@ -53,37 +59,19 @@ export default class ViewPagerBackend<T extends Route> extends React.Component<
     swipeEnabled: true,
   };
 
-  // Initial index of the tabs
-  private index = new Value(this.props.navigationState.index);
-
-  // Next index of the tabs, updated for navigation from outside (tab press, state update)
-  private nextIndex: Animated.Value<number> = new Value(UNSET);
-
-  private layoutWidth = new Value(this.props.layout.width);
-
-  // Current progress of the page (translateX value)
-  private progress = new Value(
-    // Initial value is based on the index and page width
-    this.props.navigationState.index * this.props.layout.width * DIRECTION_RIGHT
-  );
-
-  // Listeners for the entered screen
   private enterListeners: Listener[] = [];
 
   private jumpToIndex = (index: number) => {
     // If the index changed, we need to trigger a tab switch
     // this.isSwipeGesture.setValue(FALSE);
-    console.warn(index)
     this.ref.current.getNode().setPage(index);
   };
 
   private jumpTo = (key: string) => {
     const { navigationState, keyboardDismissMode, onIndexChange } = this.props;
-    console.warn(key)
     const index = navigationState.routes.findIndex(
       (route: { key: string }) => route.key === key
     );
-    console.warn()
 
     // A tab switch might occur when we're in the middle of a transition
     // In that case, the index might be same as before
@@ -145,7 +133,7 @@ export default class ViewPagerBackend<T extends Route> extends React.Component<
     }
   };
 
-  ref = React.createRef<any>()
+  ref = React.createRef<any>();
 
   render() {
     const {
@@ -153,7 +141,7 @@ export default class ViewPagerBackend<T extends Route> extends React.Component<
       swipeEnabled,
       onIndexChange,
       children,
-      // layout,
+      extraBackendProps = {},
     } = this.props;
 
     return children({
@@ -172,11 +160,13 @@ export default class ViewPagerBackend<T extends Route> extends React.Component<
             keyboardDismissMode === 'auto' ? 'on-drag' : keyboardDismissMode
           }
           onPageScroll={this.onPageScroll}
-          onPageSelected={e => onIndexChange(e.nativeEvent.position)}
+          onPageSelected={(e: { nativeEvent: { position: number } }) =>
+            onIndexChange(e.nativeEvent.position)
+          }
           onPageScrollStateChanged={this.onPageScrollStateChanged}
           scrollEnabled={swipeEnabled}
-          // orientation={layout.width > layout.height ? 'horizontal' : 'vertical'}
-          // transitionStyle="scroll"
+          orientation={extraBackendProps.orientation}
+          transitionStyle={extraBackendProps.transitionStyle}
         >
           {children}
         </AnimatedViewPager>

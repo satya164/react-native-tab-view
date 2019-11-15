@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
-import {
-  TabView,
-  TabBar,
-  SceneMap,
-  NavigationState,
-  SceneRendererProps,
-  ViewPagerBackend
-} from 'react-native-tab-view';
+import { TabView, SceneMap, ViewPagerBackend } from 'react-native-tab-view';
 import Albums from './Shared/Albums';
 import Article from './Shared/Article';
 import Contacts from './Shared/Contacts';
@@ -31,7 +23,7 @@ export default function MyPager() {
         color: [76, 175, 80],
       },
     ],
-  })
+  });
 
   const renderScene = SceneMap({
     article: Article,
@@ -43,9 +35,12 @@ export default function MyPager() {
     <TabView
       navigationState={navigation}
       renderScene={renderScene}
-      renderTabBar={() => { return null }}
+      renderTabBar={() => null}
       onIndexChange={index => {
-        setNavigation({ ...navigation, index: index })
+        setNavigation({ ...navigation, index: index });
+      }}
+      extraBackendProps={{
+        transitionStyle: 'curl',
       }}
       backend={ViewPagerBackend}
     />
@@ -54,9 +49,3 @@ export default function MyPager() {
 
 MyPager.title = 'Native Pager';
 MyPager.backgroundColor = '#263238';
-
-const styles = StyleSheet.create({
-  viewPager: {
-    flex: 1,
-  },
-});

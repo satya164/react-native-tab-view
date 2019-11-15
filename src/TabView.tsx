@@ -20,7 +20,7 @@ import {
 } from './types';
 import Pager from './Pager';
 
-type ChildProps<T extends Route> = PagerCommonProps & {
+type ChildProps<T extends Route, ExtraBackendProps> = PagerCommonProps & {
   onIndexChange: (index: number) => void;
   navigationState: NavigationState<T>;
   layout: Layout;
@@ -41,9 +41,10 @@ type ChildProps<T extends Route> = PagerCommonProps & {
     }
   ) => React.ReactNode;
   gestureHandlerProps: React.ComponentProps<typeof PanGestureHandler>;
+  extraBackendProps?: ExtraBackendProps;
 };
 
-type Props<T extends Route> = PagerCommonProps & {
+type Props<T extends Route, ExtraBackendProps extends {}> = PagerCommonProps & {
   position?: Animated.Value<number>;
   onIndexChange: (index: number) => void;
   navigationState: NavigationState<T>;
@@ -66,17 +67,18 @@ type Props<T extends Route> = PagerCommonProps & {
   sceneContainerStyle?: StyleProp<ViewStyle>;
   style?: StyleProp<ViewStyle>;
   gestureHandlerProps: React.ComponentProps<typeof PanGestureHandler>;
-  backend: React.ComponentType<ChildProps<T>>;
+  backend: React.ComponentType<ChildProps<T, ExtraBackendProps>>;
+  extraBackendProps?: ExtraBackendProps;
 };
 
 type State = {
   layout: Layout;
 };
 
-export default class TabView<T extends Route> extends React.Component<
-  Props<T>,
-  State
-  > {
+export default class TabView<
+  T extends Route,
+  ExtraBackendProps
+> extends React.Component<Props<T, ExtraBackendProps>, State> {
   static defaultProps = {
     tabBarPosition: 'top',
     renderTabBar: <P extends Route>(props: TabBarProps<P>) => (
@@ -145,6 +147,7 @@ export default class TabView<T extends Route> extends React.Component<
       gestureHandlerProps,
       springVelocityScale,
       backend: Backend,
+      extraBackendProps,
     } = this.props;
     const { layout } = this.state;
 
@@ -164,6 +167,7 @@ export default class TabView<T extends Route> extends React.Component<
           springVelocityScale={springVelocityScale}
           removeClippedSubviews={removeClippedSubviews}
           gestureHandlerProps={gestureHandlerProps}
+          extraBackendProps={extraBackendProps}
         >
           {({ position, render, addListener, removeListener, jumpTo }) => {
             // All of the props here must not change between re-renders
@@ -204,9 +208,9 @@ export default class TabView<T extends Route> extends React.Component<
                           loading
                             ? renderLazyPlaceholder({ route })
                             : renderScene({
-                              ...sceneRendererProps,
-                              route,
-                            })
+                                ...sceneRendererProps,
+                                route,
+                              })
                         }
                       </SceneView>
                     );
