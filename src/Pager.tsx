@@ -17,7 +17,7 @@ type Binary = 0 | 1;
 
 export type Props<
   T extends Route,
-  ExtraBackendProps = undefined
+  ExtraBackendProps = typeof undefined
 > = PagerCommonProps & {
   onIndexChange: (index: number) => void;
   navigationState: NavigationState<T>;
