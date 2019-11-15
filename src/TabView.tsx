@@ -15,37 +15,9 @@ import {
   NavigationState,
   Route,
   SceneRendererProps,
-  EventEmitterProps,
   PagerCommonProps,
 } from './types';
 import Pager, { Props as ChildProps } from './Pager';
-
-export type ChildProps<
-  T extends Route,
-  ExtraBackendProps
-> = PagerCommonProps & {
-  onIndexChange: (index: number) => void;
-  navigationState: NavigationState<T>;
-  layout: Layout;
-  // Clip unfocused views to improve memory usage
-  // Don't enable this on iOS where this is buggy and views don't re-appear
-  removeClippedSubviews?: boolean;
-  children: (
-    props: EventEmitterProps & {
-      // Animated value which represents the state of current index
-      // It can include fractional digits as it represents the intermediate value
-      position: Animated.Node<number>;
-      // Function to actually render the content of the pager
-      // The parent component takes care of rendering
-      render: (children: React.ReactNode) => React.ReactNode;
-      // Callback to call when switching the tab
-      // The tab switch animation is performed even if the index in state is unchanged
-      jumpTo: (key: string) => void;
-    }
-  ) => React.ReactNode;
-  gestureHandlerProps: React.ComponentProps<typeof PanGestureHandler>;
-  extraBackendProps?: ExtraBackendProps;
-};
 
 type Props<T extends Route, ExtraBackendProps extends {}> = PagerCommonProps & {
   position?: Animated.Value<number>;
