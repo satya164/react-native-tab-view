@@ -11,7 +11,7 @@ import {
   Listener,
   PagerCommonProps,
   EventEmitterProps,
-} from './types';
+} from '../src/types';
 
 const AnimatedViewPager = Animated.createAnimatedComponent(ViewPager);
 

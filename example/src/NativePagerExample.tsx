@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { TabView, SceneMap, ViewPagerBackend } from 'react-native-tab-view';
+import { TabView, SceneMap } from 'react-native-tab-view';
+import ViewPagerBackend from 'react-native-tab-view-viewpager-backend';
 import Albums from './Shared/Albums';
 import Article from './Shared/Article';
 import Contacts from './Shared/Contacts';

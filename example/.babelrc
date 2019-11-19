@@ -5,7 +5,8 @@
   "plugins": [
     ["module-resolver", {
       "alias": {
-        "react-native-tab-view": "../src/index"
+        "react-native-tab-view": "../src/index",
+        "react-native-tab-view-viewpager-backend": "../react-native-tab-view-viewpager-backend/ViewPagerBackend"
       }
     }]
   ]

@@ -2,7 +2,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "react-native-tab-view": ["./src/index"]
+      "react-native-tab-view": ["./src/index"],
+      "react-native-tab-view-viewpager-backend": ["./react-native-tab-view-viewpager-backend/ViewPagerBackend"]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,

@@ -4,6 +4,7 @@
   "settings": {
     "import/core-modules": [
       "react-native-tab-view",
+      "react-native-tab-view-viewpager-backend",
       "react-native-gesture-handler",
       "react-native-reanimated"
     ]
