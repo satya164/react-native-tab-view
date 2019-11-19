@@ -36,20 +36,11 @@ type Props<T extends Route> = PagerCommonProps & {
     }
   ) => React.ReactNode;
   gestureHandlerProps: React.ComponentProps<typeof PanGestureHandler>;
-  extraBackendProps?: {
-    orientation?: 'vertical' | 'horizontal';
-    transitionStyle?: 'scroll' | 'curl';
-  };
-  // orientation: 'vertical' | 'horizontal';
-  // transitionStyle: 'scroll' | 'curl';
+  orientation?: 'vertical' | 'horizontal';
+  transitionStyle?: 'scroll' | 'curl';
 };
 
 const { event, add } = Animated;
-// Value, cond, divide, multiply,
-//
-// const UNSET = -1;
-//
-// const DIRECTION_RIGHT = -1;
 
 export default class ViewPagerBackend<T extends Route> extends React.Component<
   Props<T>
@@ -141,7 +132,8 @@ export default class ViewPagerBackend<T extends Route> extends React.Component<
       swipeEnabled,
       onIndexChange,
       children,
-      extraBackendProps = {},
+      orientation,
+      transitionStyle,
     } = this.props;
 
     return children({
@@ -165,8 +157,8 @@ export default class ViewPagerBackend<T extends Route> extends React.Component<
           }
           onPageScrollStateChanged={this.onPageScrollStateChanged}
           scrollEnabled={swipeEnabled}
-          orientation={extraBackendProps.orientation}
-          transitionStyle={extraBackendProps.transitionStyle}
+          orientation={orientation}
+          transitionStyle={transitionStyle}
         >
           {children}
         </AnimatedViewPager>

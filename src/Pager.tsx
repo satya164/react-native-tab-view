@@ -15,10 +15,7 @@ import {
 
 type Binary = 0 | 1;
 
-export type Props<
-  T extends Route,
-  ExtraBackendProps = undefined
-> = PagerCommonProps & {
+export type Props<T extends Route> = PagerCommonProps & {
   onIndexChange: (index: number) => void;
   navigationState: NavigationState<T>;
   layout: Layout;
@@ -39,7 +36,6 @@ export type Props<
     }
   ) => React.ReactNode;
   gestureHandlerProps: React.ComponentProps<typeof PanGestureHandler>;
-  extraBackendProps?: ExtraBackendProps;
 };
 
 const {

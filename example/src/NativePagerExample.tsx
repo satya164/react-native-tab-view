@@ -39,10 +39,9 @@ export default function MyPager() {
       onIndexChange={index => {
         setNavigation({ ...navigation, index: index });
       }}
-      extraBackendProps={{
-        transitionStyle: 'curl',
-      }}
-      backend={ViewPagerBackend}
+      renderPager={props => (
+        <ViewPagerBackend {...props} transitionStyle="curl" />
+      )}
     />
   );
 }
