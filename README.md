@@ -281,6 +281,11 @@ If this is not specified, the default tab bar is rendered. You pass this props t
 renderTabBar = () => null;
 ```
 
+##### `renderPager`
+
+Callback which returns a custom React Element to use as pager:
+
+
 ##### `tabBarPosition`
 
 Position of the tab bar in the tab view. Possible values are `'top'` and `'bottom'`. Defaults to `'top'`.
@@ -358,7 +363,7 @@ Number for determining how meaningful is gesture velocity for calculating initia
 Object containing the initial height and width of the screens. Passing this will improve the initial rendering performance. For most apps, this is a good default:
 
 ```js
-{ width: Dimensions.get('window').width }}
+{ width: Dimensions.get('window').width }
 ```
 
 ##### `position`
