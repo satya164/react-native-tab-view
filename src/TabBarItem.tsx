@@ -7,10 +7,12 @@ import {
   TextStyle,
   ViewStyle,
 } from 'react-native';
-import TouchableItem from './TouchableItem';
+import TouchableItem, { Props as TouchableItemProps } from './TouchableItem';
 import { Scene, Route, NavigationState } from './types';
 import Animated from 'react-native-reanimated';
 import memoize from './memoize';
+
+export type TouchableItemProps = TouchableItemProps;
 
 type Props<T extends Route> = {
   position: Animated.Node<number>;
@@ -35,6 +37,7 @@ type Props<T extends Route> = {
     color: string;
   }) => React.ReactNode;
   renderBadge?: (scene: Scene<T>) => React.ReactNode;
+  renderTouchable?: (props: TouchableItemProps) => React.ReactNode;
   onLayout?: (event: LayoutChangeEvent) => void;
   onPress: () => void;
   onLongPress: () => void;
@@ -84,6 +87,7 @@ export default class TabBarItem<T extends Route> extends React.Component<
       renderLabel: renderLabelPassed,
       renderIcon,
       renderBadge,
+      renderTouchable,
       getLabelText,
       getTestID,
       getAccessibilityLabel,
@@ -209,30 +213,36 @@ export default class TabBarItem<T extends Route> extends React.Component<
 
     const badge = renderBadge ? renderBadge(scene) : null;
 
-    return (
-      <TouchableItem
-        borderless
-        testID={getTestID(scene)}
-        accessible={getAccessible(scene)}
-        accessibilityLabel={accessibilityLabel}
-        accessibilityTraits={isFocused ? ['button', 'selected'] : 'button'}
-        accessibilityComponentType="button"
-        accessibilityRole="button"
-        accessibilityStates={isFocused ? ['selected'] : []}
-        pressColor={pressColor}
-        pressOpacity={pressOpacity}
-        delayPressIn={0}
-        onLayout={onLayout}
-        onPress={onPress}
-        onLongPress={onLongPress}
-        style={tabContainerStyle}
-      >
-        <View pointerEvents="none" style={[styles.item, tabStyle]}>
-          {icon}
-          {label}
-          {badge != null ? <View style={styles.badge}>{badge}</View> : null}
-        </View>
-      </TouchableItem>
+    const touchableChildren = (
+      <View pointerEvents="none" style={[styles.item, tabStyle]}>
+        {icon}
+        {label}
+        {badge != null ? <View style={styles.badge}>{badge}</View> : null}
+      </View>
+    );
+
+    const touchableProps: TouchableItemProps = {
+      borderless: true,
+      testID: getTestID(scene),
+      accessible: getAccessible(scene),
+      accessibilityLabel,
+      accessibilityTraits: isFocused ? ['button', 'selected'] : 'button',
+      accessibilityComponentType: 'button',
+      accessibilityRole: 'button',
+      accessibilityStates: isFocused ? ['selected'] : [],
+      pressColor,
+      pressOpacity,
+      delayPressIn: 0,
+      onLayout,
+      onPress,
+      onLongPress: onLongPress,
+      style: tabContainerStyle,
+    };
+
+    return renderTouchable != null ? (
+      renderTouchable({ ...touchableProps, children: touchableChildren })
+    ) : (
+      <TouchableItem {...touchableProps}>{touchableChildren}</TouchableItem>
     );
   }
 }

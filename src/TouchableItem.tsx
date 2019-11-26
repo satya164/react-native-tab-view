@@ -9,12 +9,12 @@ import {
   ViewProps,
 } from 'react-native';
 
-type Props = ViewProps & {
+export type Props = ViewProps & {
   onPress: () => void;
   onLongPress?: () => void;
   delayPressIn?: number;
   borderless?: boolean;
-  pressColor: string;
+  pressColor?: string;
   pressOpacity?: number;
   children?: React.ReactNode;
   style?: StyleProp<ViewStyle>;
@@ -41,7 +41,10 @@ export default class TouchableItem extends React.Component<Props> {
       return (
         <TouchableNativeFeedback
           {...rest}
-          background={TouchableNativeFeedback.Ripple(pressColor, borderless)}
+          background={TouchableNativeFeedback.Ripple(
+            pressColor as string,
+            borderless
+          )}
         >
           <View style={style}>{React.Children.only(children)}</View>
         </TouchableNativeFeedback>

@@ -11,7 +11,7 @@ import {
   Platform,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
-import TabBarItem from './TabBarItem';
+import TabBarItem, { TouchableItemProps } from './TabBarItem';
 import TabBarIndicator, { Props as IndicatorProps } from './TabBarIndicator';
 import memoize from './memoize';
 import {
@@ -49,6 +49,7 @@ export type Props<T extends Route> = SceneRendererProps & {
   ) => React.ReactNode;
   renderBadge?: (scene: Scene<T>) => React.ReactNode;
   renderIndicator: (props: IndicatorProps<T>) => React.ReactNode;
+  renderTouchable?: (props: TouchableItemProps) => React.ReactNode;
   onTabPress?: (scene: Scene<T> & Event) => void;
   onTabLongPress?: (scene: Scene<T>) => void;
   tabStyle?: StyleProp<ViewStyle>;
@@ -310,6 +311,7 @@ export default class TabBar<T extends Route> extends React.Component<
       renderBadge,
       renderIcon,
       renderLabel,
+      renderTouchable,
       activeColor,
       inactiveColor,
       pressColor,
@@ -433,6 +435,7 @@ export default class TabBar<T extends Route> extends React.Component<
                 renderBadge={renderBadge}
                 renderIcon={renderIcon}
                 renderLabel={renderLabel}
+                renderTouchable={renderTouchable}
                 activeColor={activeColor}
                 inactiveColor={inactiveColor}
                 pressColor={pressColor}
