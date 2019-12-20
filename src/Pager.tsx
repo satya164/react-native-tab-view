@@ -36,6 +36,7 @@ export type Props<T extends Route> = PagerCommonProps & {
     }
   ) => React.ReactNode;
   gestureHandlerProps: React.ComponentProps<typeof PanGestureHandler>;
+  enabledIOSScrollViewPager: boolean;
 };
 
 const {
