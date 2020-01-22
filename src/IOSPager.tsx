@@ -29,18 +29,18 @@ export default class IOSPager<T extends Route> extends React.Component<
   }
 
   componentDidUpdate(prevProps: Props<T>) {
-    const amount = this.props.navigationState.index * this.props.layout.width;
+    const offset = this.props.navigationState.index * this.props.layout.width;
 
     if (
       prevProps.navigationState.routes.length !==
         this.props.navigationState.routes.length ||
       prevProps.layout.width !== this.props.layout.width
     ) {
-      this.scrollTo(amount, false);
+      this.scrollTo(offset, false);
     } else if (
       prevProps.navigationState.index !== this.props.navigationState.index
     ) {
-      this.scrollTo(amount);
+      this.scrollTo(offset);
     }
   }
 
