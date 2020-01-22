@@ -128,6 +128,7 @@ export default class TabView<T extends Route> extends React.Component<
     } = this.props;
     const { layout } = this.state;
 
+
     return (
       <View onLayout={this.handleLayout} style={[styles.pager, style]}>
         {renderPager({

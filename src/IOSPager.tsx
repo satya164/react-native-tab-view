@@ -1,55 +1,14 @@
 import * as React from 'react';
-import { View, ScrollView, StyleSheet, Animated } from 'react-native';
+import { StyleSheet, Keyboard, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 
-import { Route, PagerCommonProps } from './types';
+import { Route, PagerCommonProps, EventEmitterProps, Listener } from './types';
+import { Props } from '../lib/typescript/src/Pager';
 
-type ScrollEvent = {
-  nativeEvent: {
-    contentOffset: {
-      x: number;
-      y: number;
-    };
-    contentSize: {
-      height: number;
-      width: number;
-    };
-  };
-};
+const { ScrollView, event, divide } = Animated;
 
 type State = {
   initialOffset: { x: number; y: number };
-};
-
-type Scene<T> = {
-  route: T;
-};
-
-type Layout = {
-  height: number;
-  width: number;
-};
-
-type NavigationState<T> = {
-  index: number;
-  routes: Array<T>;
-};
-
-type Props<T extends Route> = PagerCommonProps & {
-  animationEnabled?: boolean;
-  swipeEnabled?: boolean;
-  onSwipeStart?: () => void;
-  onSwipeEnd?: () => void;
-  onAnimationEnd?: () => void;
-  canJumpToTab: (scene: Scene<T>) => boolean;
-  bounces: boolean;
-  layout: Layout;
-  navigationState: NavigationState<T>;
-  panX: Animated.Value;
-  offsetX: Animated.Value;
-  useNativeDriver?: boolean;
-  onIndexChange: (index: number) => void;
-  children: JSX.Element[];
-  horizontal: boolean;
 };
 
 export default class IOSPager<T extends Route> extends React.Component<
@@ -57,26 +16,21 @@ export default class IOSPager<T extends Route> extends React.Component<
   State
 > {
   static defaultProps = {
-    canJumpToTab: () => true,
     bounces: true,
   };
 
-  constructor(props: Props<T>) {
-    super(props);
-
-    const { navigationState, layout } = this.props;
-
-    this.state = {
-      initialOffset: {
-        x: navigationState.index * layout.width,
-        y: 0,
-      },
-    };
-  }
+  private initialOffset = {
+    x: this.props.navigationState.index * this.props.layout.width,
+    y: 0,
+  };
 
   componentDidMount() {
-    this._mounted = true;
-    this.setInitialPage();
+    if (this.props.layout.width) {
+      this.scrollTo(
+        this.props.navigationState.index * this.props.layout.width,
+        false
+      );
+    }
   }
 
   componentDidUpdate(prevProps: Props<T>) {
@@ -95,151 +49,119 @@ export default class IOSPager<T extends Route> extends React.Component<
     }
   }
 
-  _scrollView: ScrollView;
-  _idleCallback: any;
-  _isIdle: boolean = true;
-  _isInitial: boolean = true;
-  _mounted: boolean = false;
+  private scrollViewRef: React.RefObject<
+    Animated.ScrollView
+  > = React.createRef();
 
   private jumpTo = (key: string) => {
-    if (!this._mounted) {
-      // We are no longer mounted, this is a no-op
-      return;
-    }
+    const { navigationState, keyboardDismissMode, onIndexChange } = this.props;
 
-    const { canJumpToTab, navigationState } = this.props;
     const index = navigationState.routes.findIndex(route => route.key === key);
 
-    if (!canJumpToTab) {
-      return;
+    if (navigationState.index === index) {
+      this.scrollTo(index * this.props.layout.width);
+    } else {
+      onIndexChange(index);
+      if (keyboardDismissMode === 'auto') {
+        Keyboard.dismiss();
+      }
     }
-
-    if (index !== navigationState.index) {
-      this.props.onIndexChange(index);
-    }
-  };
-
-  private setInitialPage = () => {
-    if (this.props.layout.width) {
-      this._isInitial = true;
-      this.scrollTo(
-        this.props.navigationState.index * this.props.layout.width,
-        false
-      );
-    }
-
-    setTimeout(() => {
-      this._isInitial = false;
-    }, 50);
   };
 
   private scrollTo = (x: number, animated = true) => {
-    if (this._isIdle && this._scrollView) {
-      this._scrollView.scrollTo({
+    if (this.scrollViewRef.current) {
+      this.scrollViewRef.current.getNode().scrollTo({
         x,
-        animated: animated && this.props.animationEnabled !== false,
+        animated: animated,
       });
     }
   };
 
-  private handleMomentumScrollEnd = (e: ScrollEvent) => {
-    let nextIndex = Math.round(
-      e.nativeEvent.contentOffset.x / this.props.layout.width
-    );
+  private enterListeners: Listener[] = [];
 
-    const nextRoute = this.props.navigationState.routes[nextIndex];
-
-    if (this.props.canJumpToTab({ route: nextRoute })) {
-      this.jumpTo(nextRoute.key);
-      this.props.onAnimationEnd && this.props.onAnimationEnd();
-    } else {
-      requestAnimationFrame(() => {
-        this.scrollTo(
-          this.props.navigationState.index * this.props.layout.width
-        );
-      });
+  private addListener = (type: 'enter', listener: Listener) => {
+    switch (type) {
+      case 'enter':
+        this.enterListeners.push(listener);
+        break;
     }
   };
 
-  private handleScroll = (e: ScrollEvent) => {
-    if (this._isInitial || e.nativeEvent.contentSize.width === 0) {
-      return;
+  private removeListener = (type: 'enter', listener: Listener) => {
+    switch (type) {
+      case 'enter': {
+        const index = this.enterListeners.indexOf(listener);
+
+        if (index > -1) {
+          this.enterListeners.splice(index, 1);
+        }
+
+        break;
+      }
     }
-
-    const { navigationState, layout } = this.props;
-    const offset = navigationState.index * layout.width;
-
-    this.props.offsetX.setValue(-offset);
-    this.props.panX.setValue(offset - e.nativeEvent.contentOffset.x);
-
-    cancelAnimationFrame(this._idleCallback);
-
-    this._isIdle = false;
-    this._idleCallback = requestAnimationFrame(() => {
-      this._isIdle = true;
-    });
   };
+
+  private position = new Animated.Value(this.props.navigationState.index);
+
+  private onScroll = event([
+    {
+      nativeEvent: {
+        contentOffset: {
+          x: this.position,
+        },
+      },
+    },
+  ]);
 
   render() {
     const {
       children,
       layout,
-      navigationState,
       onSwipeStart,
       onSwipeEnd,
       bounces,
+      navigationState,
     } = this.props;
 
-    return (
-      <ScrollView
-        horizontal={this.props.horizontal}
-        pagingEnabled
-        directionalLockEnabled
-        keyboardDismissMode="on-drag"
-        keyboardShouldPersistTaps="always"
-        overScrollMode="never"
-        scrollEnabled={this.props.swipeEnabled}
-        automaticallyAdjustContentInsets={false}
-        bounces={bounces}
-        alwaysBounceHorizontal={bounces}
-        scrollsToTop={false}
-        showsHorizontalScrollIndicator={false}
-        scrollEventThrottle={1}
-        onScroll={this.handleScroll}
-        onScrollBeginDrag={onSwipeStart}
-        onScrollEndDrag={onSwipeEnd}
-        onMomentumScrollEnd={this.handleMomentumScrollEnd}
-        contentOffset={this.state.initialOffset}
-        style={styles.container}
-        contentContainerStyle={layout.width ? null : styles.container}
-        ref={el => (this._scrollView = el)}
-      >
-        {React.Children.map(children, (child, i) => {
-          const route = navigationState.routes[i];
-          const focused = i === navigationState.index;
-
-          return (
-            <View
-              key={route.key}
-              // testID={this.props.getTestID({ route })}
-              accessibilityElementsHidden={!focused}
-              importantForAccessibility={
-                focused ? 'auto' : 'no-hide-descendants'
-              }
-              style={
-                layout.width
-                  ? { width: layout.width, overflow: 'hidden' }
-                  : focused
-                  ? styles.page
-                  : null
-              }
-            >
-              {focused || layout.width ? child : null}
-            </View>
-          );
-        })}
-      </ScrollView>
-    );
+    return children({
+      position: divide(this.position, layout.width),
+      addListener: this.addListener,
+      removeListener: this.removeListener,
+      jumpTo: this.jumpTo,
+      render: children => (
+        <ScrollView
+          pagingEnabled
+          directionalLockEnabled
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps="always"
+          overScrollMode="never"
+          scrollEnabled={this.props.swipeEnabled}
+          automaticallyAdjustContentInsets={false}
+          bounces={bounces}
+          alwaysBounceHorizontal={bounces}
+          scrollsToTop={false}
+          showsHorizontalScrollIndicator={false}
+          scrollEventThrottle={1}
+          onScroll={this.onScroll}
+          onScrollBeginDrag={onSwipeStart}
+          onScrollEndDrag={onSwipeEnd}
+          onMomentumScrollEnd={this.onScroll}
+          contentOffset={this.initialOffset}
+          style={styles.container}
+          contentContainerStyle={
+            layout.width
+              ? {
+                  flexDirection: 'row',
+                  width: layout.width * navigationState.routes.length,
+                }
+              : null
+          }
+          ref={this.scrollViewRef}
+        >
+          {children}
+        </ScrollView>
+      ),
+    });
   }
 }
 
@@ -249,6 +171,7 @@ const styles = StyleSheet.create({
   },
   page: {
     flex: 1,
+    flexDirection: 'row',
     overflow: 'hidden',
   },
 });
