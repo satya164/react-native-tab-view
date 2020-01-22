@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { StyleSheet, Keyboard, View } from 'react-native';
+import { StyleSheet, Keyboard } from 'react-native';
 import Animated from 'react-native-reanimated';
 
-import { Route, PagerCommonProps, EventEmitterProps, Listener } from './types';
-import { Props } from '../lib/typescript/src/Pager';
+import { Route, Listener } from './types';
+import { Props } from './Pager';
 
 const { ScrollView, event, divide } = Animated;
 
@@ -17,11 +17,6 @@ export default class IOSPager<T extends Route> extends React.Component<
 > {
   static defaultProps = {
     bounces: true,
-  };
-
-  private initialOffset = {
-    x: this.props.navigationState.index * this.props.layout.width,
-    y: 0,
   };
 
   componentDidMount() {
@@ -48,6 +43,11 @@ export default class IOSPager<T extends Route> extends React.Component<
       this.scrollTo(amount);
     }
   }
+
+  private initialOffset = {
+    x: this.props.navigationState.index * this.props.layout.width,
+    y: 0,
+  };
 
   private scrollViewRef: React.RefObject<
     Animated.ScrollView
@@ -101,7 +101,9 @@ export default class IOSPager<T extends Route> extends React.Component<
     }
   };
 
-  private position = new Animated.Value(this.props.navigationState.index);
+  private position = new Animated.Value(
+    this.props.navigationState.index * this.props.layout.width
+  );
 
   private onScroll = event([
     {
@@ -119,7 +121,7 @@ export default class IOSPager<T extends Route> extends React.Component<
       layout,
       onSwipeStart,
       onSwipeEnd,
-      bounces,
+      overscroll,
       navigationState,
     } = this.props;
 
@@ -129,16 +131,17 @@ export default class IOSPager<T extends Route> extends React.Component<
       removeListener: this.removeListener,
       jumpTo: this.jumpTo,
       render: children => (
+        // @ts-ignore scrollToOverflowEnabled is not included in typings
         <ScrollView
           pagingEnabled
           directionalLockEnabled
           keyboardDismissMode="on-drag"
           keyboardShouldPersistTaps="always"
           overScrollMode="never"
+          scrollToOverflowEnabled
           scrollEnabled={this.props.swipeEnabled}
           automaticallyAdjustContentInsets={false}
-          bounces={bounces}
-          alwaysBounceHorizontal={bounces}
+          bounces={overscroll}
           scrollsToTop={false}
           showsHorizontalScrollIndicator={false}
           scrollEventThrottle={1}
@@ -153,6 +156,7 @@ export default class IOSPager<T extends Route> extends React.Component<
               ? {
                   flexDirection: 'row',
                   width: layout.width * navigationState.routes.length,
+                  flex: 1,
                 }
               : null
           }
@@ -168,10 +172,5 @@ export default class IOSPager<T extends Route> extends React.Component<
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  page: {
-    flex: 1,
-    flexDirection: 'row',
-    overflow: 'hidden',
   },
 });

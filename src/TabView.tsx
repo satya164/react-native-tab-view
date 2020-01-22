@@ -45,6 +45,7 @@ type Props<T extends Route> = PagerCommonProps & {
   gestureHandlerProps: React.ComponentProps<typeof PanGestureHandler>;
   renderPager: (props: ChildProps<T>) => React.ReactNode;
   enabledIOSScrollViewPager: boolean;
+  overscroll: boolean;
 };
 
 type State = {
@@ -70,6 +71,7 @@ export default class TabView<T extends Route> extends React.Component<
     timingConfig: {},
     gestureHandlerProps: {},
     enabledIOSScrollViewPager: true,
+    overscroll: false,
     renderPager: (props: ChildProps<any>) => <DefaultPager {...props} />,
   };
 
@@ -111,6 +113,7 @@ export default class TabView<T extends Route> extends React.Component<
       lazyPreloadDistance,
       removeClippedSubviews,
       keyboardDismissMode,
+      overscroll,
       swipeEnabled,
       swipeVelocityImpact,
       timingConfig,
@@ -127,7 +130,6 @@ export default class TabView<T extends Route> extends React.Component<
       enabledIOSScrollViewPager,
     } = this.props;
     const { layout } = this.state;
-
 
     return (
       <View onLayout={this.handleLayout} style={[styles.pager, style]}>
@@ -146,7 +148,7 @@ export default class TabView<T extends Route> extends React.Component<
           removeClippedSubviews,
           gestureHandlerProps,
           enabledIOSScrollViewPager,
-          renderScene,
+          overscroll,
           children: ({
             position,
             render,

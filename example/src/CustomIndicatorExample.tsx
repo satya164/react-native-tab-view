@@ -163,6 +163,7 @@ export default class CustomIndicatorExample extends React.Component<{}, State> {
         renderTabBar={this.renderTabBar}
         tabBarPosition="bottom"
         onIndexChange={this.handleIndexChange}
+        enabledIOSScrollViewPager
       />
     );
   }
