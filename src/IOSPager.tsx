@@ -131,14 +131,13 @@ export default class IOSPager<T extends Route> extends React.Component<
       removeListener: this.removeListener,
       jumpTo: this.jumpTo,
       render: children => (
-        // @ts-ignore scrollToOverflowEnabled is not included in typings
+        // @ts-ignore
         <ScrollView
           pagingEnabled
           directionalLockEnabled
           keyboardDismissMode="on-drag"
           keyboardShouldPersistTaps="always"
           overScrollMode="never"
-          scrollToOverflowEnabled
           scrollEnabled={this.props.swipeEnabled}
           automaticallyAdjustContentInsets={false}
           bounces={overscroll}
