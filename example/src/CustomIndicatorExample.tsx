@@ -164,6 +164,7 @@ export default class CustomIndicatorExample extends React.Component<{}, State> {
         tabBarPosition="bottom"
         onIndexChange={this.handleIndexChange}
         enabledIOSScrollViewPager
+        overscroll
       />
     );
   }
