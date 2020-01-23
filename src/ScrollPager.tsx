@@ -1,24 +1,24 @@
 import * as React from 'react';
 import { StyleSheet, Keyboard } from 'react-native';
 import Animated from 'react-native-reanimated';
-
-import { Route, Listener } from './types';
 import { Props } from './Pager';
+import { Route, Listener } from './types';
 
-const { event, divide } = Animated;
+const { event, divide, Value } = Animated;
 
 type State = {
   initialOffset: { x: number; y: number };
 };
 
+// @TODO osdnk: Remove it after fixing in DefinitelyTyped
 declare module 'react-native' {
   export interface ScrollViewProps {
     scrollToOverflowEnabled?: boolean;
   }
 }
 
-export default class IOSPager<T extends Route> extends React.Component<
-  Props<T>,
+export default class ScrollPager<T extends Route> extends React.Component<
+  Props<T> & { overscroll?: boolean },
   State
 > {
   static defaultProps = {
@@ -48,6 +48,10 @@ export default class IOSPager<T extends Route> extends React.Component<
     ) {
       this.scrollTo(offset);
     }
+
+    if (prevProps.layout.width !== this.props.layout.width) {
+      this.layoutWidthNode.setValue(this.props.layout.width);
+    }
   }
 
   private initialOffset = {
@@ -55,9 +59,7 @@ export default class IOSPager<T extends Route> extends React.Component<
     y: 0,
   };
 
-  private scrollViewRef: React.RefObject<
-    Animated.ScrollView
-  > = React.createRef();
+  private scrollViewRef = React.createRef<Animated.ScrollView>();
 
   private jumpTo = (key: string) => {
     const { navigationState, keyboardDismissMode, onIndexChange } = this.props;
@@ -121,6 +123,10 @@ export default class IOSPager<T extends Route> extends React.Component<
     },
   ]);
 
+  private layoutWidthNode = new Value(this.props.layout.width);
+
+  private relativePosition = divide(this.position, this.layoutWidthNode);
+
   render() {
     const {
       children,
@@ -132,7 +138,7 @@ export default class IOSPager<T extends Route> extends React.Component<
     } = this.props;
 
     return children({
-      position: divide(this.position, layout.width),
+      position: this.relativePosition,
       addListener: this.addListener,
       removeListener: this.removeListener,
       jumpTo: this.jumpTo,

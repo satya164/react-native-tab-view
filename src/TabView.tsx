@@ -17,8 +17,7 @@ import {
   SceneRendererProps,
   PagerCommonProps,
 } from './types';
-import { Props as ChildProps } from './Pager';
-import DefaultPager from './DefaultPager';
+import Pager, { Props as ChildProps } from './Pager';
 
 type Props<T extends Route> = PagerCommonProps & {
   position?: Animated.Value<number>;
@@ -44,8 +43,6 @@ type Props<T extends Route> = PagerCommonProps & {
   style?: StyleProp<ViewStyle>;
   gestureHandlerProps: React.ComponentProps<typeof PanGestureHandler>;
   renderPager: (props: ChildProps<T>) => React.ReactNode;
-  enabledIOSScrollViewPager: boolean;
-  overscroll: boolean;
 };
 
 type State = {
@@ -70,9 +67,7 @@ export default class TabView<T extends Route> extends React.Component<
     springConfig: {},
     timingConfig: {},
     gestureHandlerProps: {},
-    enabledIOSScrollViewPager: true,
-    overscroll: false,
-    renderPager: (props: ChildProps<any>) => <DefaultPager {...props} />,
+    renderPager: (props: ChildProps<any>) => <Pager {...props} />,
   };
 
   state = {
@@ -113,7 +108,6 @@ export default class TabView<T extends Route> extends React.Component<
       lazyPreloadDistance,
       removeClippedSubviews,
       keyboardDismissMode,
-      overscroll,
       swipeEnabled,
       swipeVelocityImpact,
       timingConfig,
@@ -127,7 +121,6 @@ export default class TabView<T extends Route> extends React.Component<
       gestureHandlerProps,
       springVelocityScale,
       renderPager,
-      enabledIOSScrollViewPager,
     } = this.props;
     const { layout } = this.state;
 
@@ -147,8 +140,6 @@ export default class TabView<T extends Route> extends React.Component<
           springVelocityScale,
           removeClippedSubviews,
           gestureHandlerProps,
-          enabledIOSScrollViewPager,
-          overscroll,
           children: ({
             position,
             render,

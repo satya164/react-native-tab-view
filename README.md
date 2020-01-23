@@ -283,14 +283,9 @@ If this is not specified, the default tab bar is rendered. You pass this props t
 
 ##### `renderPager`
 
-Callback which returns a custom React Element to use as pager:
+Callback which returns a custom React Element to use as pager.
 
-##### `enabledIOSScrollViewPager`
-When `true` renders `ScrollView` instead of default pager. It might deliver slightly better experience. However, `gestureHandlerProps` have no impact then. Defaults to `false`. 
-
-##### `overscroll`
-
-Works only when `enabledIOSScrollViewPager` set to `true`. When `true`, the scroll view bounces when it reaches the end of the content. The default value is `false`. 
+E.g. you can import `ScrollPager` from `react-native-tab-view`. It might deliver slightly better experience on iOS.
 
 ##### `tabBarPosition`
 
