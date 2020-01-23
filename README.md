@@ -287,6 +287,30 @@ Callback which returns a custom React Element to use as pager.
 
 E.g. you can import `ScrollPager` from `react-native-tab-view`. It might deliver slightly better experience on iOS.
 
+```js
+import { TabView, ScrollPager } from 'react-native-tab-view';
+// ...
+<TabView
+  renderPager={props => <ScrollPager { ...props }/>}
+  // ...
+/>
+```
+
+Also, you can use `ViewPager`-based pager with [`React Native Tab View ViewPager Adapter
+`](https://github.com/software-mansion/react-native-tab-view-viewpager-adapter). 
+
+```js
+import { TabView } from 'react-native-tab-view';
+import ViewPagerAdapter from 'react-native-tab-view-viewpager-adapter';
+// ...
+<TabView
+  renderPager={props => (
+    <ViewPagerAdapter {...props} transition="curl" showPageIndicator />
+  )}
+  // ...
+/>
+```
+
 ##### `tabBarPosition`
 
 Position of the tab bar in the tab view. Possible values are `'top'` and `'bottom'`. Defaults to `'top'`.
@@ -595,31 +619,6 @@ It accepts the same set of props as default pager extended with one addition:
 ##### ovescroll
 When `true`, the scroll view bounces when it reaches the end of the content. The default value is `false`. 
 
-Example: 
-
-```js
-import { TabView, ScrollPager } from 'react-native-tab-view';
-// ...
-<TabView
-  renderPager={props => <ScrollPager { ...props }/>}
-  // ...
-/>
-```
-
-Also, you can use `ViewPager`-based pager with [`React Native Tab View ViewPager Adapter
-`](https://github.com/software-mansion/react-native-tab-view-viewpager-adapter). 
-
-```js
-import { TabView } from 'react-native-tab-view';
-import ViewPagerAdapter from 'react-native-tab-view-viewpager-adapter';
-// ...
-<TabView
-  renderPager={props => (
-    <ViewPagerAdapter {...props} transition="curl" showPageIndicator />
-  )}
-  // ...
-/>
-```
 
 ## Using with other libraries
 
