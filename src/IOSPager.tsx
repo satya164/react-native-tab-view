@@ -5,11 +5,17 @@ import Animated from 'react-native-reanimated';
 import { Route, Listener } from './types';
 import { Props } from './Pager';
 
-const { ScrollView, event, divide } = Animated;
+const { event, divide } = Animated;
 
 type State = {
   initialOffset: { x: number; y: number };
 };
+
+declare module 'react-native' {
+  export interface ScrollViewProps {
+    scrollToOverflowEnabled?: boolean;
+  }
+}
 
 export default class IOSPager<T extends Route> extends React.Component<
   Props<T>,
@@ -131,8 +137,7 @@ export default class IOSPager<T extends Route> extends React.Component<
       removeListener: this.removeListener,
       jumpTo: this.jumpTo,
       render: children => (
-        // @ts-ignore
-        <ScrollView
+        <Animated.ScrollView
           pagingEnabled
           directionalLockEnabled
           keyboardDismissMode="on-drag"
@@ -163,7 +168,7 @@ export default class IOSPager<T extends Route> extends React.Component<
           ref={this.scrollViewRef}
         >
           {children}
-        </ScrollView>
+        </Animated.ScrollView>
       ),
     });
   }
