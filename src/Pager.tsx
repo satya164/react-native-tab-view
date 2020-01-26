@@ -612,8 +612,6 @@ export default class Pager<T extends Route> extends React.Component<
               onSwipeStart && onSwipeStart();
               this.interactionHandle = InteractionManager.createInteractionHandle();
 
-              this.interactionHandle = InteractionManager.createInteractionHandle();
-
               if (keyboardDismissMode === 'auto') {
                 const input = TextInput.State.currentlyFocusedField();
 
