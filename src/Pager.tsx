@@ -230,6 +230,7 @@ export default class Pager<T extends Route> extends React.Component<
       InteractionManager.clearInteractionHandle(this.interactionHandle);
     }
   }
+
   static contextType = PagerContext;
 
   // Mechanism to add child PanGestureHandler refs in the case that this
@@ -609,6 +610,8 @@ export default class Pager<T extends Route> extends React.Component<
 
             if (isSwiping === TRUE) {
               onSwipeStart && onSwipeStart();
+              this.interactionHandle = InteractionManager.createInteractionHandle();
+
               this.interactionHandle = InteractionManager.createInteractionHandle();
 
               if (keyboardDismissMode === 'auto') {
