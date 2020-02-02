@@ -37,7 +37,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Install dependencies
-        run: yarn
+        run: yarn bootstrap
 
       - name: Publish Expo app
         working-directory: ./example
