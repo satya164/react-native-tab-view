@@ -50,6 +50,7 @@ export type Props<T extends Route> = PagerCommonProps & {
 
 type State = {
   layout: Layout;
+  layout2: Layout;
 };
 
 const GestureHandlerWrapper = GestureHandlerRootView ?? View;
