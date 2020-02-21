@@ -79,7 +79,7 @@ export default class TabView<T extends Route> extends React.Component<
     layout: { width: 0, height: 0, ...this.props.initialLayout },
   };
 
-  private jumpToIndex = (index: number) => {
+  jumpToIndex = (index: number) => {
     if (index !== this.props.navigationState.index) {
       this.props.onIndexChange(index);
     }
