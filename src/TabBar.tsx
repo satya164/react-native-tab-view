@@ -29,6 +29,8 @@ export type Props<T extends Route> = SceneRendererProps & {
   bounces?: boolean;
   activeColor?: string;
   inactiveColor?: string;
+  activeBackgroundColor?: string;
+  inactiveBackgroundColor?: string;
   pressColor?: string;
   pressOpacity?: number;
   getLabelText: (scene: Scene<T>) => string | undefined;
@@ -67,7 +69,7 @@ type State = {
 export default class TabBar<T extends Route> extends React.Component<
   Props<T>,
   State
-> {
+  > {
   static defaultProps = {
     getLabelText: ({ route }: Scene<Route>) =>
       typeof route.title === 'string' ? route.title.toUpperCase() : route.title,
@@ -77,8 +79,8 @@ export default class TabBar<T extends Route> extends React.Component<
       typeof route.accessibilityLabel === 'string'
         ? route.accessibilityLabel
         : typeof route.title === 'string'
-        ? route.title
-        : undefined,
+          ? route.title
+          : undefined,
     getTestID: ({ route }: Scene<Route>) => route.testID,
     renderIndicator: (props: IndicatorProps<Route>) => (
       <TabBarIndicator {...props} />
@@ -96,7 +98,7 @@ export default class TabBar<T extends Route> extends React.Component<
 
     if (
       prevProps.navigationState.routes.length !==
-        navigationState.routes.length ||
+      navigationState.routes.length ||
       prevProps.navigationState.index !== navigationState.index ||
       prevState.layout.width !== layout.width ||
       prevState.tabWidths !== tabWidths
@@ -171,14 +173,14 @@ export default class TabBar<T extends Route> extends React.Component<
       tabWidths: { [key: string]: number },
       flattenedWidth: string | number | undefined
     ) => (i: number) =>
-      this.getComputedTabWidth(
-        i,
-        layout,
-        routes,
-        scrollEnabled,
-        tabWidths,
-        flattenedWidth
-      )
+        this.getComputedTabWidth(
+          i,
+          layout,
+          routes,
+          scrollEnabled,
+          tabWidths,
+          flattenedWidth
+        )
   );
 
   private getMaxScrollDistance = (tabBarWidth: number, layoutWidth: number) =>
@@ -312,6 +314,8 @@ export default class TabBar<T extends Route> extends React.Component<
       renderLabel,
       activeColor,
       inactiveColor,
+      activeBackgroundColor,
+      inactiveBackgroundColor,
       pressColor,
       pressOpacity,
       onTabPress,
@@ -347,8 +351,8 @@ export default class TabBar<T extends Route> extends React.Component<
             tabBarWidth
               ? { width: tabBarWidth }
               : scrollEnabled
-              ? { width: tabBarWidthPercent }
-              : null,
+                ? { width: tabBarWidthPercent }
+                : null,
             indicatorContainerStyle,
           ]}
         >
@@ -397,7 +401,7 @@ export default class TabBar<T extends Route> extends React.Component<
             ])}
             ref={el => {
               // @ts-ignore
-              this.scrollView = el?.getNode();
+              this.scrollView = el ?.getNode();
             }}
           >
             {routes.map((route: T) => (
@@ -405,22 +409,22 @@ export default class TabBar<T extends Route> extends React.Component<
                 onLayout={
                   isWidthDynamic
                     ? e => {
-                        this.measuredTabWidths[route.key] =
-                          e.nativeEvent.layout.width;
+                      this.measuredTabWidths[route.key] =
+                        e.nativeEvent.layout.width;
 
-                        // When we have measured widths for all of the tabs, we should updates the state
-                        // We avoid doing separate setState for each layout since it triggers multiple renders and slows down app
-                        if (
-                          routes.every(
-                            r =>
-                              typeof this.measuredTabWidths[r.key] === 'number'
-                          )
-                        ) {
-                          this.setState({
-                            tabWidths: { ...this.measuredTabWidths },
-                          });
-                        }
+                      // When we have measured widths for all of the tabs, we should updates the state
+                      // We avoid doing separate setState for each layout since it triggers multiple renders and slows down app
+                      if (
+                        routes.every(
+                          r =>
+                            typeof this.measuredTabWidths[r.key] === 'number'
+                        )
+                      ) {
+                        this.setState({
+                          tabWidths: { ...this.measuredTabWidths },
+                        });
                       }
+                    }
                     : undefined
                 }
                 key={route.key}
@@ -436,6 +440,8 @@ export default class TabBar<T extends Route> extends React.Component<
                 renderLabel={renderLabel}
                 activeColor={activeColor}
                 inactiveColor={inactiveColor}
+                activeBackgroundColor={activeBackgroundColor}
+                inactiveBackgroundColor={inactiveBackgroundColor}
                 pressColor={pressColor}
                 pressOpacity={pressOpacity}
                 onPress={() => {
@@ -447,7 +453,7 @@ export default class TabBar<T extends Route> extends React.Component<
                     },
                   };
 
-                  onTabPress?.(event);
+                  onTabPress ?.(event);
 
                   if (event.defaultPrevented) {
                     return;
@@ -455,7 +461,7 @@ export default class TabBar<T extends Route> extends React.Component<
 
                   this.props.jumpTo(route.key);
                 }}
-                onLongPress={() => onTabLongPress?.({ route })}
+                onLongPress={() => onTabLongPress ?.({ route })}
                 labelStyle={labelStyle}
                 style={tabStyle}
               />

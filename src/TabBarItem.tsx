@@ -18,6 +18,8 @@ type Props<T extends Route> = {
   navigationState: NavigationState<T>;
   activeColor?: string;
   inactiveColor?: string;
+  activeBackgroundColor?: string;
+  inactiveBackgroundColor?: string;
   pressColor?: string;
   pressOpacity?: number;
   getLabelText: (scene: Scene<T>) => string | undefined;
@@ -47,7 +49,7 @@ const DEFAULT_INACTIVE_COLOR = 'rgba(255, 255, 255, 0.7)';
 
 export default class TabBarItem<T extends Route> extends React.Component<
   Props<T>
-> {
+  > {
   private getActiveOpacity = memoize(
     (position: Animated.Node<number>, routes: Route[], tabIndex: number) => {
       if (routes.length > 1) {
@@ -90,6 +92,8 @@ export default class TabBarItem<T extends Route> extends React.Component<
       getAccessible,
       activeColor = DEFAULT_ACTIVE_COLOR,
       inactiveColor = DEFAULT_INACTIVE_COLOR,
+      activeBackgroundColor,
+      inactiveBackgroundColor,
       pressColor,
       pressOpacity,
       labelStyle,
@@ -148,25 +152,25 @@ export default class TabBarItem<T extends Route> extends React.Component<
       renderLabelPassed !== undefined
         ? renderLabelPassed
         : ({ route, color }: { route: T; color: string }) => {
-            const labelText = getLabelText({ route });
+          const labelText = getLabelText({ route });
 
-            if (typeof labelText === 'string') {
-              return (
-                <Animated.Text
-                  style={[
-                    styles.label,
-                    icon ? { marginTop: 0 } : null,
-                    { color },
-                    labelStyle,
-                  ]}
-                >
-                  {labelText}
-                </Animated.Text>
-              );
-            }
+          if (typeof labelText === 'string') {
+            return (
+              <Animated.Text
+                style={[
+                  styles.label,
+                  icon ? { marginTop: 0 } : null,
+                  { color },
+                  labelStyle,
+                ]}
+              >
+                {labelText}
+              </Animated.Text>
+            );
+          }
 
-            return labelText;
-          };
+          return labelText;
+        };
 
     if (renderLabel) {
       const activeLabel = renderLabel({
@@ -195,7 +199,7 @@ export default class TabBarItem<T extends Route> extends React.Component<
     }
 
     const tabStyle = StyleSheet.flatten(style);
-    const isWidthSet = tabStyle?.width !== undefined;
+    const isWidthSet = tabStyle ?.width !== undefined;
     const tabContainerStyle: ViewStyle | null = isWidthSet ? null : { flex: 1 };
 
     const scene = { route };
@@ -225,7 +229,7 @@ export default class TabBarItem<T extends Route> extends React.Component<
         onLayout={onLayout}
         onPress={onPress}
         onLongPress={onLongPress}
-        style={tabContainerStyle}
+        style={[tabContainerStyle, { backgroundColor: isFocused ? activeBackgroundColor : inactiveBackgroundColor }]}
       >
         <View pointerEvents="none" style={[styles.item, tabStyle]}>
           {icon}
