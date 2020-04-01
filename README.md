@@ -535,6 +535,12 @@ Function which takes an object with the current route and returns a custom React
 
 Function which takes an object with the current route and returns a custom React Element to be used as a badge.
 
+#### `renderTouchable`
+
+Function which takes an object with the current route and returns a custom React Element to be used as a touchable elements.
+
+
+
 ##### `onTabPress`
 
 Function to execute on tab press. It receives the scene for the pressed tab, useful for things like scroll to top.
