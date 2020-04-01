@@ -11,7 +11,8 @@ import {
   Platform,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
-import TabBarItem, { TouchableItemProps } from './TabBarItem';
+import { Props as TouchableItemProps } from './TouchableItem';
+import TabBarItem from './TabBarItem';
 import TabBarIndicator, { Props as IndicatorProps } from './TabBarIndicator';
 import memoize from './memoize';
 import {

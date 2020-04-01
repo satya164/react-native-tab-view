@@ -12,8 +12,6 @@ import { Scene, Route, NavigationState } from './types';
 import Animated from 'react-native-reanimated';
 import memoize from './memoize';
 
-export type TouchableItemProps = TouchableItemProps;
-
 type Props<T extends Route> = {
   position: Animated.Node<number>;
   route: T;
@@ -52,8 +50,10 @@ export default class TabBarItem<T extends Route> extends React.Component<
   Props<T>
 > {
   static defaultProps = {
-    renderTouchable: TouchableItem
-  }
+    renderTouchable: (props: TouchableItemProps) => (
+      <TouchableItem {...props} />
+    ),
+  };
 
   private getActiveOpacity = memoize(
     (position: Animated.Node<number>, routes: Route[], tabIndex: number) => {
@@ -91,7 +91,7 @@ export default class TabBarItem<T extends Route> extends React.Component<
       renderLabel: renderLabelPassed,
       renderIcon,
       renderBadge,
-      renderTouchable: Touchable,
+      renderTouchable,
       getLabelText,
       getTestID,
       getAccessibilityLabel,
@@ -229,11 +229,11 @@ export default class TabBarItem<T extends Route> extends React.Component<
       children: touchableChildren,
       borderless: true,
       testID: getTestID(scene),
-      accessible:getAccessible(scene),
+      accessible: getAccessible(scene),
       accessibilityLabel: accessibilityLabel,
       accessibilityTraits: isFocused ? ['button', 'selected'] : 'button',
-      accessibilityComponentType: "button",
-      accessibilityRole: "tab",
+      accessibilityComponentType: 'button',
+      accessibilityRole: 'tab',
       accessibilityStates: isFocused ? ['selected'] : [],
       pressColor,
       pressOpacity,
@@ -241,10 +241,15 @@ export default class TabBarItem<T extends Route> extends React.Component<
       onLayout,
       onPress: onPress,
       onLongPress: onLongPress,
-      style: tabContainerStyle
+      style: tabContainerStyle,
     };
 
-    return <Touchable { ...touchableProps} />
+    /**
+     * @DEV
+     * renderTouchable has a default value, but its interface should be optional,
+     * i added force unwrap to silence typescript error.
+     */
+    return renderTouchable!(touchableProps);
   }
 }
 

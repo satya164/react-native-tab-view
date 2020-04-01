@@ -4,6 +4,7 @@ export {
   default as TabBarIndicator,
   Props as TabBarIndicatorProps,
 } from './TabBarIndicator';
+export { Props as TouchableItemProps } from './TouchableItem';
 export { default as SceneMap } from './SceneMap';
 export { default as ScrollPager } from './ScrollPager';
 
