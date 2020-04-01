@@ -51,6 +51,10 @@ const DEFAULT_INACTIVE_COLOR = 'rgba(255, 255, 255, 0.7)';
 export default class TabBarItem<T extends Route> extends React.Component<
   Props<T>
 > {
+  static defaultProps = {
+    renderTouchable: TabBarItem
+  }
+
   private getActiveOpacity = memoize(
     (position: Animated.Node<number>, routes: Route[], tabIndex: number) => {
       if (routes.length > 1) {
@@ -87,7 +91,7 @@ export default class TabBarItem<T extends Route> extends React.Component<
       renderLabel: renderLabelPassed,
       renderIcon,
       renderBadge,
-      renderTouchable,
+      renderTouchable: Touchable,
       getLabelText,
       getTestID,
       getAccessibilityLabel,
@@ -199,7 +203,7 @@ export default class TabBarItem<T extends Route> extends React.Component<
     }
 
     const tabStyle = StyleSheet.flatten(style);
-    const isWidthSet = tabStyle && tabStyle.width !== undefined;
+    const isWidthSet = tabStyle?.width !== undefined;
     const tabContainerStyle: ViewStyle | null = isWidthSet ? null : { flex: 1 };
 
     const scene = { route };
@@ -222,28 +226,25 @@ export default class TabBarItem<T extends Route> extends React.Component<
     );
 
     const touchableProps: TouchableItemProps = {
+      children: touchableChildren,
       borderless: true,
       testID: getTestID(scene),
-      accessible: getAccessible(scene),
-      accessibilityLabel,
+      accessible:getAccessible(scene),
+      accessibilityLabel: accessibilityLabel,
       accessibilityTraits: isFocused ? ['button', 'selected'] : 'button',
-      accessibilityComponentType: 'button',
-      accessibilityRole: 'button',
+      accessibilityComponentType: "button",
+      accessibilityRole: "tab",
       accessibilityStates: isFocused ? ['selected'] : [],
       pressColor,
       pressOpacity,
       delayPressIn: 0,
       onLayout,
-      onPress,
+      onPress: onPress,
       onLongPress: onLongPress,
-      style: tabContainerStyle,
+      style: tabContainerStyle
     };
 
-    return renderTouchable != null ? (
-      renderTouchable({ ...touchableProps, children: touchableChildren })
-    ) : (
-      <TouchableItem {...touchableProps}>{touchableChildren}</TouchableItem>
-    );
+    return <Touchable { ...touchableProps} />
   }
 }
 

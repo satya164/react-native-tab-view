@@ -373,6 +373,7 @@ export default class TabBar<T extends Route> extends React.Component<
         <View style={styles.scroll}>
           <Animated.ScrollView
             horizontal
+            accessibilityRole="tablist"
             keyboardShouldPersistTaps="handled"
             scrollEnabled={scrollEnabled}
             bounces={bounces}
@@ -398,7 +399,7 @@ export default class TabBar<T extends Route> extends React.Component<
             ])}
             ref={el => {
               // @ts-ignore
-              this.scrollView = el && el.getNode();
+              this.scrollView = el?.getNode();
             }}
           >
             {routes.map((route: T) => (
@@ -449,7 +450,7 @@ export default class TabBar<T extends Route> extends React.Component<
                     },
                   };
 
-                  onTabPress && onTabPress(event);
+                  onTabPress?.(event);
 
                   if (event.defaultPrevented) {
                     return;
@@ -457,7 +458,7 @@ export default class TabBar<T extends Route> extends React.Component<
 
                   this.props.jumpTo(route.key);
                 }}
-                onLongPress={() => onTabLongPress && onTabLongPress({ route })}
+                onLongPress={() => onTabLongPress?.({ route })}
                 labelStyle={labelStyle}
                 style={tabStyle}
               />
