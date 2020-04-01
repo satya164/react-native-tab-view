@@ -52,7 +52,7 @@ export default class TabBarItem<T extends Route> extends React.Component<
   Props<T>
 > {
   static defaultProps = {
-    renderTouchable: TabBarItem
+    renderTouchable: TouchableItem
   }
 
   private getActiveOpacity = memoize(
