@@ -537,9 +537,7 @@ Function which takes an object with the current route and returns a custom React
 
 #### `renderTouchable`
 
-Function which takes an object with the current route and returns a custom React Element to be used as a touchable elements.
-
-
+Function which takes an object with the current route and returns a custom React Element to be used as a touchable for `TabBarItem`.
 
 ##### `onTabPress`
 
