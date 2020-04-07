@@ -5,6 +5,8 @@
 # XDE
 .expo/
 
+web-build/
+
 # VSCode
 .vscode/
 .history/
