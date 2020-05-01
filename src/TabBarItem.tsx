@@ -12,7 +12,7 @@ import { Scene, Route, NavigationState } from './types';
 import Animated from 'react-native-reanimated';
 import memoize from './memoize';
 
-type Props<T extends Route> = {
+export type Props<T extends Route> = {
   position: Animated.Node<number>;
   route: T;
   navigationState: NavigationState<T>;
