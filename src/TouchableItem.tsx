@@ -1,13 +1,14 @@
 import * as React from 'react';
 import {
-  TouchableNativeFeedback,
   TouchableOpacity,
   Platform,
   View,
   StyleProp,
+  StyleSheet,
   ViewStyle,
   ViewProps,
 } from 'react-native';
+import { TouchableNativeFeedback as RNGHTouchableNativeFeedback } from 'react-native-gesture-handler';
 
 type Props = ViewProps & {
   onPress: () => void;
@@ -39,12 +40,20 @@ export default class TouchableItem extends React.Component<Props> {
 
     if (Platform.OS === 'android' && Platform.Version >= LOLLIPOP) {
       return (
-        <TouchableNativeFeedback
-          {...rest}
-          background={TouchableNativeFeedback.Ripple(pressColor, borderless)}
-        >
-          <View style={style}>{React.Children.only(children)}</View>
-        </TouchableNativeFeedback>
+        <View style={styles.outerContainer}>
+          <RNGHTouchableNativeFeedback
+            {...rest}
+            background={{
+              borderless,
+              color: pressColor,
+              type: 'Ripple',
+            }}
+            containerStyle={styles.container}
+            style={styles.button}
+          >
+            <View style={style}>{React.Children.only(children)}</View>
+          </RNGHTouchableNativeFeedback>
+        </View>
       );
     } else {
       return (
@@ -55,3 +64,21 @@ export default class TouchableItem extends React.Component<Props> {
     }
   }
 }
+
+const styles = StyleSheet.create({
+  button: {
+    justifyContent: 'center',
+    flex: 1,
+    flexDirection: 'row',
+  },
+  container: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  outerContainer: {
+    borderRadius: 100,
+    flex: 1,
+    flexDirection: 'row',
+    overflow: 'hidden',
+  },
+});

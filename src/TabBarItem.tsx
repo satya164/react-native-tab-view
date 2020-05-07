@@ -211,7 +211,7 @@ export default class TabBarItem<T extends Route> extends React.Component<
 
     return (
       <TouchableItem
-        borderless
+        borderless={false}
         testID={getTestID(scene)}
         accessible={getAccessible(scene)}
         accessibilityLabel={accessibilityLabel}
