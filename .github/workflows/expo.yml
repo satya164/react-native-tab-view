@@ -30,11 +30,13 @@ jobs:
         uses: actions/cache@master
         with:
           path: '**/node_modules'
-          key: ${{ runner.os }}-yarn-v1-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies
         if: steps.yarn-cache.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile
+        run: |
+          yarn install --cwd example --frozen-lockfile
+          yarn install --frozen-lockfile
 
       - name: Publish Expo app
         working-directory: ./example
