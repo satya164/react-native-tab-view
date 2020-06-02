@@ -43,7 +43,7 @@ jobs:
         run: echo "::set-output name=path::@satya164/react-native-tab-view-demos?release-channel=pr-${{ github.event.number }}
 
       - name: Comment on PR
-        uses: unsplash/comment-on-pr@v1.2.0
+        uses: unsplash/comment-on-pr@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
