@@ -8,7 +8,7 @@ jobs:
     if: github.event.pull_request.head.repo.owner.login == 'react-native-community'
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Setup Node.js
         uses: actions/setup-node@v1
@@ -25,7 +25,7 @@ jobs:
 
       - name: Restore yarn cache
         id: yarn-cache
-        uses: actions/cache@master
+        uses: actions/cache@v2
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-yarn-v1-${{ hashFiles('**/yarn.lock') }}
@@ -43,7 +43,7 @@ jobs:
         run: echo "::set-output name=path::@satya164/react-native-tab-view-demos?release-channel=pr-${{ github.event.number }}
 
       - name: Comment on PR
-        uses: unsplash/comment-on-pr@master
+        uses: unsplash/comment-on-pr@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
