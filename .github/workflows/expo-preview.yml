@@ -5,14 +5,15 @@ jobs:
   publish:
     name: Install and publish
     runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.owner.login == 'react-native-community'
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Setup Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: 12.x
+          node-version: 10.x
 
       - name: Setup Expo
         uses: expo/expo-github-action@v5
@@ -22,20 +23,16 @@ jobs:
           expo-password: ${{ secrets.EXPO_CLI_PASSWORD }}
           expo-cache: true
 
-      - name: Get yarn cache
+      - name: Restore yarn cache
         id: yarn-cache
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - name: Check yarn cache
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
-          path: ${{ steps.yarn-cache.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          path: '**/node_modules'
+          key: ${{ runner.os }}-yarn-v1-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies
-        run: yarn bootstrap
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile
 
       - name: Publish Expo app
         working-directory: ./example
@@ -43,11 +40,11 @@ jobs:
 
       - name: Get expo link
         id: expo
-        run: echo "::set-output name=path::@satya164/react-native-tab-view-demos?release-channel=pr-${{ github.event.number }}"
+        run: echo "::set-output name=path::@satya164/react-native-tab-view-demos?release-channel=pr-${{ github.event.number }}
 
       - name: Comment on PR
-        uses: unsplash/comment-on-pr@master
+        uses: unsplash/comment-on-pr@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          msg: The Expo app for the example from this branch is ready!<br><br>[expo.io/${{ steps.expo.outputs.path }}](https://expo.io/${{ steps.expo.outputs.path }})<br><br><a href="https://exp.host/${{ steps.expo.outputs.path }}"><img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=exp://exp.host/${{ steps.expo.outputs.path }}" height="200px" width="200px"></a>.
+          msg: The Expo app for the example from this branch is ready!<br><br>[expo.io/${{ steps.expo.outputs.path }}](https://expo.io/${{ steps.expo.outputs.path }})<br><br><a href="https://exp.host/${{ steps.expo.outputs.path }}"><img src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=exp://exp.host/${{ steps.expo.outputs.path }}" height="200px" width="200px"></a>.
