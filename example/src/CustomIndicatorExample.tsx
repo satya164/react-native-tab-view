@@ -14,9 +14,6 @@ import Albums from './Shared/Albums';
 import Article from './Shared/Article';
 import Contacts from './Shared/Contacts';
 
-// @ts-ignore
-const AnimatedInterpolate = Animated.interpolateNode || Animated.interpolate;
-
 type Route = {
   key: string;
   icon: string;
@@ -78,12 +75,12 @@ export default class CustomIndicatorExample extends React.Component<{}, State> {
       2,
     ];
 
-    const scale = AnimatedInterpolate(position, {
+    const scale = Animated.interpolate(position, {
       inputRange,
       outputRange: inputRange.map((x) => (Math.trunc(x) === x ? 2 : 0.1)),
     });
 
-    const opacity = AnimatedInterpolate(position, {
+    const opacity = Animated.interpolate(position, {
       inputRange,
       outputRange: inputRange.map((x) => {
         const d = x - Math.trunc(x);
@@ -91,7 +88,7 @@ export default class CustomIndicatorExample extends React.Component<{}, State> {
       }),
     });
 
-    const translateX = AnimatedInterpolate(position, {
+    const translateX = Animated.interpolate(position, {
       inputRange: inputRange,
       outputRange: inputRange.map((x) => {
         const i = Math.round(x);
@@ -99,7 +96,7 @@ export default class CustomIndicatorExample extends React.Component<{}, State> {
       }),
     });
 
-    const backgroundColor = AnimatedInterpolate(position, {
+    const backgroundColor = Animated.interpolate(position, {
       inputRange,
       outputRange: inputRange.map((x) =>
         Animated.color(...navigationState.routes[Math.round(x)].color)

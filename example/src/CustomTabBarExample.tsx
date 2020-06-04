@@ -19,9 +19,6 @@ type Route = {
   icon: string;
 };
 
-// @ts-ignore
-const AnimatedInterpolate = Animated.interpolateNode || Animated.interpolate;
-
 type State = NavigationState<Route>;
 
 export default class CustomTabBarExample extends React.Component<{}, State> {
@@ -56,11 +53,11 @@ export default class CustomTabBarExample extends React.Component<{}, State> {
   }) => ({ route, index }: { route: Route; index: number }) => {
     const inputRange = navigationState.routes.map((_, i) => i);
 
-    const activeOpacity = AnimatedInterpolate(position, {
+    const activeOpacity = Animated.interpolate(position, {
       inputRange,
       outputRange: inputRange.map((i: number) => (i === index ? 1 : 0)),
     });
-    const inactiveOpacity = AnimatedInterpolate(position, {
+    const inactiveOpacity = Animated.interpolate(position, {
       inputRange,
       outputRange: inputRange.map((i: number) => (i === index ? 0 : 1)),
     });
