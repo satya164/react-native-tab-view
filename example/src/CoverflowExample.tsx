@@ -11,6 +11,9 @@ import {
 import { TabView, SceneRendererProps } from 'react-native-tab-view';
 import Animated from 'react-native-reanimated';
 
+// @ts-ignore
+const AnimatedInterpolate = Animated.interpolateNode || Animated.interpolate;
+
 type Route = {
   key: string;
 };
@@ -55,17 +58,17 @@ const Scene = ({ route, position, layout, index, length }: Props) => {
       }
     });
 
-    const translateX = Animated.interpolate(position, {
+    const translateX = AnimatedInterpolate(position, {
       inputRange,
       outputRange: translateOutputRange,
       extrapolate: Animated.Extrapolate.CLAMP,
     });
-    const scale = Animated.interpolate(position, {
+    const scale = AnimatedInterpolate(position, {
       inputRange,
       outputRange: scaleOutputRange,
       extrapolate: Animated.Extrapolate.CLAMP,
     });
-    const opacity = Animated.interpolate(position, {
+    const opacity = AnimatedInterpolate(position, {
       inputRange,
       outputRange: opacityOutputRange,
       extrapolate: Animated.Extrapolate.CLAMP,
