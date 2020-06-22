@@ -197,7 +197,7 @@ export default class ScrollPager<T extends Route> extends React.Component<
           onScroll={this.onScroll}
           onScrollBeginDrag={handleSwipeStart}
           onScrollEndDrag={handleSwipeEnd}
-          //onMomentumScrollEnd={this.onScroll}
+          onMomentumScrollEnd={this.onScroll}
           contentOffset={this.initialOffset}
           style={styles.container}
           contentContainerStyle={
