@@ -4,14 +4,28 @@ import Animated from 'react-native-reanimated';
 import { Props } from './Pager';
 import { Route, Listener } from './types';
 
-const { event, divide, onChange, cond, eq, round, call, Value } = Animated;
+const {
+  event,
+  divide,
+  onChange,
+  cond,
+  eq,
+  round,
+  call,
+  Value,
+  set,
+  neq,
+  sub,
+  and,
+  modulo,
+} = Animated;
 
 type State = {
   initialOffset: { x: number; y: number };
 };
 
 export default class ScrollPager<T extends Route> extends React.Component<
-  Props<T> & { overscroll?: boolean },
+  Props<T> & { overscroll?: boolean; position?: Animated.Value<number> },
   State
 > {
   static defaultProps = {
@@ -134,6 +148,8 @@ export default class ScrollPager<T extends Route> extends React.Component<
 
   private relativePosition = divide(this.position, this.layoutWidthNode);
 
+  private prevRelPosition = new Animated.Value(0);
+
   render() {
     const {
       children,
@@ -181,7 +197,7 @@ export default class ScrollPager<T extends Route> extends React.Component<
           onScroll={this.onScroll}
           onScrollBeginDrag={handleSwipeStart}
           onScrollEndDrag={handleSwipeEnd}
-          onMomentumScrollEnd={this.onScroll}
+          //onMomentumScrollEnd={this.onScroll}
           contentOffset={this.initialOffset}
           style={styles.container}
           contentContainerStyle={
@@ -197,17 +213,41 @@ export default class ScrollPager<T extends Route> extends React.Component<
         >
           {children}
           <Animated.Code
-            exec={onChange(
-              this.relativePosition,
-              cond(eq(round(this.relativePosition), this.relativePosition), [
-                call([this.relativePosition], ([relativePosition]) => {
-                  if (this.wasTouched) {
-                    onIndexChange(relativePosition);
-                    this.wasTouched = false;
-                  }
-                }),
-              ])
-            )}
+            exec={onChange(this.position, [
+              cond(
+                and(
+                  eq(round(this.relativePosition), this.relativePosition),
+                  neq(
+                    modulo(sub(this.prevRelPosition, this.relativePosition), 1),
+                    0
+                  )
+                ),
+                [
+                  call([this.relativePosition], ([relativePosition]) => {
+                    if (this.wasTouched) {
+                      onIndexChange(relativePosition);
+                      this.wasTouched = false;
+                    }
+                  }),
+                ]
+              ),
+              ...(this.props.position
+                ? [
+                    cond(
+                      neq(
+                        modulo(
+                          sub(this.prevRelPosition, this.relativePosition),
+                          1
+                        ),
+                        0
+                      ),
+                      set(this.props.position, this.relativePosition)
+                    ),
+
+                    set(this.prevRelPosition, this.relativePosition),
+                  ]
+                : []),
+            ])}
           />
         </Animated.ScrollView>
       ),
