@@ -130,7 +130,7 @@ export default class ScrollPager<T extends Route> extends React.Component<
     }
   };
 
-  private position = new Animated.Value(
+  private translateX = new Animated.Value(
     this.props.navigationState.index * this.props.layout.width
   );
 
@@ -138,7 +138,7 @@ export default class ScrollPager<T extends Route> extends React.Component<
     {
       nativeEvent: {
         contentOffset: {
-          x: this.position,
+          x: this.translateX,
         },
       },
     },
@@ -146,7 +146,7 @@ export default class ScrollPager<T extends Route> extends React.Component<
 
   private layoutWidthNode = new Value(this.props.layout.width);
 
-  private relativePosition = divide(this.position, this.layoutWidthNode);
+  private relativePosition = divide(this.translateX, this.layoutWidthNode);
 
   private prevRelPosition = new Animated.Value(0);
 
@@ -213,7 +213,7 @@ export default class ScrollPager<T extends Route> extends React.Component<
         >
           {children}
           <Animated.Code
-            exec={onChange(this.position, [
+            exec={onChange(this.translateX, [
               cond(
                 and(
                   eq(round(this.relativePosition), this.relativePosition),
