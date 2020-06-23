@@ -218,10 +218,8 @@ export default class TabBarItem<T extends Route> extends React.Component<
         testID={getTestID(scene)}
         accessible={getAccessible(scene)}
         accessibilityLabel={accessibilityLabel}
-        accessibilityTraits={isFocused ? ['button', 'selected'] : 'button'}
-        accessibilityComponentType="button"
         accessibilityRole="tab"
-        accessibilityStates={isFocused ? ['selected'] : []}
+        accessibilityState={{ selected: isFocused }}
         pressColor={pressColor}
         pressOpacity={pressOpacity}
         delayPressIn={0}
