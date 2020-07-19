@@ -64,7 +64,7 @@ export type Props<T extends Route> = SceneRendererProps & {
 
 type State = {
   layout: Layout;
-  tabWidths: { [key: string]: number };
+  tabWidths?: { [key: string]: number };
 };
 
 const scheduleInNextFrame = (cb: () => void) => {
@@ -98,7 +98,7 @@ export default class TabBar<T extends Route> extends React.Component<
 
   state: State = {
     layout: { width: 0, height: 0 },
-    tabWidths: {},
+    tabWidths: undefined,
   };
 
   componentDidUpdate(prevProps: Props<T>, prevState: State) {
@@ -112,20 +112,18 @@ export default class TabBar<T extends Route> extends React.Component<
       prevState.layout.width !== layout.width ||
       prevState.tabWidths !== tabWidths
     ) {
-      if (
-        this.getFlattenedTabWidth(this.props.tabStyle) === 'auto' &&
-        !(
-          layout.width &&
-          navigationState.routes.every(
-            (r) => typeof tabWidths[r.key] === 'number'
-          )
-        )
-      ) {
-        // When tab width is dynamic, only adjust the scroll once we have all tab widths and layout
+      const isWidthDynamic =
+        this.getFlattenedTabWidth(this.props.tabStyle) === 'auto';
+      if (isWidthDynamic && (!layout.width || !tabWidths)) {
         return;
       }
 
-      this.resetScroll(navigationState.index);
+      // Do not use animated scroll on initial render
+      // (that is, when layout is not yet calculated)
+      const animatedScroll = isWidthDynamic
+        ? !!prevState.tabWidths && !!prevState.layout.width
+        : !!prevState.layout.width;
+      this.scrollToTab(navigationState.index, animatedScroll);
     }
   }
 
@@ -154,11 +152,11 @@ export default class TabBar<T extends Route> extends React.Component<
     layout: Layout,
     routes: Route[],
     scrollEnabled: boolean | undefined,
-    tabWidths: { [key: string]: number },
+    tabWidths: { [key: string]: number } | undefined,
     flattenedWidth: string | number | undefined
   ) => {
     if (flattenedWidth === 'auto') {
-      return tabWidths[routes[index].key] || 0;
+      return tabWidths?.[routes[index].key] || 0;
     }
 
     switch (typeof flattenedWidth) {
@@ -185,7 +183,7 @@ export default class TabBar<T extends Route> extends React.Component<
       layout: Layout,
       routes: Route[],
       scrollEnabled: boolean | undefined,
-      tabWidths: { [key: string]: number },
+      tabWidths: { [key: string]: number } | undefined,
       flattenedWidth: string | number | undefined
     ) => (i: number) =>
       this.getComputedTabWidth(
@@ -268,12 +266,12 @@ export default class TabBar<T extends Route> extends React.Component<
     return this.normalizeScrollValue(props, state, scrollAmount);
   };
 
-  private resetScroll = (index: number) => {
+  private scrollToTab = (index: number, animated: boolean = true) => {
     if (this.props.scrollEnabled) {
       this.scrollView &&
         this.scrollView.scrollTo({
           x: this.getScrollAmount(this.props, this.state, index),
-          animated: true,
+          animated,
         });
     }
   };
