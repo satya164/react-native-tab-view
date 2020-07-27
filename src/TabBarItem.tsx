@@ -220,7 +220,7 @@ export default class TabBarItem<T extends Route> extends React.Component<
         accessibilityLabel={accessibilityLabel}
         accessibilityTraits={isFocused ? ['button', 'selected'] : 'button'}
         accessibilityComponentType="button"
-        accessibilityRole="tab"
+        accessibilityRole="none"
         accessibilityState={{ selected: isFocused }}
         // @ts-ignore: this is to support older React Native versions
         accessibilityStates={isFocused ? ['selected'] : []}
