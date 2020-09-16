@@ -1,15 +1,12 @@
 import * as React from 'react';
 import { StyleSheet, I18nManager, StyleProp, ViewStyle } from 'react-native';
-import Animated, {
-  Easing as OldEasing,
-  // @ts-ignore
-  EasingNode,
-} from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 
 import memoize from './memoize';
 import { Route, SceneRendererProps, NavigationState } from './types';
 
-const Easing = EasingNode || OldEasing;
+// @ts-ignore
+const Easing = Animated.EasingNode || Animated.Easing;
 
 export type GetTabWidth = (index: number) => number;
 
