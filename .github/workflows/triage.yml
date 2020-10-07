@@ -8,7 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.label.name == 'needs more info'
     steps:
-      - uses: actions/checkout@v2
       - uses: actions/github-script@v2
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
@@ -24,7 +23,6 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.label.name == 'needs repro'
     steps:
-      - uses: actions/checkout@v2
       - uses: actions/github-script@v2
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
@@ -33,5 +31,35 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: "Hey! Thanks for opening the issue. Can you provide a [minimal repro](https://stackoverflow.com/help/minimal-reproducible-example) which demonstrates the issue? Posting a snippet of your code in the issue is useful, but it's not usually straightforward to run. A repro will help us debug the issue faster. Please try to keep the repro as small as possible.\n\nThe easiest way to provide a repro is on [snack.expo.io](https://snack.expo.io). If it's not possible to repro it on [snack.expo.io](https://snack.expo.io), then you can also provide the repro in a GitHub repository."
+              body: "Hey! Thanks for opening the issue. Can you provide a [minimal repro](https://stackoverflow.com/help/minimal-reproducible-example) which demonstrates the issue? Posting a snippet of your code in the issue is useful, but it's not usually straightforward to run. A repro will help us debug the issue faster. Please try to keep the repro as small as possible.\n\nThe easiest way to provide a repro is on [snack.expo.io](https://snack.expo.io). If it's not possible to repro it on [snack.expo.io](https://snack.expo.io), then please provide the repro in a GitHub repository."
+            })
+
+  react-native-reanimated:
+    runs-on: ubuntu-latest
+    if: github.event.label.name == 'library:react-native-reanimated'
+    steps:
+      - uses: actions/github-script@v2
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: "Hey! Thanks for opening the issue. The issue tracker is intended for only tracking bug reports in React Navigation. Seems you have an issue related to `react-native-reanimated` library. Please post your issue in [this repo](https://github.com/software-mansion/react-native-reanimated) so that it's notified to the maintainers of that library."
+            })
+
+  react-native-gesture-handler:
+    runs-on: ubuntu-latest
+    if: github.event.label.name == 'library:react-native-gesture-handler'
+    steps:
+      - uses: actions/github-script@v2
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: "Hey! Thanks for opening the issue. The issue tracker is intended for only tracking bug reports in React Navigation. Seems you have an issue related to `react-native-gesture-handler` library. Please post your issue in [this repo](https://github.com/software-mansion/react-native-gesture-handler) so that it's notified to the maintainers of that library."
             })

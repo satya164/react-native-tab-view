@@ -37,6 +37,7 @@ For Syntax Highlighting check this [link](https://help.github.com/en/articles/cr
 | software                     | version
 | ---------------------------- | -------
 | ios or android               |
+| expo                         |
 | react-native                 |
 | react-native-tab-view        |
 | react-native-gesture-handler |

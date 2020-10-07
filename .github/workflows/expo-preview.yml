@@ -5,10 +5,10 @@ jobs:
   publish:
     name: Install and publish
     runs-on: ubuntu-latest
-    if: github.event.pull_request.head.repo.owner.login == 'react-native-community'
+    if: github.event.pull_request.head.repo.owner.login == 'satya164'
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Setup Node.js
         uses: actions/setup-node@v1
@@ -25,7 +25,7 @@ jobs:
 
       - name: Restore yarn cache
         id: yarn-cache
-        uses: actions/cache@master
+        uses: actions/cache@v2
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
@@ -39,14 +39,33 @@ jobs:
       - name: Publish Expo app
         working-directory: ./example
         run: expo publish --release-channel=pr-${{ github.event.number }}
+        env:
+          EXPO_USE_DEV_SERVER: true
 
       - name: Get expo link
         id: expo
         run: echo "::set-output name=path::@satya164/react-native-tab-view-demos?release-channel=pr-${{ github.event.number }}
 
       - name: Comment on PR
-        uses: unsplash/comment-on-pr@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: actions/github-script@v2
         with:
-          msg: The Expo app for the example from this branch is ready!<br><br>[expo.io/${{ steps.expo.outputs.path }}](https://expo.io/${{ steps.expo.outputs.path }})<br><br><a href="https://exp.host/${{ steps.expo.outputs.path }}"><img src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=exp://exp.host/${{ steps.expo.outputs.path }}" height="200px" width="200px"></a>.
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const body = 'The Expo app for the example from this branch is ready!\n\n[expo.io/${{ steps.expo.outputs.path }}](https://expo.io/${{ steps.expo.outputs.path }})\n\n<a href="https://exp.host/${{ steps.expo.outputs.path }}"><img src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=exp://exp.host/${{ steps.expo.outputs.path }}" height="200px" width="200px"></a>';
+
+            const comments = await github.issues.listComments({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+
+            if (comments.data.some(comment => comment.body === body)) {
+              return;
+            }
+
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            })

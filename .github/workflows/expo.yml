@@ -2,7 +2,7 @@ name: Expo Publish
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   publish:
@@ -27,7 +27,7 @@ jobs:
 
       - name: Restore yarn cache
         id: yarn-cache
-        uses: actions/cache@master
+        uses: actions/cache@v2
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}

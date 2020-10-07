@@ -11,6 +11,9 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           required-packages: |
+            react-native
             react-native-tab-view
             react-native-gesture-handler
             react-native-reanimated
+          optional-packages: |
+            expo
