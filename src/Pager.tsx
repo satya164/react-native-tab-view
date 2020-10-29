@@ -601,11 +601,11 @@ export default class Pager<T extends Route> extends React.Component<
           ? lessThan(this.gestureX, 0)
           : greaterThan(this.gestureX, 0),
         // Based on the direction of the gesture, determine if we're entering the previous or next screen
-        cond(neq(floor(this.position), this.lastEnteredIndex), [
+        cond(and(neq(floor(this.position), this.lastEnteredIndex), neq(this.position, this.lastEnteredIndex)), [
           set(this.lastEnteredIndex, floor(this.position)),
           call([floor(this.position)], this.handleEnteredIndexChange),
         ]),
-        cond(neq(ceil(this.position), this.lastEnteredIndex), [
+        cond(and(neq(ceil(this.position), this.lastEnteredIndex), neq(this.position, this.lastEnteredIndex)), [
           set(this.lastEnteredIndex, ceil(this.position)),
           call([ceil(this.position)], this.handleEnteredIndexChange),
         ])
