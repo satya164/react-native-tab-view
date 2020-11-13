@@ -15,4 +15,8 @@ export { default as TouchableItem } from './TouchableItem';
 export { default as SceneMap } from './SceneMap';
 export { default as ScrollPager } from './ScrollPager';
 
+export { default as CollapsibleTabView } from './CollapsibleTabView';
+export { useSceneProps } from './CollapsibleTabView';
+export type { Props as CollapsibleTabViewProps } from './CollapsibleTabView';
+
 export type { Route, NavigationState, SceneRendererProps } from './types';
