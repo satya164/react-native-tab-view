@@ -1,5 +1,51 @@
 import * as React from 'react';
-import { View, Text, Image, ScrollView, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  ScrollView,
+  StyleSheet,
+  ViewStyle,
+  Animated,
+} from 'react-native';
+
+const ArticleContent = () => {
+  return (
+    <>
+      <View style={styles.author}>
+        <Image
+          style={styles.avatar}
+          source={require('../../assets/avatar-1.png')}
+        />
+        <View style={styles.meta}>
+          <Text style={styles.name}>Knowledge Bot</Text>
+          <Text style={styles.timestamp}>1st Jan 2025</Text>
+        </View>
+      </View>
+      <Text style={styles.title}>Lorem Ipsum</Text>
+      <Text style={styles.paragraph}>
+        Contrary to popular belief, Lorem Ipsum is not simply random text. It
+        has roots in a piece of classical Latin literature from 45 BC, making it
+        over 2000 years old.
+      </Text>
+      <Image style={styles.image} source={require('../../assets/book.jpg')} />
+      <Text style={styles.paragraph}>
+        Richard McClintock, a Latin professor at Hampden-Sydney College in
+        Virginia, looked up one of the more obscure Latin words, consectetur,
+        from a Lorem Ipsum passage, and going through the cites of the word in
+        classical literature, discovered the undoubtable source.
+      </Text>
+      <Text style={styles.paragraph}>
+        Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of &quot;de Finibus
+        Finibus Bonorum et Malorum&quot; (The Extremes of Good and Evil) by
+        Cicero, written in 45 BC. This book is a treatise on the theory of
+        ethics, very popular during the Renaissance. The first line of Lorem
+        Ipsum, &quot;Lorem ipsum dolor sit amet..&quot;, comes from a line in
+        section 1.10.32.
+      </Text>
+    </>
+  );
+};
 
 export default class Article extends React.Component {
   render() {
@@ -8,41 +54,30 @@ export default class Article extends React.Component {
         style={styles.container}
         contentContainerStyle={styles.content}
       >
-        <View style={styles.author}>
-          <Image
-            style={styles.avatar}
-            source={require('../../assets/avatar-1.png')}
-          />
-          <View style={styles.meta}>
-            <Text style={styles.name}>Knowledge Bot</Text>
-            <Text style={styles.timestamp}>1st Jan 2025</Text>
-          </View>
-        </View>
-        <Text style={styles.title}>Lorem Ipsum</Text>
-        <Text style={styles.paragraph}>
-          Contrary to popular belief, Lorem Ipsum is not simply random text. It
-          has roots in a piece of classical Latin literature from 45 BC, making
-          it over 2000 years old.
-        </Text>
-        <Image style={styles.image} source={require('../../assets/book.jpg')} />
-        <Text style={styles.paragraph}>
-          Richard McClintock, a Latin professor at Hampden-Sydney College in
-          Virginia, looked up one of the more obscure Latin words, consectetur,
-          from a Lorem Ipsum passage, and going through the cites of the word in
-          classical literature, discovered the undoubtable source.
-        </Text>
-        <Text style={styles.paragraph}>
-          Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of &quot;de
-          Finibus Bonorum et Malorum&quot; (The Extremes of Good and Evil) by
-          Cicero, written in 45 BC. This book is a treatise on the theory of
-          ethics, very popular during the Renaissance. The first line of Lorem
-          Ipsum, &quot;Lorem ipsum dolor sit amet..&quot;, comes from a line in
-          section 1.10.32.
-        </Text>
+        <ArticleContent />
       </ScrollView>
     );
   }
 }
+
+// used in Collapsible TabView examples
+export const AnimatedArticle = React.forwardRef<
+  any,
+  {
+    contentContainerStyle?: ViewStyle;
+  }
+>(({ contentContainerStyle, ...rest }, ref) => {
+  return (
+    <Animated.ScrollView
+      ref={ref}
+      style={styles.container}
+      contentContainerStyle={[styles.content, contentContainerStyle]}
+      {...rest}
+    >
+      <ArticleContent />
+    </Animated.ScrollView>
+  );
+});
 
 const styles = StyleSheet.create({
   container: {

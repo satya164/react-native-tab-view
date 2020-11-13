@@ -1,7 +1,14 @@
 /* eslint-disable import/no-commonjs */
 
 import * as React from 'react';
-import { Image, Dimensions, ScrollView, StyleSheet } from 'react-native';
+import {
+  Image,
+  Dimensions,
+  ScrollView,
+  StyleSheet,
+  ViewStyle,
+  Animated,
+} from 'react-native';
 
 const COVERS = [
   require('../../assets/album-art-1.jpg'),
@@ -14,6 +21,12 @@ const COVERS = [
   require('../../assets/album-art-8.jpg'),
 ];
 
+const albumsContent = () =>
+  COVERS.map((source, i) => (
+    // eslint-disable-next-line react/no-array-index-key
+    <Image key={i} source={source} style={styles.cover} />
+  ));
+
 export default class Albums extends React.Component {
   render() {
     return (
@@ -21,14 +34,30 @@ export default class Albums extends React.Component {
         style={styles.container}
         contentContainerStyle={styles.content}
       >
-        {COVERS.map((source, i) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <Image key={i} source={source} style={styles.cover} />
-        ))}
+        {albumsContent()}
       </ScrollView>
     );
   }
 }
+
+// used in Collapsible TabView examples
+export const AnimatedAlbums = React.forwardRef<
+  any,
+  {
+    contentContainerStyle?: ViewStyle;
+  }
+>(({ contentContainerStyle, ...rest }, ref) => {
+  return (
+    <Animated.ScrollView
+      ref={ref}
+      style={styles.container}
+      contentContainerStyle={[styles.content, contentContainerStyle]}
+      {...rest}
+    >
+      {albumsContent()}
+    </Animated.ScrollView>
+  );
+});
 
 const styles = StyleSheet.create({
   container: {

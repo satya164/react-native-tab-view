@@ -23,6 +23,9 @@ import TabBarIconExample from './TabBarIconExample';
 import CustomIndicatorExample from './CustomIndicatorExample';
 import CustomTabBarExample from './CustomTabBarExample';
 import CoverflowExample from './CoverflowExample';
+import CollapsibleTabViewExample from './CollapsibleTabViewExample';
+import CollapsibleTabViewNoSnapExample from './CollapsibleTabViewNoSnapExample';
+import CollapsibleTabViewDynamicHeightExample from './CollapsibleTabViewDynamicHeightExample';
 
 type State = {
   title: string;
@@ -51,6 +54,9 @@ const EXAMPLE_COMPONENTS: ExampleComponentType[] = [
   CustomIndicatorExample,
   CustomTabBarExample,
   CoverflowExample,
+  CollapsibleTabViewExample,
+  CollapsibleTabViewNoSnapExample,
+  CollapsibleTabViewDynamicHeightExample,
 ];
 
 const KeepAwake = () => {

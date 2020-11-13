@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Animated } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 
 type Item = { name: string; number: number };
@@ -79,24 +79,36 @@ class ContactItem extends React.PureComponent<{
   }
 }
 
+const ItemSeparator = () => <View style={styles.separator} />;
+
+const renderItem = ({ item }: { item: Item }) => <ContactItem item={item} />;
+
 export default class Contacts extends React.Component {
-  private renderItem = ({ item }: { item: Item }) => (
-    <ContactItem item={item} />
-  );
-
-  private ItemSeparator = () => <View style={styles.separator} />;
-
   render() {
     return (
       <FlatList
         data={CONTACTS}
         keyExtractor={(_, i) => String(i)}
-        renderItem={this.renderItem}
-        ItemSeparatorComponent={this.ItemSeparator}
+        renderItem={renderItem}
+        ItemSeparatorComponent={ItemSeparator}
       />
     );
   }
 }
+
+// used in Collapsible TabView examples
+export const AnimatedContacts = React.forwardRef<any, object>((props, ref) => {
+  return (
+    <Animated.FlatList
+      ref={ref}
+      data={CONTACTS}
+      keyExtractor={(_, i) => String(i)}
+      renderItem={renderItem}
+      ItemSeparatorComponent={ItemSeparator}
+      {...props}
+    />
+  );
+});
 
 const styles = StyleSheet.create({
   item: {
