@@ -34,7 +34,7 @@ type ScrollRef = ScrollableView | ScrollableList;
 // work to be done in @types/react-native
 // It should be `(instance: ScrollableComponent | null): void` [see above]
 // instead of `(instance: any | null): void`
-// but @types has wrong types for Animated.[FlatList | ScrollView | SectionList]
+// but @types has wrong types for Animated.[FlatList | ScrollView]
 // without class methods definitions. If we were using non Animated components,
 // just a regular FlatList for example, it would work with the commented code
 // above.
@@ -114,7 +114,6 @@ type SceneProps = {
  *
  * - Animated.ScrollView
  * - Animated.FlatList
- * - Animated.SectionList
  *
  * ```js
  * const sceneProps = useSceneProps('routeKey')
@@ -164,7 +163,6 @@ export const useSceneProps = <T extends Route>(
 /**
  * Utility function to perform scroll on:
  * - FlatList
- * - SectionList
  * - ScrollView
  */
 const scrollScene = ({
@@ -372,7 +370,7 @@ const CollapsibleTabView = <T extends Route>({
    * Function to be passed as ref for the scrollable animated
    * component inside the tab scene.
    *
-   * One of: Animated.[SrcollView | FlatList | SectionList]
+   * One of: Animated.[SrcollView | FlatList]
    *
    * It is exposed in the context.
    */
