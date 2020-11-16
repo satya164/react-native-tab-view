@@ -205,7 +205,7 @@ export type Props<T extends Route> = Partial<TabViewProps<T>> &
     /**
      * Props passed to the tab bar component.
      */
-    tabBarProps?: TabBarProps<T>;
+    tabBarProps?: Partial<TabBarProps<T>>;
     /**
      * Header rendered on top of the tab bar. Defaul is `() => null`
      */
