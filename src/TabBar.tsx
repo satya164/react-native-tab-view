@@ -149,26 +149,26 @@ export default class TabBar<T extends Route> extends React.Component<
   };
 
   //
-  // when calculating the scroll distance, take into consideration also any spacing from the container 
+  // when calculating the scroll distance, take into consideration also any spacing from the container
   //
-  private getComputedContentSpacing = (style: StyleProp<ViewStyle>) => {
+  private getComputedContentSpacing = (style?: StyleProp<ViewStyle>) => {
     const contentStyle = StyleSheet.flatten(style);
 
     let space = 0;
-    
-    if(typeof contentStyle.marginLeft === 'number'){
+
+    if (typeof contentStyle?.marginLeft === 'number') {
       space += contentStyle.marginLeft;
     }
 
-    if(typeof contentStyle.marginRight === 'number'){
+    if (typeof contentStyle?.marginRight === 'number') {
       space += contentStyle.marginRight;
     }
 
-    if(typeof contentStyle.paddingLeft === 'number'){
+    if (typeof contentStyle?.paddingLeft === 'number') {
       space += contentStyle.paddingLeft;
     }
 
-    if(typeof contentStyle.paddingRight === 'number'){
+    if (typeof contentStyle?.paddingRight === 'number') {
       space += contentStyle.paddingRight;
     }
 
