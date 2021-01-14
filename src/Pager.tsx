@@ -410,7 +410,7 @@ export default class Pager<T extends Route> extends React.Component<
   };
 
   private jumpTo = (key: string) => {
-    const { navigationState, keyboardDismissMode, onIndexChange } = this.props;
+    const { navigationState, keyboardDismissMode } = this.props;
 
     const index = navigationState.routes.findIndex(
       (route) => route.key === key
@@ -422,8 +422,6 @@ export default class Pager<T extends Route> extends React.Component<
     this.jumpToIndex(index);
     if (navigationState.index !== index) {
       requestAnimationFrame(() => {
-        onIndexChange(index);
-
         // When the index changes, the focused input will no longer be in current tab
         // So we should dismiss the keyboard
         if (keyboardDismissMode === 'auto') {
