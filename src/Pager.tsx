@@ -419,16 +419,17 @@ export default class Pager<T extends Route> extends React.Component<
     // A tab switch might occur when we're in the middle of a transition
     // In that case, the index might be same as before
     // So we conditionally make the pager to update the position
-    if (navigationState.index === index) {
-      this.jumpToIndex(index);
-    } else {
-      onIndexChange(index);
+    this.jumpToIndex(index);
+    if (navigationState.index !== index) {
+      requestAnimationFrame(() => {
+        onIndexChange(index);
 
-      // When the index changes, the focused input will no longer be in current tab
-      // So we should dismiss the keyboard
-      if (keyboardDismissMode === 'auto') {
-        Keyboard.dismiss();
-      }
+        // When the index changes, the focused input will no longer be in current tab
+        // So we should dismiss the keyboard
+        if (keyboardDismissMode === 'auto') {
+          Keyboard.dismiss();
+        }
+      });
     }
   };
 
