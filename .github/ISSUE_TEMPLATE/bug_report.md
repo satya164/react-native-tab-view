@@ -40,7 +40,6 @@ For Syntax Highlighting check this [link](https://help.github.com/en/articles/cr
 | expo                         |
 | react-native                 |
 | react-native-tab-view        |
-| react-native-gesture-handler |
-| react-native-reanimated      |
+| react-native-pager-view      |
 | node                         |
 | npm or yarn                  |

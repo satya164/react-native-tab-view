@@ -13,7 +13,6 @@ jobs:
           required-packages: |
             react-native
             react-native-tab-view
-            react-native-gesture-handler
-            react-native-reanimated
+            react-native-pager-view
           optional-packages: |
             expo
