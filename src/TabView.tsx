@@ -25,16 +25,16 @@ export type Props<T extends Route> = PagerProps & {
       route: T;
     }
   ) => React.ReactNode;
-  renderLazyPlaceholder: (props: { route: T }) => React.ReactNode;
-  renderTabBar: (
+  renderLazyPlaceholder?: (props: { route: T }) => React.ReactNode;
+  renderTabBar?: (
     props: SceneRendererProps & {
       navigationState: NavigationState<T>;
     }
   ) => React.ReactNode;
-  tabBarPosition: 'top' | 'bottom';
+  tabBarPosition?: 'top' | 'bottom';
   initialLayout?: { width?: number; height?: number };
-  lazy: ((props: { route: T }) => boolean) | boolean;
-  lazyPreloadDistance: number;
+  lazy?: ((props: { route: T }) => boolean) | boolean;
+  lazyPreloadDistance?: number;
   sceneContainerStyle?: StyleProp<ViewStyle>;
   style?: StyleProp<ViewStyle>;
 };
@@ -57,7 +57,6 @@ export default class TabView<T extends Route> extends React.Component<
     swipeEnabled: true,
     lazy: false,
     lazyPreloadDistance: 0,
-    removeClippedSubviews: false,
   };
 
   state = {
