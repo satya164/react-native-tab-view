@@ -12,6 +12,7 @@ web-build/
 .history/
 
 jsconfig.json
+tsconfig.tsbuildinfo
 
 # Xcode
 #
