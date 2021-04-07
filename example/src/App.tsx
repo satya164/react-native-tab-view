@@ -7,7 +7,6 @@ import {
   Text,
   TouchableOpacity,
   View,
-  YellowBox,
   I18nManager,
 } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -15,7 +14,7 @@ import { registerRootComponent } from 'expo';
 import { Asset } from 'expo-asset';
 import { useKeepAwake } from 'expo-keep-awake';
 import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import ScrollableTabBarExample from './ScrollableTabBarExample';
 import AutoWidthTabBarExample from './AutoWidthTabBarExample';
 import TabBarIconExample from './TabBarIconExample';
@@ -37,9 +36,7 @@ type ExampleComponentType = React.ComponentType<{}> & {
   appbarElevation?: number;
 };
 
-I18nManager.forceRTL(false);
-
-YellowBox.ignoreWarnings(['bind():']);
+I18nManager.forceRTL(true);
 
 const PERSISTENCE_KEY = 'index_persistence';
 
