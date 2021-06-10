@@ -124,6 +124,7 @@ export default function TabView<T extends Route>({
                       lazyPreloadDistance={lazyPreloadDistance}
                       navigationState={navigationState}
                       style={sceneContainerStyle}
+                      isSwiping={isSwiping}
                     >
                       {({ loading }) =>
                         loading
