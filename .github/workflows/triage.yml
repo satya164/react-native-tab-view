@@ -51,7 +51,7 @@ jobs:
 
   react-native-pager-view:
     runs-on: ubuntu-latest
-    if: github.event.label.name == 'library:react-native-pager-view'
+    if: github.event.label.name == 'react-native-pager-view'
     steps:
       - uses: actions/github-script@v3
         with:

@@ -1,0 +1,28 @@
+name: Feature Request
+description: Suggest an idea or new feature in the library.
+labels: [feature request]
+body:
+  - type: textarea
+    attributes:
+      label: Description
+      description: |
+        Describe the feature you would like to see in the library.
+
+        If this is related to a problem, describe what the problem is. For example, "I'm always frustrated when..."
+      placeholder: Brief description of the feature
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Alternatives
+      description: |
+        Describe any alternative approaches you might have considered, or other solutions you have researched.
+      placeholder: Alternative approaches or other solutions
+  - type: textarea
+    attributes:
+      label: Inspirations & examples
+      description: |
+        If you are trying to achieve a specific UX, share some examples of other apps which implement this UX.
+
+        Screenshots and videos of the behavior will be very helpful.
+      placeholder: Examples of other apps

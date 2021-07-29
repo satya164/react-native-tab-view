@@ -1,5 +1,5 @@
-name: React Navigation 5
-description: Report an issue with React Navigation 5
+name: Bug Report
+description: Report an issue with the library.
 labels: [bug]
 body:
   - type: markdown
