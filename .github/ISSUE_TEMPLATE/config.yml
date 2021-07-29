@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Discussions
+    url: https://github.com/satya164/react-native-tab-view/discussions
+    about: Ask, answer and discuss questions about the library.
+  - name: Reactiflux
+    url: https://www.reactiflux.com/
+    about: Chat with other community members in the help-react-native channel.

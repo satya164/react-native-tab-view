@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   publish:
@@ -15,15 +16,12 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: 10.x
+          node-version: 14.x
 
       - name: Setup Expo
-        uses: expo/expo-github-action@v5
+        uses: expo/expo-github-action@v6
         with:
-          expo-version: 3.x
-          expo-username: ${{ secrets.EXPO_CLI_USERNAME }}
-          expo-password: ${{ secrets.EXPO_CLI_PASSWORD }}
-          expo-cache: true
+          token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Restore yarn cache
         id: yarn-cache
@@ -40,4 +38,4 @@ jobs:
 
       - name: Publish Expo app
         working-directory: ./example
-        run: expo publish
+        run: yarn expo publish
