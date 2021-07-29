@@ -59,7 +59,7 @@
     "jest": "^27.0.6",
     "prettier": "^2.3.2",
     "react": "~16.13.1",
-    "react-native": "~0.63.4",
+    "react-native": "~0.64.1",
     "react-native-builder-bob": "^0.18.1",
     "react-native-pager-view": "^5.0.12",
     "release-it": "^14.10.1",
