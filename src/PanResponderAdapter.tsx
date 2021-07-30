@@ -48,7 +48,7 @@ const DefaultTransitionSpec = {
   overshootClamping: true,
 };
 
-export default function Pager<T extends Route>({
+export default function PanResponderAdapter<T extends Route>({
   layout,
   keyboardDismissMode = 'auto',
   swipeEnabled = true,
