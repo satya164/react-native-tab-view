@@ -48,7 +48,7 @@ const DefaultTransitionSpec = {
   overshootClamping: true,
 };
 
-export default function PanResponderAdapter<T extends Route>({
+export default function Pager<T extends Route>({
   layout,
   keyboardDismissMode = 'auto',
   swipeEnabled = true,
@@ -117,6 +117,7 @@ export default function PanResponderAdapter<T extends Route>({
     }
 
     if (layout.width && currentIndexRef.current !== index) {
+      currentIndexRef.current = index;
       jumpToIndex(index);
     }
   }, [jumpToIndex, keyboardDismissMode, layout.width, index]);
@@ -139,11 +140,12 @@ export default function PanResponderAdapter<T extends Route>({
       return false;
     }
 
+    const diffX = I18nManager.isRTL ? -gestureState.dx : gestureState.dx;
+
     return (
       isMovingHorizontally(event, gestureState) &&
-      ((gestureState.dx >= DEAD_ZONE && currentIndexRef.current > 0) ||
-        (gestureState.dx <= -DEAD_ZONE &&
-          currentIndexRef.current < routes.length - 1))
+      ((diffX >= DEAD_ZONE && currentIndexRef.current > 0) ||
+        (diffX <= -DEAD_ZONE && currentIndexRef.current < routes.length - 1))
     );
   };
 
@@ -163,18 +165,20 @@ export default function PanResponderAdapter<T extends Route>({
     _: GestureResponderEvent,
     gestureState: PanResponderGestureState
   ) => {
+    const diffX = I18nManager.isRTL ? -gestureState.dx : gestureState.dx;
+
     if (
       // swiping left
-      (gestureState.dx > 0 && index <= 0) ||
+      (diffX > 0 && index <= 0) ||
       // swiping right
-      (gestureState.dx < 0 && index >= routes.length - 1)
+      (diffX < 0 && index >= routes.length - 1)
     ) {
       return;
     }
 
     if (layout.width) {
       // @ts-expect-error: _offset is private, but docs use it as well
-      const position = (panX._offset + gestureState.dx) / -layout.width;
+      const position = (panX._offset + diffX) / -layout.width;
       const next =
         position > index ? Math.ceil(position) : Math.floor(position);
 
@@ -183,7 +187,7 @@ export default function PanResponderAdapter<T extends Route>({
       }
     }
 
-    panX.setValue(gestureState.dx);
+    panX.setValue(diffX);
   };
 
   const finishGesture = (
@@ -211,7 +215,9 @@ export default function PanResponderAdapter<T extends Route>({
         Math.min(
           Math.max(
             0,
-            currentIndex - gestureState.dx / Math.abs(gestureState.dx)
+            I18nManager.isRTL
+              ? currentIndex + gestureState.dx / Math.abs(gestureState.dx)
+              : currentIndex - gestureState.dx / Math.abs(gestureState.dx)
           ),
           routes.length - 1
         )
