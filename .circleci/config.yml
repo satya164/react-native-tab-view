@@ -1,58 +1,85 @@
-version: 2
+version: 2.1
 
-defaults: &defaults
-  docker:
-    - image: circleci/node:10
-  working_directory: ~/project
+executors:
+  default:
+    docker:
+      - image: circleci/node:14
+    working_directory: ~/project
+
+commands:
+  attach_project:
+    steps:
+      - attach_workspace:
+          at: ~/project
 
 jobs:
   install-dependencies:
-    <<: *defaults
+    executor: default
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/project
+      - attach_project
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "package.json" }}
-            - v1-dependencies-
+            - dependencies-{{ checksum "package.json" }}
+            - dependencies-
       - restore_cache:
           keys:
-            - v1-dependencies-example-{{ checksum "example/package.json" }}
-            - v1-dependencies-example-
-      - run: yarn bootstrap
+            - dependencies-example-{{ checksum "example/package.json" }}
+            - dependencies-example-
+      - run:
+          name: Install dependencies
+          command: |
+            yarn install --cwd example --frozen-lockfile
+            yarn install --frozen-lockfile
       - save_cache:
-          key: v1-dependencies-{{ checksum "package.json" }}
-          paths: node_modules
+          key: dependencies-{{ checksum "package.json" }}
+          paths:
+            - node_modules
       - save_cache:
-          key: v1-dependencies-example-{{ checksum "example/package.json" }}
-          paths: example/node_modules
+          key: dependencies-example-{{ checksum "example/package.json" }}
+          paths:
+            - example/node_modules
       - persist_to_workspace:
           root: .
-          paths: .
-  lint-and-typecheck:
-      <<: *defaults
-      steps:
-        - attach_workspace:
-            at: ~/project
-        - run: |
+          paths:
+            - .
+  lint:
+    executor: default
+    steps:
+      - attach_project
+      - run:
+          name: Lint files
+          command: |
             yarn lint
+
+  typescript:
+    executor: default
+    steps:
+      - attach_project
+      - run:
+          name: Typecheck files
+          command: |
             yarn typescript
-  unit-tests:
-      <<: *defaults
-      steps:
-        - attach_workspace:
-            at: ~/project
-        - run: yarn test -- --coverage
-        - store_artifacts:
-            path: coverage
-            destination: coverage
+
+  build-package:
+    executor: default
+    steps:
+      - attach_project
+      - run:
+          name: Build package
+          command: |
+            yarn prepare
 
 workflows:
-  version: 2
   build-and-test:
     jobs:
       - install-dependencies
-      - lint-and-typecheck:
+      - lint:
+          requires:
+            - install-dependencies
+      - typescript:
+          requires:
+            - install-dependencies
+      - build-package:
           requires:
             - install-dependencies
