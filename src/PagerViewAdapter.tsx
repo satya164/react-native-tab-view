@@ -49,6 +49,7 @@ export default function PagerViewAdapter<T extends Route>({
 
   const pagerRef = React.useRef<ViewPager>();
   const indexRef = React.useRef<number>(index);
+  const initialIndexRef = React.useRef<number>(index);
   const navigationStateRef = React.useRef(navigationState);
 
   const position = useAnimatedValue(index);
@@ -124,7 +125,7 @@ export default function PagerViewAdapter<T extends Route>({
         {...rest}
         ref={pagerRef}
         style={[styles.container, style]}
-        initialPage={index}
+        initialPage={initialIndexRef.current}
         keyboardDismissMode={
           keyboardDismissMode === 'auto' ? 'on-drag' : keyboardDismissMode
         }
