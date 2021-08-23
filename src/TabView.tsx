@@ -141,7 +141,8 @@ export default function TabView<T extends Route>({
 
 const styles = StyleSheet.create({
   pager: {
-    flex: 1,
+    flexGrow: 1,
+    flexShrink: 1,
     overflow: 'hidden',
   },
 });
