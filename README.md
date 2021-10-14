@@ -38,6 +38,10 @@ Open a Terminal in the project root and run:
 ```sh
 yarn add react-native-tab-view
 ```
+or
+```sh
+npm install react-native-tab-view --save
+```
 
 Now we need to install [`react-native-pager-view`](https://github.com/callstack/react-native-viewpager) if you plan to support iOS and Android.
 
