@@ -31,6 +31,7 @@ export type Props<T extends Route> = PagerProps & {
   lazyPreloadDistance?: number;
   sceneContainerStyle?: StyleProp<ViewStyle>;
   style?: StyleProp<ViewStyle>;
+  useNativeDriver?: boolean;
 };
 
 export default function TabView<T extends Route>({
@@ -49,6 +50,7 @@ export default function TabView<T extends Route>({
   style,
   swipeEnabled = true,
   tabBarPosition = 'top',
+  useNativeDriver = true
 }: Props<T>) {
   const [layout, setLayout] = React.useState({
     width: 0,
@@ -84,6 +86,7 @@ export default function TabView<T extends Route>({
         onSwipeStart={onSwipeStart}
         onSwipeEnd={onSwipeEnd}
         onIndexChange={jumpToIndex}
+        useNativeDriver={useNativeDriver}
       >
         {({ position, render, addEnterListener, jumpTo }) => {
           // All of the props here must not change between re-renders

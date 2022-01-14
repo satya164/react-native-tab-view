@@ -30,6 +30,7 @@ type Props<T extends Route> = PagerProps & {
       jumpTo: (key: string) => void;
     }
   ) => React.ReactElement;
+  useNativeDriver: boolean;
 };
 
 export default function PagerViewAdapter<T extends Route>({
@@ -41,6 +42,7 @@ export default function PagerViewAdapter<T extends Route>({
   onSwipeEnd,
   children,
   style,
+  useNativeDriver,
   ...rest
 }: Props<T>) {
   const { index } = navigationState;
@@ -137,7 +139,7 @@ export default function PagerViewAdapter<T extends Route>({
               },
             },
           ],
-          { useNativeDriver: true }
+          { useNativeDriver }
         )}
         onPageSelected={(e) => {
           const index = e.nativeEvent.position;
