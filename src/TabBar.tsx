@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import TabBarItem, { Props as TabBarItemProps } from './TabBarItem';
 import TabBarIndicator, { Props as IndicatorProps } from './TabBarIndicator';
+import SimpleIndicator from './SimpleIndicatior';
 import type {
   Route,
   Scene,
@@ -48,6 +49,7 @@ export type Props<T extends Route> = SceneRendererProps & {
   ) => React.ReactNode;
   renderBadge?: (scene: Scene<T>) => React.ReactNode;
   renderIndicator: (props: IndicatorProps<T>) => React.ReactNode;
+  simpleIndicator: boolean;
   renderTabBarItem?: (
     props: TabBarItemProps<T> & { key: string }
   ) => React.ReactElement;
@@ -299,6 +301,7 @@ export default class TabBar<T extends Route> extends React.Component<
       contentContainerStyle,
       style,
       indicatorContainerStyle,
+      simpleIndicator,
     } = this.props;
     const { layout, tabWidths } = this.state;
     const { routes } = navigationState;
@@ -310,6 +313,10 @@ export default class TabBar<T extends Route> extends React.Component<
       this.scrollAmount,
       this.getMaxScrollDistance(tabBarWidth, layout.width)
     );
+
+    const renderIndicator = simpleIndicator ? (props: IndicatorProps<Route>) => (
+      <SimpleIndicator {...props} />
+    ) : this.props.renderIndicator;
 
     return (
       <Animated.View
@@ -329,7 +336,7 @@ export default class TabBar<T extends Route> extends React.Component<
             indicatorContainerStyle,
           ]}
         >
-          {this.props.renderIndicator({
+          {renderIndicator({
             position,
             layout,
             navigationState,

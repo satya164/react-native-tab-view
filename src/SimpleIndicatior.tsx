@@ -32,7 +32,7 @@ export default class TabBarIndicator<T extends Route> extends React.Component<Pr
   };
 
   render() {
-    const { position, navigationState, getTabWidth, style, layout, width } = this.props;
+    const { position, navigationState, getTabWidth, style, layout } = this.props;
     const { routes } = navigationState;
 
     const transform = [];
@@ -43,7 +43,7 @@ export default class TabBarIndicator<T extends Route> extends React.Component<Pr
       transform.push({ translateX });
     }
 
-    return <Animated.View style={[styles.indicator, { transform }, style, { width }]} />;
+    return <Animated.View style={[styles.indicator, { transform }, style]} />;
   }
 }
 
