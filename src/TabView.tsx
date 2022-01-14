@@ -23,7 +23,7 @@ export type Props<T extends Route> = PagerProps & {
   renderScene: (props: SceneRendererProps & { route: T }) => React.ReactNode;
   renderLazyPlaceholder?: (props: { route: T }) => React.ReactNode;
   renderTabBar?: (
-    props: SceneRendererProps & { navigationState: NavigationState<T> }
+    props: SceneRendererProps & { navigationState: NavigationState<T> } & {}
   ) => React.ReactNode;
   tabBarPosition?: 'top' | 'bottom';
   initialLayout?: Partial<Layout>;
@@ -32,6 +32,7 @@ export type Props<T extends Route> = PagerProps & {
   sceneContainerStyle?: StyleProp<ViewStyle>;
   style?: StyleProp<ViewStyle>;
   useNativeDriver?: boolean;
+  simpleIndicator?: boolean;
 };
 
 export default function TabView<T extends Route>({
@@ -50,7 +51,7 @@ export default function TabView<T extends Route>({
   style,
   swipeEnabled = true,
   tabBarPosition = 'top',
-  useNativeDriver = true
+  useNativeDriver = true,
 }: Props<T>) {
   const [layout, setLayout] = React.useState({
     width: 0,

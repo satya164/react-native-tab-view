@@ -49,7 +49,7 @@ export type Props<T extends Route> = SceneRendererProps & {
   ) => React.ReactNode;
   renderBadge?: (scene: Scene<T>) => React.ReactNode;
   renderIndicator: (props: IndicatorProps<T>) => React.ReactNode;
-  simpleIndicator: boolean;
+  simpleIndicator?: boolean;
   renderTabBarItem?: (
     props: TabBarItemProps<T> & { key: string }
   ) => React.ReactElement;
@@ -314,9 +314,9 @@ export default class TabBar<T extends Route> extends React.Component<
       this.getMaxScrollDistance(tabBarWidth, layout.width)
     );
 
-    const renderIndicator = simpleIndicator ? (props: IndicatorProps<Route>) => (
-      <SimpleIndicator {...props} />
-    ) : this.props.renderIndicator;
+    const renderIndicator = simpleIndicator
+      ? (props: IndicatorProps<Route>) => <SimpleIndicator {...props} />
+      : this.props.renderIndicator;
 
     return (
       <Animated.View
