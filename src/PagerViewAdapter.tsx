@@ -142,6 +142,8 @@ export default function PagerViewAdapter<T extends Route>({
         onPageSelected={(e) => {
           const index = e.nativeEvent.position;
           indexRef.current = index;
+          position.setValue(index);
+          offset.setValue(0);
           onIndexChange(index);
         }}
         onPageScrollStateChanged={onPageScrollStateChanged}
