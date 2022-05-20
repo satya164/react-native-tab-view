@@ -196,7 +196,7 @@ export default function PanResponderAdapter<T extends Route>({
   ) => {
     panX.flattenOffset();
 
-    onSwipeEnd?.();
+    onSwipeEnd?.(navigationStateRef.current.index);
 
     const currentIndex =
       typeof pendingIndexRef.current === 'number'

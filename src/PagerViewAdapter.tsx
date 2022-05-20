@@ -83,7 +83,7 @@ export default function PagerViewAdapter<T extends Route>({
 
     switch (pageScrollState) {
       case 'idle':
-        onSwipeEnd?.();
+        onSwipeEnd?.(indexRef.current);
         return;
       case 'dragging': {
         const subscription = offset.addListener(({ value }) => {

@@ -54,5 +54,5 @@ export type PagerProps = Omit<
   keyboardDismissMode?: 'none' | 'on-drag' | 'auto';
   swipeEnabled?: boolean;
   onSwipeStart?: () => void;
-  onSwipeEnd?: () => void;
+  onSwipeEnd?: (index: number) => void;
 };
