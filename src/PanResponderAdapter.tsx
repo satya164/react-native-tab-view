@@ -268,14 +268,17 @@ export default function PanResponderAdapter<T extends Route>({
   });
 
   const maxTranslate = layout.width * (routes.length - 1);
-  const translateX = Animated.multiply(
+  const translateX = React.useMemo(() => {
+    if (maxTranslate <= 0) return 0;
+    return Animated.multiply(
     panX.interpolate({
       inputRange: [-maxTranslate, 0],
       outputRange: [-maxTranslate, 0],
-      extrapolate: 'clamp',
+      extrapolate: "clamp",
     }),
     I18nManager.isRTL ? -1 : 1
-  );
+   );
+  }, [maxTranslate, panX]);
 
   return children({
     position: layout.width
