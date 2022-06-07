@@ -22,6 +22,11 @@ import type {
   Event,
 } from './types';
 
+export function getGroup(name: string): string | undefined {
+  const parts = name.split('_');
+  return parts.length > 1 ? parts[0] : undefined;
+}
+
 export type Props<T extends Route> = SceneRendererProps & {
   navigationState: NavigationState<T>;
   scrollEnabled?: boolean;
@@ -64,6 +69,8 @@ export type Props<T extends Route> = SceneRendererProps & {
 type State = {
   layout: Layout;
   tabWidths: { [key: string]: number };
+  groups: { name: string; last: string; routes: string[] }[];
+  initialized: boolean;
 };
 
 export default class TabBar<T extends Route> extends React.Component<
@@ -89,6 +96,8 @@ export default class TabBar<T extends Route> extends React.Component<
   state: State = {
     layout: { width: 0, height: 0 },
     tabWidths: {},
+    groups: [],
+    initialized: false,
   };
 
   componentDidUpdate(prevProps: Props<T>, prevState: State) {
@@ -113,6 +122,32 @@ export default class TabBar<T extends Route> extends React.Component<
       ) {
         // When tab width is dynamic, only adjust the scroll once we have all tab widths and layout
         return;
+      }
+
+      //if currently selected route is in a group, update this group
+      const currentRoute = navigationState.routes[
+        navigationState.index
+      ] as unknown as {
+        key: string;
+        name: string;
+        params: any;
+      };
+
+      let newGroups = this.getGroups();
+      const groupName = getGroup(currentRoute.name);
+      if (groupName) {
+        const group = newGroups.find((group) => group.name === groupName);
+        if (group) group.last = currentRoute.key;
+      }
+      if (
+        !this.state.initialized ||
+        (this.state.groups.length === newGroups.length &&
+          newGroups.every((group) => this.state.groups.includes(group)))
+      ) {
+        this.setState(() => ({
+          groups: newGroups,
+          initialized: true,
+        }));
       }
 
       this.resetScroll(navigationState.index);
@@ -185,6 +220,38 @@ export default class TabBar<T extends Route> extends React.Component<
         ),
       0
     );
+  };
+
+  private getGroups = () => {
+    const { navigationState } = this.props;
+
+    let groups = [...this.state.groups];
+    for (const route of navigationState.routes) {
+      const convertedRoute = route as unknown as {
+        key: string;
+        name: string;
+        params: any;
+      };
+      const groupName = getGroup(convertedRoute.name);
+      if (groupName) {
+        //update groups
+        const group = groups.find((group) => group.name === groupName);
+        if (group) {
+          const index = group.routes.findIndex(
+            (route) => route === convertedRoute.name
+          );
+          if (index === -1) group.routes.push(convertedRoute.name);
+        } else {
+          groups.push({
+            name: groupName,
+            last: convertedRoute.key,
+            routes: [convertedRoute.name],
+          });
+        }
+      }
+    }
+
+    return groups;
   };
 
   private normalizeScrollValue = (
@@ -311,6 +378,10 @@ export default class TabBar<T extends Route> extends React.Component<
       this.getMaxScrollDistance(tabBarWidth, layout.width)
     );
 
+    const groups = this.state.initialized
+      ? this.state.groups
+      : this.getGroups();
+
     return (
       <Animated.View
         onLayout={this.handleLayout}
@@ -380,6 +451,26 @@ export default class TabBar<T extends Route> extends React.Component<
             ref={this.scrollViewRef}
           >
             {routes.map((route: T) => {
+              const convertedRoute = route as unknown as {
+                key: string;
+                name: string;
+                params: any;
+              };
+
+              const groupName = getGroup(convertedRoute.name);
+              if (groupName) {
+                const group = groups.find((group) => group.name === groupName);
+                if (
+                  group &&
+                  !(
+                    group.routes.findIndex(
+                      (route) => route === convertedRoute.name
+                    ) === 0
+                  )
+                )
+                  return null;
+              }
+
               const props: TabBarItemProps<T> & { key: string } = {
                 key: route.key,
                 position: position,
@@ -430,7 +521,21 @@ export default class TabBar<T extends Route> extends React.Component<
                     return;
                   }
 
-                  this.props.jumpTo(route.key);
+                  if (groupName) {
+                    const group = this.state.groups.find(
+                      (group) => group.name === groupName
+                    );
+                    this.props.jumpTo(
+                      group?.last &&
+                        navigationState.routes.find(
+                          (route) => group.last === route.key
+                        )
+                        ? group.last
+                        : route.key
+                    );
+                  } else {
+                    this.props.jumpTo(route.key);
+                  }
                 },
                 onLongPress: () => onTabLongPress?.({ route }),
                 labelStyle: labelStyle,

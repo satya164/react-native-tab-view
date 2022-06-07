@@ -9,6 +9,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import PlatformPressable from './PlatformPressable';
+import { getGroup } from './TabBar';
 import type { Scene, Route, NavigationState } from './types';
 
 export type Props<T extends Route> = {
@@ -47,37 +48,42 @@ const DEFAULT_INACTIVE_COLOR = 'rgba(255, 255, 255, 0.7)';
 export default class TabBarItem<T extends Route> extends React.Component<
   Props<T>
 > {
-  private getActiveOpacity = (
+  private getOpacities = (
     position: Animated.AnimatedInterpolation,
     routes: Route[],
     tabIndex: number
-  ) => {
+  ): {
+    activeOpacity: Animated.AnimatedInterpolation | number;
+    inactiveOpacity: Animated.AnimatedInterpolation | number;
+  } => {
     if (routes.length > 1) {
+      const routeNames = (
+        routes as unknown as {
+          key: string;
+          name: string;
+          params: any;
+        }[]
+      ).map((route) => route.name);
+      const ownGroup = getGroup(routeNames[tabIndex]) ?? 'none'; //Otherwise, thinks other missing groups are equivalent.
+
       const inputRange = routes.map((_, i) => i);
 
-      return position.interpolate({
-        inputRange,
-        outputRange: inputRange.map((i) => (i === tabIndex ? 1 : 0)),
-      });
+      return {
+        activeOpacity: position.interpolate({
+          inputRange,
+          outputRange: inputRange.map((i) =>
+            i === tabIndex || getGroup(routeNames[i]) === ownGroup ? 1 : 0
+          ),
+        }),
+        inactiveOpacity: position.interpolate({
+          inputRange,
+          outputRange: inputRange.map((i) =>
+            i === tabIndex || getGroup(routeNames[i]) === ownGroup ? 0 : 1
+          ),
+        }),
+      };
     } else {
-      return 1;
-    }
-  };
-
-  private getInactiveOpacity = (
-    position: Animated.AnimatedInterpolation,
-    routes: Route[],
-    tabIndex: number
-  ) => {
-    if (routes.length > 1) {
-      const inputRange = routes.map((_: Route, i: number) => i);
-
-      return position.interpolate({
-        inputRange,
-        outputRange: inputRange.map((i: number) => (i === tabIndex ? 0 : 1)),
-      });
-    } else {
-      return 0;
+      return { activeOpacity: 1, inactiveOpacity: 0 };
     }
   };
 
@@ -122,12 +128,7 @@ export default class TabBarItem<T extends Route> extends React.Component<
         ? labelColorFromStyle
         : DEFAULT_INACTIVE_COLOR;
 
-    const activeOpacity = this.getActiveOpacity(
-      position,
-      navigationState.routes,
-      tabIndex
-    );
-    const inactiveOpacity = this.getInactiveOpacity(
+    const { activeOpacity, inactiveOpacity } = this.getOpacities(
       position,
       navigationState.routes,
       tabIndex
