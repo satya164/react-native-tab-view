@@ -16,6 +16,7 @@ import type {
   SceneRendererProps,
   PagerProps,
 } from './types';
+import { noBounceProps } from './noBounce';
 
 export type Props<T extends Route> = PagerProps & {
   onIndexChange: (index: number) => void;
@@ -84,6 +85,7 @@ export default function TabView<T extends Route>({
         onSwipeStart={onSwipeStart}
         onSwipeEnd={onSwipeEnd}
         onIndexChange={jumpToIndex}
+        {...noBounceProps}
       >
         {({ position, render, addEnterListener, jumpTo }) => {
           // All of the props here must not change between re-renders
