@@ -141,6 +141,9 @@ export default class TabBar<T extends Route> extends React.Component<
     tabWidths: { [key: string]: number },
     flattenedWidth: string | number | undefined
   ) => {
+    if (routes.length === 0) {
+      return 0;
+    }
     if (flattenedWidth === 'auto') {
       return tabWidths[routes[index].key] || 0;
     }
