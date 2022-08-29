@@ -16,6 +16,7 @@
     "expo-asset": "~8.6.1",
     "expo-constants": "~13.2.3",
     "expo-keep-awake": "~10.2.0",
+    "expo-updates": "^0.14.5",
     "react": "18.0.0",
     "react-dom": "18.0.0",
     "react-native": "0.69.5",
