@@ -10,6 +10,7 @@ import {
   I18nManager,
   Platform,
   FlatList,
+  ListRenderItemInfo,
 } from 'react-native';
 import TabBarItem, { Props as TabBarItemProps } from './TabBarItem';
 import TabBarIndicator, { Props as IndicatorProps } from './TabBarIndicator';
@@ -367,7 +368,7 @@ export default class TabBar<T extends Route> extends React.Component<
         </Animated.View>
         <View style={styles.scroll}>
           <Animated.FlatList
-            data={routes}
+            data={routes as Animated.WithAnimatedValue<T>[]}
             keyExtractor={(item) => item.key}
             horizontal
             accessibilityRole="tablist"
@@ -393,7 +394,7 @@ export default class TabBar<T extends Route> extends React.Component<
               contentContainerStyle,
             ]}
             scrollEventThrottle={16}
-            renderItem={({ item: route, index }) => {
+            renderItem={({ item: route, index }: ListRenderItemInfo<T>) => {
               const props: TabBarItemProps<T> & { key: string } = {
                 key: route.key,
                 position: position,
