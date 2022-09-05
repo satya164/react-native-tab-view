@@ -41,7 +41,7 @@ export default function PagerViewAdapter<T extends Route>({
   onSwipeEnd,
   children,
   style,
-  disableChangeTabAnimation,
+  animationEnabled,
   ...rest
 }: Props<T>) {
   const { index } = navigationState;
@@ -64,11 +64,11 @@ export default function PagerViewAdapter<T extends Route>({
       (route: { key: string }) => route.key === key
     );
 
-    if (disableChangeTabAnimation) {
+    if (animationEnabled) {
+      pagerRef.current?.setPage(index);
+    } else {
       pagerRef.current?.setPageWithoutAnimation(index);
       position.setValue(index);
-    } else {
-      pagerRef.current?.setPage(index);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -79,11 +79,11 @@ export default function PagerViewAdapter<T extends Route>({
     }
 
     if (indexRef.current !== index) {
-      if (disableChangeTabAnimation) {
+      if (animationEnabled) {
+        pagerRef.current?.setPage(index);
+      } else {
         pagerRef.current?.setPageWithoutAnimation(index);
         position.setValue(index);
-      } else {
-        pagerRef.current?.setPage(index);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

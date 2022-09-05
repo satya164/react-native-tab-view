@@ -335,9 +335,9 @@ Style to apply to the view wrapping each screen. You can pass this to override s
 
 Style to apply to the tab view container.
 
-### `disableChangeTabAnimation`
+### `animationEnabled`
 
-Boolean indicating whether to disable the change tab animation.
+Enables animation when changing tab. By default it's true.
 
 ### `TabBar`
 

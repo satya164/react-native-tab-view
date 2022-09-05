@@ -55,5 +55,5 @@ export type PagerProps = Omit<
   swipeEnabled?: boolean;
   onSwipeStart?: () => void;
   onSwipeEnd?: () => void;
-  disableChangeTabAnimation?: boolean;
+  animationEnabled?: boolean;
 };
