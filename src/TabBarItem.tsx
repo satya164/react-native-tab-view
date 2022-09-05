@@ -19,10 +19,10 @@ export type Props<T extends Route> = {
   inactiveColor?: string;
   pressColor?: string;
   pressOpacity?: number;
-  getLabelText: (scene: Scene<T>) => string | undefined;
-  getAccessible: (scene: Scene<T>) => boolean | undefined;
-  getAccessibilityLabel: (scene: Scene<T>) => string | undefined;
-  getTestID: (scene: Scene<T>) => string | undefined;
+  getLabelText?: (scene: Scene<T>) => string | undefined;
+  getAccessible?: (scene: Scene<T>) => boolean | undefined;
+  getAccessibilityLabel?: (scene: Scene<T>) => string | undefined;
+  getTestID?: (scene: Scene<T>) => string | undefined;
   renderLabel?: (scene: {
     route: T;
     focused: boolean;
@@ -168,7 +168,7 @@ export default class TabBarItem<T extends Route> extends React.Component<
       renderLabelCustom !== undefined
         ? renderLabelCustom
         : ({ route, color }: { route: T; color: string }) => {
-            const labelText = getLabelText({ route });
+            const labelText = getLabelText?.({ route });
 
             if (typeof labelText === 'string') {
               return (
@@ -220,20 +220,20 @@ export default class TabBarItem<T extends Route> extends React.Component<
 
     const scene = { route };
 
-    let accessibilityLabel = getAccessibilityLabel(scene);
+    let accessibilityLabel = getAccessibilityLabel?.(scene);
 
     accessibilityLabel =
       typeof accessibilityLabel !== 'undefined'
         ? accessibilityLabel
-        : getLabelText(scene);
+        : getLabelText?.(scene);
 
     const badge = renderBadge ? renderBadge(scene) : null;
 
     return (
       <PlatformPressable
         android_ripple={{ borderless: true }}
-        testID={getTestID(scene)}
-        accessible={getAccessible(scene)}
+        testID={getTestID?.(scene)}
+        accessible={getAccessible?.(scene)}
         accessibilityLabel={accessibilityLabel}
         accessibilityRole="tab"
         accessibilityState={{ selected: isFocused }}

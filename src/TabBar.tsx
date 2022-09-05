@@ -30,10 +30,10 @@ export type Props<T extends Route> = SceneRendererProps & {
   inactiveColor?: string;
   pressColor?: string;
   pressOpacity?: number;
-  getLabelText: (scene: Scene<T>) => string | undefined;
-  getAccessible: (scene: Scene<T>) => boolean | undefined;
-  getAccessibilityLabel: (scene: Scene<T>) => string | undefined;
-  getTestID: (scene: Scene<T>) => string | undefined;
+  getLabelText?: (scene: Scene<T>) => string | undefined;
+  getAccessible?: (scene: Scene<T>) => boolean | undefined;
+  getAccessibilityLabel?: (scene: Scene<T>) => string | undefined;
+  getTestID?: (scene: Scene<T>) => string | undefined;
   renderLabel?: (
     scene: Scene<T> & {
       focused: boolean;
@@ -47,7 +47,7 @@ export type Props<T extends Route> = SceneRendererProps & {
     }
   ) => React.ReactNode;
   renderBadge?: (scene: Scene<T>) => React.ReactNode;
-  renderIndicator: (props: IndicatorProps<T>) => React.ReactNode;
+  renderIndicator?: (props: IndicatorProps<T>) => React.ReactNode;
   renderTabBarItem?: (
     props: TabBarItemProps<T> & { key: string }
   ) => React.ReactElement;
@@ -345,7 +345,7 @@ export default class TabBar<T extends Route> extends React.Component<
             indicatorContainerStyle,
           ]}
         >
-          {this.props.renderIndicator({
+          {this.props.renderIndicator?.({
             position,
             layout,
             navigationState,
