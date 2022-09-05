@@ -41,6 +41,7 @@ export default function PagerViewAdapter<T extends Route>({
   onSwipeEnd,
   children,
   style,
+  disableChangeTabAnimation,
   ...rest
 }: Props<T>) {
   const { index } = navigationState;
@@ -63,7 +64,13 @@ export default function PagerViewAdapter<T extends Route>({
       (route: { key: string }) => route.key === key
     );
 
-    pagerRef.current?.setPage(index);
+    if (disableChangeTabAnimation) {
+      pagerRef.current?.setPageWithoutAnimation(index);
+      position.setValue(index);
+    } else {
+      pagerRef.current?.setPage(index);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   React.useEffect(() => {
@@ -72,8 +79,14 @@ export default function PagerViewAdapter<T extends Route>({
     }
 
     if (indexRef.current !== index) {
-      pagerRef.current?.setPage(index);
+      if (disableChangeTabAnimation) {
+        pagerRef.current?.setPageWithoutAnimation(index);
+        position.setValue(index);
+      } else {
+        pagerRef.current?.setPage(index);
+      }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keyboardDismissMode, index]);
 
   const onPageScrollStateChanged = (
