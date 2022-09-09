@@ -58,6 +58,7 @@ export default function PanResponderAdapter<T extends Route>({
   onSwipeEnd,
   children,
   style,
+  animationEnabled,
 }: Props<T>) {
   const { routes, index } = navigationState;
 
@@ -81,22 +82,27 @@ export default function PanResponderAdapter<T extends Route>({
 
       const { timing, ...transitionConfig } = DefaultTransitionSpec;
 
-      Animated.parallel([
-        timing(panX, {
-          ...transitionConfig,
-          toValue: offset,
-          useNativeDriver: false,
-        }),
-      ]).start(({ finished }) => {
-        if (finished) {
-          onIndexChangeRef.current(index);
-          pendingIndexRef.current = undefined;
-        }
-      });
+      if (animationEnabled) {
+        Animated.parallel([
+          timing(panX, {
+            ...transitionConfig,
+            toValue: offset,
+            useNativeDriver: false,
+          }),
+        ]).start(({ finished }) => {
+          if (finished) {
+            onIndexChangeRef.current(index);
+            pendingIndexRef.current = undefined;
+          }
+        });
+      } else {
+        panX.setValue(offset);
+        onIndexChangeRef.current(index);
+      }
 
       pendingIndexRef.current = index;
     },
-    [panX]
+    [animationEnabled, panX]
   );
 
   React.useEffect(() => {

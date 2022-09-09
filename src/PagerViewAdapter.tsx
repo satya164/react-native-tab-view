@@ -11,7 +11,6 @@ import type {
   EventEmitterProps,
   PagerProps,
 } from './types';
-import useLatestCallback from 'use-latest-callback';
 
 const AnimatedViewPager = Animated.createAnimatedComponent(ViewPager);
 
@@ -60,18 +59,21 @@ export default function PagerViewAdapter<T extends Route>({
     navigationStateRef.current = navigationState;
   });
 
-  const jumpTo = useLatestCallback((key: string) => {
-    const index = navigationStateRef.current.routes.findIndex(
-      (route: { key: string }) => route.key === key
-    );
+  const jumpTo = React.useCallback(
+    (key: string) => {
+      const index = navigationStateRef.current.routes.findIndex(
+        (route: { key: string }) => route.key === key
+      );
 
-    if (animationEnabled) {
-      pagerRef.current?.setPage(index);
-    } else {
-      pagerRef.current?.setPageWithoutAnimation(index);
-      position.setValue(index);
-    }
-  });
+      if (animationEnabled) {
+        pagerRef.current?.setPage(index);
+      } else {
+        pagerRef.current?.setPageWithoutAnimation(index);
+        position.setValue(index);
+      }
+    },
+    [animationEnabled, position]
+  );
 
   React.useEffect(() => {
     if (keyboardDismissMode === 'auto') {
@@ -86,8 +88,7 @@ export default function PagerViewAdapter<T extends Route>({
         position.setValue(index);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [keyboardDismissMode, index, animationEnabled]);
+  }, [keyboardDismissMode, index, animationEnabled, position]);
 
   const onPageScrollStateChanged = (
     state: PageScrollStateChangedNativeEvent
