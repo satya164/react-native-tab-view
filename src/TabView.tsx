@@ -51,6 +51,7 @@ export default function TabView<T extends Route>({
   style,
   swipeEnabled = true,
   tabBarPosition = 'top',
+  animateOnIndexChange,
 }: Props<T>) {
   const [layout, setLayout] = React.useState({
     width: 0,
@@ -87,6 +88,7 @@ export default function TabView<T extends Route>({
         onSwipeEnd={onSwipeEnd}
         onIndexChange={jumpToIndex}
         style={pagerStyle}
+        animateOnIndexChange={animateOnIndexChange}
       >
         {({ position, render, addEnterListener, jumpTo }) => {
           // All of the props here must not change between re-renders

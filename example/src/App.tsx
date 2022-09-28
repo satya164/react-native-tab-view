@@ -22,6 +22,7 @@ import CustomIndicatorExample from './CustomIndicatorExample';
 import CustomTabBarExample from './CustomTabBarExample';
 import CoverflowExample from './CoverflowExample';
 import TabBarGapExample from './TabBarGapExample';
+import CustomAnimationExample from './CustomAnimationExample';
 
 type ExampleComponentType = React.ComponentType<{}> & {
   title: string;
@@ -43,6 +44,7 @@ const EXAMPLE_COMPONENTS: ExampleComponentType[] = [
   CustomTabBarExample,
   CoverflowExample,
   TabBarGapExample,
+  CustomAnimationExample,
 ];
 
 const ExampleList = () => {

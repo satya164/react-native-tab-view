@@ -55,4 +55,5 @@ export type PagerProps = Omit<
   swipeEnabled?: boolean;
   onSwipeStart?: () => void;
   onSwipeEnd?: () => void;
+  animateOnIndexChange?: (currentIndex: number, nextIndex: number) => boolean;
 };
