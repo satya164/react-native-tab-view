@@ -58,7 +58,7 @@ export default function PanResponderAdapter<T extends Route>({
   onSwipeEnd,
   children,
   style,
-  animationEnabled,
+  animationEnabled = false,
 }: Props<T>) {
   const { routes, index } = navigationState;
 
@@ -77,12 +77,12 @@ export default function PanResponderAdapter<T extends Route>({
   const swipeDistanceThreshold = layout.width / 1.75;
 
   const jumpToIndex = React.useCallback(
-    (index: number, useAnimation: boolean = false) => {
+    (index: number, animate = animationEnabled) => {
       const offset = -index * layoutRef.current.width;
 
       const { timing, ...transitionConfig } = DefaultTransitionSpec;
 
-      if (animationEnabled || useAnimation) {
+      if (animate) {
         Animated.parallel([
           timing(panX, {
             ...transitionConfig,
@@ -99,6 +99,7 @@ export default function PanResponderAdapter<T extends Route>({
       } else {
         panX.setValue(offset);
         onIndexChangeRef.current(index);
+        pendingIndexRef.current = undefined;
       }
     },
     [animationEnabled, panX]
