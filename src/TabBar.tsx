@@ -31,10 +31,10 @@ export type Props<T extends Route> = SceneRendererProps & {
   inactiveColor?: string;
   pressColor?: string;
   pressOpacity?: number;
-  getLabelText: (scene: Scene<T>) => string | undefined;
-  getAccessible: (scene: Scene<T>) => boolean | undefined;
-  getAccessibilityLabel: (scene: Scene<T>) => string | undefined;
-  getTestID: (scene: Scene<T>) => string | undefined;
+  getLabelText?: (scene: Scene<T>) => string | undefined;
+  getAccessible?: (scene: Scene<T>) => boolean | undefined;
+  getAccessibilityLabel?: (scene: Scene<T>) => string | undefined;
+  getTestID?: (scene: Scene<T>) => string | undefined;
   renderLabel?: (
     scene: Scene<T> & {
       focused: boolean;
@@ -48,7 +48,7 @@ export type Props<T extends Route> = SceneRendererProps & {
     }
   ) => React.ReactNode;
   renderBadge?: (scene: Scene<T>) => React.ReactNode;
-  renderIndicator: (props: IndicatorProps<T>) => React.ReactNode;
+  renderIndicator?: (props: IndicatorProps<T>) => React.ReactNode;
   renderTabBarItem?: (
     props: TabBarItemProps<T> & { key: string }
   ) => React.ReactElement;
@@ -65,433 +65,447 @@ export type Props<T extends Route> = SceneRendererProps & {
 
 type State = {
   layout: Layout;
-  tabWidths: { [key: string]: number };
+  tabWidths: Record<string, number>;
 };
 
 const Separator = ({ width }: { width: number }) => {
   return <View style={{ width }} />;
 };
 
-export default class TabBar<T extends Route> extends React.Component<
-  Props<T>,
-  State
-> {
-  static defaultProps = {
-    getLabelText: ({ route }: Scene<Route>) => route.title,
-    getAccessible: ({ route }: Scene<Route>) =>
+const getFlattenedTabWidth = (style: StyleProp<ViewStyle>) => {
+  const tabStyle = StyleSheet.flatten(style);
+
+  return tabStyle ? tabStyle.width : undefined;
+};
+
+const getComputedTabWidth = (
+  index: number,
+  layout: Layout,
+  routes: Route[],
+  scrollEnabled: boolean | undefined,
+  tabWidths: { [key: string]: number },
+  flattenedWidth: string | number | undefined
+) => {
+  if (flattenedWidth === 'auto') {
+    return tabWidths[routes[index].key] || 0;
+  }
+
+  switch (typeof flattenedWidth) {
+    case 'number':
+      return flattenedWidth;
+    case 'string':
+      if (flattenedWidth.endsWith('%')) {
+        const width = parseFloat(flattenedWidth);
+        if (Number.isFinite(width)) {
+          return layout.width * (width / 100);
+        }
+      }
+  }
+
+  if (scrollEnabled) {
+    return (layout.width / 5) * 2;
+  }
+  return layout.width / routes.length;
+};
+
+const getMaxScrollDistance = (tabBarWidth: number, layoutWidth: number) =>
+  tabBarWidth - layoutWidth;
+
+const getTabBarWidth = <T extends Route>(props: Props<T>, state: State) => {
+  const { layout, tabWidths } = state;
+  const { scrollEnabled, tabStyle } = props;
+  const { routes } = props.navigationState;
+
+  return routes.reduce<number>(
+    (acc, _, i) =>
+      acc +
+      (i > 0 ? props.gap ?? 0 : 0) +
+      getComputedTabWidth(
+        i,
+        layout,
+        routes,
+        scrollEnabled,
+        tabWidths,
+        getFlattenedTabWidth(tabStyle)
+      ),
+    0
+  );
+};
+
+const normalizeScrollValue = <T extends Route>(
+  props: Props<T>,
+  state: State,
+  value: number
+) => {
+  const { layout } = state;
+  const tabBarWidth = getTabBarWidth(props, state);
+  const maxDistance = getMaxScrollDistance(tabBarWidth, layout.width);
+  const scrollValue = Math.max(Math.min(value, maxDistance), 0);
+
+  if (Platform.OS === 'android' && I18nManager.isRTL) {
+    // On Android, scroll value is not applied in reverse in RTL
+    // so we need to manually adjust it to apply correct value
+    return maxDistance - scrollValue;
+  }
+
+  return scrollValue;
+};
+
+const getScrollAmount = <T extends Route>(
+  props: Props<T>,
+  state: State,
+  index: number
+) => {
+  const { layout, tabWidths } = state;
+  const { scrollEnabled, tabStyle } = props;
+  const { routes } = props.navigationState;
+
+  const centerDistance = Array.from({ length: index + 1 }).reduce<number>(
+    (total, _, i) => {
+      const tabWidth = getComputedTabWidth(
+        i,
+        layout,
+        routes,
+        scrollEnabled,
+        tabWidths,
+        getFlattenedTabWidth(tabStyle)
+      );
+
+      // To get the current index centered we adjust scroll amount by width of indexes
+      // 0 through (i - 1) and add half the width of current index i
+      return (
+        total +
+        (index === i
+          ? (tabWidth + (props.gap ?? 0)) / 2
+          : tabWidth + (props.gap ?? 0))
+      );
+    },
+    0
+  );
+
+  const scrollAmount = centerDistance - layout.width / 2;
+
+  return normalizeScrollValue(props, state, scrollAmount);
+};
+
+const getTranslateX = (
+  scrollAmount: Animated.Value,
+  maxScrollDistance: number
+) =>
+  Animated.multiply(
+    Platform.OS === 'android' && I18nManager.isRTL
+      ? Animated.add(maxScrollDistance, Animated.multiply(scrollAmount, -1))
+      : scrollAmount,
+    I18nManager.isRTL ? 1 : -1
+  );
+
+export default function TabBar<T extends Route>(props: Props<T>) {
+  const {
+    getLabelText = ({ route }: Scene<Route>) => route.title,
+    getAccessible = ({ route }: Scene<Route>) =>
       typeof route.accessible !== 'undefined' ? route.accessible : true,
-    getAccessibilityLabel: ({ route }: Scene<Route>) =>
+    getAccessibilityLabel = ({ route }: Scene<Route>) =>
       typeof route.accessibilityLabel === 'string'
         ? route.accessibilityLabel
         : typeof route.title === 'string'
         ? route.title
         : undefined,
-    getTestID: ({ route }: Scene<Route>) => route.testID,
-    renderIndicator: (props: IndicatorProps<Route>) => (
+    getTestID = ({ route }: Scene<Route>) => route.testID,
+    renderIndicator = (props: IndicatorProps<Route>) => (
       <TabBarIndicator {...props} />
     ),
-    gap: 0,
-  };
+    gap = 0,
+    scrollEnabled,
+    jumpTo,
+    navigationState,
+    position,
+    activeColor,
+    bounces,
+    contentContainerStyle,
+    inactiveColor,
+    indicatorContainerStyle,
+    indicatorStyle,
+    labelStyle,
+    onTabLongPress,
+    onTabPress,
+    pressColor,
+    pressOpacity,
+    renderBadge,
+    renderIcon,
+    renderLabel,
+    renderTabBarItem,
+    style,
+    tabStyle,
+  } = props;
 
-  state: State = {
-    layout: { width: 0, height: 0 },
-    tabWidths: {},
-  };
+  const [layout, setLayout] = React.useState<Layout>({ width: 0, height: 0 });
+  const [tabWidths, setTabWidths] = React.useState<Record<string, number>>({});
+  const flatListRef = React.useRef<FlatList>(null);
+  const scrollAmount = React.useRef(new Animated.Value(0)).current;
+  const measuredTabWidths = React.useRef<Record<string, number>>({});
 
-  componentDidUpdate(prevProps: Props<T>, prevState: State) {
-    const { navigationState } = this.props;
-    const { layout, tabWidths } = this.state;
-
+  React.useEffect(() => {
     if (
-      prevProps.navigationState.routes.length !==
-        navigationState.routes.length ||
-      prevProps.navigationState.index !== navigationState.index ||
-      prevState.layout.width !== layout.width ||
-      prevState.tabWidths !== tabWidths
-    ) {
-      if (
-        this.getFlattenedTabWidth(this.props.tabStyle) === 'auto' &&
-        !(
-          layout.width &&
-          navigationState.routes.every(
-            (r) => typeof tabWidths[r.key] === 'number'
-          )
+      getFlattenedTabWidth(tabStyle) === 'auto' &&
+      !(
+        layout.width &&
+        navigationState.routes.every(
+          (r) => typeof tabWidths[r.key] === 'number'
         )
-      ) {
-        // When tab width is dynamic, only adjust the scroll once we have all tab widths and layout
-        return;
-      }
-
-      this.resetScroll(navigationState.index);
-    }
-  }
-
-  // to store the layout.width of each tab
-  // when all onLayout's are fired, this would be set in state
-  private measuredTabWidths: { [key: string]: number } = {};
-
-  private scrollAmount = new Animated.Value(0);
-
-  private flatListRef = React.createRef<FlatList>();
-
-  private getFlattenedTabWidth = (style: StyleProp<ViewStyle>) => {
-    const tabStyle = StyleSheet.flatten(style);
-
-    return tabStyle ? tabStyle.width : undefined;
-  };
-
-  private getComputedTabWidth = (
-    index: number,
-    layout: Layout,
-    routes: Route[],
-    scrollEnabled: boolean | undefined,
-    tabWidths: { [key: string]: number },
-    flattenedWidth: string | number | undefined
-  ) => {
-    if (flattenedWidth === 'auto') {
-      return tabWidths[routes[index].key] || 0;
-    }
-
-    switch (typeof flattenedWidth) {
-      case 'number':
-        return flattenedWidth;
-      case 'string':
-        if (flattenedWidth.endsWith('%')) {
-          const width = parseFloat(flattenedWidth);
-          if (Number.isFinite(width)) {
-            return layout.width * (width / 100);
-          }
-        }
-    }
-
-    if (scrollEnabled) {
-      return (layout.width / 5) * 2;
-    }
-    return layout.width / routes.length;
-  };
-
-  private getMaxScrollDistance = (tabBarWidth: number, layoutWidth: number) =>
-    tabBarWidth - layoutWidth;
-
-  private getTabBarWidth = (props: Props<T>, state: State) => {
-    const { layout, tabWidths } = state;
-    const { scrollEnabled, tabStyle } = props;
-    const { routes } = props.navigationState;
-
-    return routes.reduce<number>(
-      (acc, _, i) =>
-        acc +
-        (i > 0 ? props.gap ?? 0 : 0) +
-        this.getComputedTabWidth(
-          i,
-          layout,
-          routes,
-          scrollEnabled,
-          tabWidths,
-          this.getFlattenedTabWidth(tabStyle)
-        ),
-      0
-    );
-  };
-
-  private normalizeScrollValue = (
-    props: Props<T>,
-    state: State,
-    value: number
-  ) => {
-    const { layout } = state;
-    const tabBarWidth = this.getTabBarWidth(props, state);
-    const maxDistance = this.getMaxScrollDistance(tabBarWidth, layout.width);
-    const scrollValue = Math.max(Math.min(value, maxDistance), 0);
-
-    if (Platform.OS === 'android' && I18nManager.isRTL) {
-      // On Android, scroll value is not applied in reverse in RTL
-      // so we need to manually adjust it to apply correct value
-      return maxDistance - scrollValue;
-    }
-
-    return scrollValue;
-  };
-
-  private getScrollAmount = (props: Props<T>, state: State, index: number) => {
-    const { layout, tabWidths } = state;
-    const { scrollEnabled, tabStyle } = props;
-    const { routes } = props.navigationState;
-
-    const centerDistance = Array.from({ length: index + 1 }).reduce<number>(
-      (total, _, i) => {
-        const tabWidth = this.getComputedTabWidth(
-          i,
-          layout,
-          routes,
-          scrollEnabled,
-          tabWidths,
-          this.getFlattenedTabWidth(tabStyle)
-        );
-
-        // To get the current index centered we adjust scroll amount by width of indexes
-        // 0 through (i - 1) and add half the width of current index i
-        return (
-          total +
-          (index === i
-            ? (tabWidth + (props.gap ?? 0)) / 2
-            : tabWidth + (props.gap ?? 0))
-        );
-      },
-      0
-    );
-
-    const scrollAmount = centerDistance - layout.width / 2;
-
-    return this.normalizeScrollValue(props, state, scrollAmount);
-  };
-
-  private resetScroll = (index: number) => {
-    if (this.props.scrollEnabled) {
-      this.flatListRef.current?.scrollToOffset({
-        offset: this.getScrollAmount(this.props, this.state, index),
-        animated: true,
-      });
-    }
-  };
-
-  private handleLayout = (e: LayoutChangeEvent) => {
-    const { height, width } = e.nativeEvent.layout;
-
-    if (
-      this.state.layout.width === width &&
-      this.state.layout.height === height
+      )
     ) {
+      // When tab width is dynamic, only adjust the scroll once we have all tab widths and layout
       return;
     }
 
-    this.setState({
-      layout: {
+    if (scrollEnabled) {
+      flatListRef.current?.scrollToOffset({
+        offset: getScrollAmount(
+          props,
+          { layout, tabWidths },
+          navigationState.index
+        ),
+        animated: true,
+      });
+    }
+  }, [
+    layout,
+    layout.width,
+    navigationState,
+    props,
+    scrollEnabled,
+    tabStyle,
+    tabWidths,
+  ]);
+
+  const handleLayout = React.useCallback(
+    (e: LayoutChangeEvent) => {
+      const { height, width } = e.nativeEvent.layout;
+
+      if (layout.width === width && layout.height === height) {
+        return;
+      }
+      setLayout({
         height,
         width,
-      },
-    });
-  };
+      });
+    },
+    [layout]
+  );
 
-  private getTranslateX = (
-    scrollAmount: Animated.Value,
-    maxScrollDistance: number
-  ) =>
-    Animated.multiply(
-      Platform.OS === 'android' && I18nManager.isRTL
-        ? Animated.add(maxScrollDistance, Animated.multiply(scrollAmount, -1))
-        : scrollAmount,
-      I18nManager.isRTL ? 1 : -1
-    );
+  const { routes } = navigationState;
 
-  render() {
-    const {
-      position,
-      navigationState,
-      jumpTo,
-      scrollEnabled,
-      bounces,
+  const flattenedTabWidth = React.useMemo(
+    () => getFlattenedTabWidth(tabStyle),
+    [tabStyle]
+  );
+  const isWidthDynamic = flattenedTabWidth === 'auto';
+  const tabBarWidth = getTabBarWidth(props, { layout, tabWidths });
+  const separatorsWidth = Math.max(0, routes.length - 1) * gap;
+  const separatorPercent = (separatorsWidth / tabBarWidth) * 100;
+
+  const tabBarWidthPercent = `${routes.length * 40}%`;
+
+  const translateX = React.useMemo(
+    () =>
+      getTranslateX(
+        scrollAmount,
+        getMaxScrollDistance(tabBarWidth, layout.width)
+      ),
+    [layout.width, scrollAmount, tabBarWidth]
+  );
+
+  const renderItem = React.useCallback(
+    ({ item: route, index }: ListRenderItemInfo<T>) => {
+      const props: TabBarItemProps<T> & { key: string } = {
+        key: route.key,
+        position: position,
+        route: route,
+        navigationState: navigationState,
+        getAccessibilityLabel: getAccessibilityLabel,
+        getAccessible: getAccessible,
+        getLabelText: getLabelText,
+        getTestID: getTestID,
+        renderBadge: renderBadge,
+        renderIcon: renderIcon,
+        renderLabel: renderLabel,
+        activeColor: activeColor,
+        inactiveColor: inactiveColor,
+        pressColor: pressColor,
+        pressOpacity: pressOpacity,
+        onLayout: isWidthDynamic
+          ? (e) => {
+              measuredTabWidths.current[route.key] = e.nativeEvent.layout.width;
+
+              // When we have measured widths for all of the tabs, we should updates the state
+              // We avoid doing separate setState for each layout since it triggers multiple renders and slows down app
+              if (
+                routes.every(
+                  (r) => typeof measuredTabWidths.current[r.key] === 'number'
+                )
+              ) {
+                setTabWidths({ ...measuredTabWidths.current });
+              }
+            }
+          : undefined,
+        onPress: () => {
+          const event: Scene<T> & Event = {
+            route,
+            defaultPrevented: false,
+            preventDefault: () => {
+              event.defaultPrevented = true;
+            },
+          };
+
+          onTabPress?.(event);
+
+          if (event.defaultPrevented) {
+            return;
+          }
+
+          jumpTo(route.key);
+        },
+        onLongPress: () => onTabLongPress?.({ route }),
+        labelStyle: labelStyle,
+        style: [
+          tabStyle,
+          // Calculate the deafult width for tab for FlatList to work.
+          flattenedTabWidth === undefined && {
+            width: getComputedTabWidth(
+              index,
+              layout,
+              routes,
+              scrollEnabled,
+              tabWidths,
+              flattenedTabWidth
+            ),
+          },
+        ],
+      };
+
+      return (
+        <React.Fragment key={route.key}>
+          {gap > 0 && index > 0 ? <Separator width={gap} /> : null}
+          {renderTabBarItem ? (
+            renderTabBarItem(props)
+          ) : (
+            <TabBarItem {...props} />
+          )}
+        </React.Fragment>
+      );
+    },
+    [
+      activeColor,
+      flattenedTabWidth,
+      gap,
       getAccessibilityLabel,
       getAccessible,
       getLabelText,
       getTestID,
+      inactiveColor,
+      isWidthDynamic,
+      jumpTo,
+      labelStyle,
+      layout,
+      navigationState,
+      onTabLongPress,
+      onTabPress,
+      position,
+      pressColor,
+      pressOpacity,
       renderBadge,
       renderIcon,
       renderLabel,
       renderTabBarItem,
-      activeColor,
-      inactiveColor,
-      pressColor,
-      pressOpacity,
-      onTabPress,
-      onTabLongPress,
+      routes,
+      scrollEnabled,
       tabStyle,
-      labelStyle,
-      indicatorStyle,
-      contentContainerStyle,
-      style,
-      indicatorContainerStyle,
-      gap = 0,
-    } = this.props;
-    const { layout, tabWidths } = this.state;
-    const { routes } = navigationState;
+      tabWidths,
+    ]
+  );
 
-    const isWidthDynamic = this.getFlattenedTabWidth(tabStyle) === 'auto';
-    const tabBarWidth = this.getTabBarWidth(this.props, this.state);
-    const separatorsWidth = Math.max(0, routes.length - 1) * gap;
-    const separatorPercent = (separatorsWidth / tabBarWidth) * 100;
+  const keyExtractor = React.useCallback((item: T) => item.key, []);
 
-    const tabBarWidthPercent = `${routes.length * 40}%`;
-    const translateX = this.getTranslateX(
-      this.scrollAmount,
-      this.getMaxScrollDistance(tabBarWidth, layout.width)
-    );
-
-    return (
+  return (
+    <Animated.View onLayout={handleLayout} style={[styles.tabBar, style]}>
       <Animated.View
-        onLayout={this.handleLayout}
-        style={[styles.tabBar, style]}
+        pointerEvents="none"
+        style={[
+          styles.indicatorContainer,
+          scrollEnabled ? { transform: [{ translateX }] as any } : null,
+          tabBarWidth > separatorsWidth
+            ? { width: tabBarWidth - separatorsWidth }
+            : scrollEnabled
+            ? { width: tabBarWidthPercent }
+            : null,
+          indicatorContainerStyle,
+        ]}
       >
-        <Animated.View
-          pointerEvents="none"
-          style={[
-            styles.indicatorContainer,
-            scrollEnabled ? { transform: [{ translateX }] as any } : null,
-            tabBarWidth > separatorsWidth
-              ? { width: tabBarWidth - separatorsWidth }
-              : scrollEnabled
-              ? { width: tabBarWidthPercent }
-              : null,
-            indicatorContainerStyle,
-          ]}
-        >
-          {this.props.renderIndicator({
-            position,
-            layout,
-            navigationState,
-            jumpTo,
-            width: isWidthDynamic
-              ? 'auto'
-              : `${(100 - separatorPercent) / routes.length}%`,
-            style: indicatorStyle,
-            getTabWidth: (i: number) =>
-              this.getComputedTabWidth(
-                i,
-                layout,
-                routes,
-                scrollEnabled,
-                tabWidths,
-                this.getFlattenedTabWidth(tabStyle)
-              ),
-            gap,
-          })}
-        </Animated.View>
-        <View style={styles.scroll}>
-          <Animated.FlatList
-            data={routes as Animated.WithAnimatedValue<T>[]}
-            keyExtractor={(item) => item.key}
-            horizontal
-            accessibilityRole="tablist"
-            keyboardShouldPersistTaps="handled"
-            scrollEnabled={scrollEnabled}
-            bounces={bounces}
-            alwaysBounceHorizontal={false}
-            scrollsToTop={false}
-            showsHorizontalScrollIndicator={false}
-            showsVerticalScrollIndicator={false}
-            automaticallyAdjustContentInsets={false}
-            overScrollMode="never"
-            contentContainerStyle={[
-              styles.tabContent,
-              scrollEnabled
-                ? {
-                    width:
-                      tabBarWidth > separatorsWidth
-                        ? tabBarWidth
-                        : tabBarWidthPercent,
-                  }
-                : styles.container,
-              contentContainerStyle,
-            ]}
-            scrollEventThrottle={16}
-            renderItem={({ item: route, index }: ListRenderItemInfo<T>) => {
-              const props: TabBarItemProps<T> & { key: string } = {
-                key: route.key,
-                position: position,
-                route: route,
-                navigationState: navigationState,
-                getAccessibilityLabel: getAccessibilityLabel,
-                getAccessible: getAccessible,
-                getLabelText: getLabelText,
-                getTestID: getTestID,
-                renderBadge: renderBadge,
-                renderIcon: renderIcon,
-                renderLabel: renderLabel,
-                activeColor: activeColor,
-                inactiveColor: inactiveColor,
-                pressColor: pressColor,
-                pressOpacity: pressOpacity,
-                onLayout: isWidthDynamic
-                  ? (e) => {
-                      this.measuredTabWidths[route.key] =
-                        e.nativeEvent.layout.width;
-
-                      // When we have measured widths for all of the tabs, we should updates the state
-                      // We avoid doing separate setState for each layout since it triggers multiple renders and slows down app
-                      if (
-                        routes.every(
-                          (r) =>
-                            typeof this.measuredTabWidths[r.key] === 'number'
-                        )
-                      ) {
-                        this.setState({
-                          tabWidths: { ...this.measuredTabWidths },
-                        });
-                      }
-                    }
-                  : undefined,
-                onPress: () => {
-                  const event: Scene<T> & Event = {
-                    route,
-                    defaultPrevented: false,
-                    preventDefault: () => {
-                      event.defaultPrevented = true;
-                    },
-                  };
-
-                  onTabPress?.(event);
-
-                  if (event.defaultPrevented) {
-                    return;
-                  }
-
-                  this.props.jumpTo(route.key);
-                },
-                onLongPress: () => onTabLongPress?.({ route }),
-                labelStyle: labelStyle,
-                style: [
-                  tabStyle,
-                  // Calculate the deafult width for tab for FlatList to work.
-                  this.getFlattenedTabWidth(tabStyle) === undefined && {
-                    width: this.getComputedTabWidth(
-                      index,
-                      layout,
-                      routes,
-                      scrollEnabled,
-                      tabWidths,
-                      this.getFlattenedTabWidth(tabStyle)
-                    ),
-                  },
-                ],
-              };
-
-              return (
-                <React.Fragment key={route.key}>
-                  {gap > 0 && index > 0 ? <Separator width={gap} /> : null}
-                  {renderTabBarItem ? (
-                    renderTabBarItem(props)
-                  ) : (
-                    <TabBarItem {...props} />
-                  )}
-                </React.Fragment>
-              );
-            }}
-            onScroll={Animated.event(
-              [
-                {
-                  nativeEvent: {
-                    contentOffset: { x: this.scrollAmount },
-                  },
-                },
-              ],
-              { useNativeDriver: true }
-            )}
-            ref={this.flatListRef}
-          />
-        </View>
+        {renderIndicator({
+          position,
+          layout,
+          navigationState,
+          jumpTo,
+          width: isWidthDynamic
+            ? 'auto'
+            : `${(100 - separatorPercent) / routes.length}%`,
+          style: indicatorStyle,
+          getTabWidth: (i: number) =>
+            getComputedTabWidth(
+              i,
+              layout,
+              routes,
+              scrollEnabled,
+              tabWidths,
+              flattenedTabWidth
+            ),
+          gap,
+        })}
       </Animated.View>
-    );
-  }
+      <View style={styles.scroll}>
+        <Animated.FlatList
+          data={routes as Animated.WithAnimatedValue<T>[]}
+          keyExtractor={keyExtractor}
+          horizontal
+          accessibilityRole="tablist"
+          keyboardShouldPersistTaps="handled"
+          scrollEnabled={scrollEnabled}
+          bounces={bounces}
+          alwaysBounceHorizontal={false}
+          scrollsToTop={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          automaticallyAdjustContentInsets={false}
+          overScrollMode="never"
+          contentContainerStyle={[
+            styles.tabContent,
+            scrollEnabled
+              ? {
+                  width:
+                    tabBarWidth > separatorsWidth
+                      ? tabBarWidth
+                      : tabBarWidthPercent,
+                }
+              : styles.container,
+            contentContainerStyle,
+          ]}
+          scrollEventThrottle={16}
+          renderItem={renderItem}
+          onScroll={Animated.event(
+            [
+              {
+                nativeEvent: {
+                  contentOffset: { x: scrollAmount },
+                },
+              },
+            ],
+            { useNativeDriver: true }
+          )}
+          ref={flatListRef}
+        />
+      </View>
+    </Animated.View>
+  );
 }
 
 const styles = StyleSheet.create({
