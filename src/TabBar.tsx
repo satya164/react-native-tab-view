@@ -315,117 +315,6 @@ export default function TabBar<T extends Route>(props: Props<T>) {
     [layout.width, scrollAmount, tabBarWidth]
   );
 
-  const renderItem = React.useCallback(
-    ({ item: route, index }: ListRenderItemInfo<T>) => {
-      const props: TabBarItemProps<T> & { key: string } = {
-        key: route.key,
-        position: position,
-        route: route,
-        navigationState: navigationState,
-        getAccessibilityLabel: getAccessibilityLabel,
-        getAccessible: getAccessible,
-        getLabelText: getLabelText,
-        getTestID: getTestID,
-        renderBadge: renderBadge,
-        renderIcon: renderIcon,
-        renderLabel: renderLabel,
-        activeColor: activeColor,
-        inactiveColor: inactiveColor,
-        pressColor: pressColor,
-        pressOpacity: pressOpacity,
-        onLayout: isWidthDynamic
-          ? (e) => {
-              measuredTabWidths.current[route.key] = e.nativeEvent.layout.width;
-
-              // When we have measured widths for all of the tabs, we should updates the state
-              // We avoid doing separate setState for each layout since it triggers multiple renders and slows down app
-              if (
-                routes.every(
-                  (r) => typeof measuredTabWidths.current[r.key] === 'number'
-                )
-              ) {
-                setTabWidths({ ...measuredTabWidths.current });
-              }
-            }
-          : undefined,
-        onPress: () => {
-          const event: Scene<T> & Event = {
-            route,
-            defaultPrevented: false,
-            preventDefault: () => {
-              event.defaultPrevented = true;
-            },
-          };
-
-          onTabPress?.(event);
-
-          if (event.defaultPrevented) {
-            return;
-          }
-
-          jumpTo(route.key);
-        },
-        onLongPress: () => onTabLongPress?.({ route }),
-        labelStyle: labelStyle,
-        style: [
-          tabStyle,
-          // Calculate the deafult width for tab for FlatList to work.
-          flattenedTabWidth === undefined && {
-            width: getComputedTabWidth(
-              index,
-              layout,
-              routes,
-              scrollEnabled,
-              tabWidths,
-              flattenedTabWidth
-            ),
-          },
-        ],
-      };
-
-      return (
-        <React.Fragment key={route.key}>
-          {gap > 0 && index > 0 ? <Separator width={gap} /> : null}
-          {renderTabBarItem ? (
-            renderTabBarItem(props)
-          ) : (
-            <TabBarItem {...props} />
-          )}
-        </React.Fragment>
-      );
-    },
-    [
-      activeColor,
-      flattenedTabWidth,
-      gap,
-      getAccessibilityLabel,
-      getAccessible,
-      getLabelText,
-      getTestID,
-      inactiveColor,
-      isWidthDynamic,
-      jumpTo,
-      labelStyle,
-      layout,
-      navigationState,
-      onTabLongPress,
-      onTabPress,
-      position,
-      pressColor,
-      pressOpacity,
-      renderBadge,
-      renderIcon,
-      renderLabel,
-      renderTabBarItem,
-      routes,
-      scrollEnabled,
-      tabStyle,
-      tabWidths,
-    ]
-  );
-
-  const keyExtractor = React.useCallback((item: T) => item.key, []);
-
   return (
     <Animated.View onLayout={handleLayout} style={[styles.tabBar, style]}>
       <Animated.View
@@ -465,7 +354,7 @@ export default function TabBar<T extends Route>(props: Props<T>) {
       <View style={styles.scroll}>
         <Animated.FlatList
           data={routes as Animated.WithAnimatedValue<T>[]}
-          keyExtractor={keyExtractor}
+          keyExtractor={(item) => item.key}
           horizontal
           accessibilityRole="tablist"
           keyboardShouldPersistTaps="handled"
@@ -490,7 +379,86 @@ export default function TabBar<T extends Route>(props: Props<T>) {
             contentContainerStyle,
           ]}
           scrollEventThrottle={16}
-          renderItem={renderItem}
+          renderItem={({ item: route, index }: ListRenderItemInfo<T>) => {
+            const props: TabBarItemProps<T> & { key: string } = {
+              key: route.key,
+              position: position,
+              route: route,
+              navigationState: navigationState,
+              getAccessibilityLabel: getAccessibilityLabel,
+              getAccessible: getAccessible,
+              getLabelText: getLabelText,
+              getTestID: getTestID,
+              renderBadge: renderBadge,
+              renderIcon: renderIcon,
+              renderLabel: renderLabel,
+              activeColor: activeColor,
+              inactiveColor: inactiveColor,
+              pressColor: pressColor,
+              pressOpacity: pressOpacity,
+              onLayout: isWidthDynamic
+                ? (e) => {
+                    measuredTabWidths.current[route.key] =
+                      e.nativeEvent.layout.width;
+
+                    // When we have measured widths for all of the tabs, we should updates the state
+                    // We avoid doing separate setState for each layout since it triggers multiple renders and slows down app
+                    if (
+                      routes.every(
+                        (r) =>
+                          typeof measuredTabWidths.current[r.key] === 'number'
+                      )
+                    ) {
+                      setTabWidths({ ...measuredTabWidths.current });
+                    }
+                  }
+                : undefined,
+              onPress: () => {
+                const event: Scene<T> & Event = {
+                  route,
+                  defaultPrevented: false,
+                  preventDefault: () => {
+                    event.defaultPrevented = true;
+                  },
+                };
+
+                onTabPress?.(event);
+
+                if (event.defaultPrevented) {
+                  return;
+                }
+
+                jumpTo(route.key);
+              },
+              onLongPress: () => onTabLongPress?.({ route }),
+              labelStyle: labelStyle,
+              style: [
+                tabStyle,
+                // Calculate the deafult width for tab for FlatList to work.
+                flattenedTabWidth === undefined && {
+                  width: getComputedTabWidth(
+                    index,
+                    layout,
+                    routes,
+                    scrollEnabled,
+                    tabWidths,
+                    flattenedTabWidth
+                  ),
+                },
+              ],
+            };
+
+            return (
+              <React.Fragment key={route.key}>
+                {gap > 0 && index > 0 ? <Separator width={gap} /> : null}
+                {renderTabBarItem ? (
+                  renderTabBarItem(props)
+                ) : (
+                  <TabBarItem {...props} />
+                )}
+              </React.Fragment>
+            );
+          }}
           onScroll={Animated.event(
             [
               {
