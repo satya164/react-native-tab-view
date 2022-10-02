@@ -1,5 +1,11 @@
 import * as React from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  ListRenderItemInfo,
+} from 'react-native';
 
 type Item = { name: string; number: number };
 
@@ -71,8 +77,8 @@ const ContactItem = ({ item: { name, number } }: { item: Item }) => {
 };
 
 const Contacts = () => {
-  const renderItem = React.useCallback((item: { item: Item }) => {
-    return <ContactItem item={item.item} />;
+  const renderItem = React.useCallback(({ item }: ListRenderItemInfo<Item>) => {
+    return <ContactItem item={item} />;
   }, []);
 
   const keyExtractor = React.useCallback(
