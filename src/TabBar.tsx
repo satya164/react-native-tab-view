@@ -62,6 +62,7 @@ export type Props<T extends Route> = SceneRendererProps & {
   contentContainerStyle?: StyleProp<ViewStyle>;
   style?: StyleProp<ViewStyle>;
   gap?: number;
+  tabBarTestId?: string;
 };
 
 type FlattenedTabWidth = string | number | undefined;
@@ -244,78 +245,37 @@ const renderIndicatorDefault = (props: IndicatorProps<Route>) => (
   <TabBarIndicator {...props} />
 );
 
-const getTestIdDefault = ({ route }: Scene<Route>) => route.testID;
-
-export default function TabBar<T extends Route>({
-  getLabelText = getLabelTextDefault,
-  getAccessible = getAccessibleDefault,
-  getAccessibilityLabel = getAccessibilityLabelDefault,
-  getTestID = getTestIdDefault,
-  renderIndicator = renderIndicatorDefault,
-  gap = 0,
-  scrollEnabled,
-  jumpTo,
-  navigationState,
-  position,
-  activeColor,
-  bounces,
-  contentContainerStyle,
-  inactiveColor,
-  indicatorContainerStyle,
-  indicatorStyle,
-  labelStyle,
-  onTabLongPress,
-  onTabPress,
-  pressColor,
-  pressOpacity,
-  renderBadge,
-  renderIcon,
-  renderLabel,
-  renderTabBarItem,
-  style,
-  tabStyle,
-}: Props<T>) {
-  const [layout, setLayout] = React.useState<Layout>({ width: 0, height: 0 });
-  const [tabWidths, setTabWidths] = React.useState<Record<string, number>>({});
-  const flatListRef = React.useRef<FlatList>(null);
-  const isFirst = React.useRef(true);
-  const scrollAmount = useAnimatedValue(0);
-  const measuredTabWidths = React.useRef<Record<string, number>>({});
-
-  const { routes } = navigationState;
-  const flattenedTabWidth = getFlattenedTabWidth(tabStyle);
-  const isWidthDynamic = flattenedTabWidth === 'auto';
-  const scrollOffset = getScrollAmount({
-    layout,
-    navigationState,
-    tabWidths,
-    gap,
-    scrollEnabled,
-    flattenedTabWidth,
-  });
-
-  const hasMeasuredTabWidths =
-    Boolean(layout.width) &&
-    routes.every((r) => typeof tabWidths[r.key] === 'number');
-
-  React.useEffect(() => {
-    if (isFirst.current) {
-      isFirst.current = false;
-      return;
-    }
-
-    if (isWidthDynamic && !hasMeasuredTabWidths) {
-      // When tab width is dynamic, only adjust the scroll once we have all tab widths and layout
-      return;
-    }
-
-    if (scrollEnabled) {
-      flatListRef.current?.scrollToOffset({
-        offset: scrollOffset,
-        animated: true,
-      });
-    }
-  }, [hasMeasuredTabWidths, isWidthDynamic, scrollEnabled, scrollOffset]);
+  render() {
+    const {
+      position,
+      navigationState,
+      jumpTo,
+      scrollEnabled,
+      bounces,
+      getAccessibilityLabel,
+      getAccessible,
+      getLabelText,
+      getTestID,
+      renderBadge,
+      renderIcon,
+      renderLabel,
+      renderTabBarItem,
+      activeColor,
+      inactiveColor,
+      pressColor,
+      pressOpacity,
+      onTabPress,
+      onTabLongPress,
+      tabStyle,
+      labelStyle,
+      indicatorStyle,
+      contentContainerStyle,
+      style,
+      indicatorContainerStyle,
+      gap = 0,
+    } = this.props;
+    const { layout, tabWidths } = this.state;
+    const { routes } = navigationState;
 
   const handleLayout = (e: LayoutChangeEvent) => {
     const { height, width } = e.nativeEvent.layout;
@@ -415,143 +375,33 @@ export default function TabBar<T extends Route>({
           : undefined,
       };
 
-      return (
-        <>
-          {gap > 0 && index > 0 ? <Separator width={gap} /> : null}
-          {renderTabBarItem ? (
-            renderTabBarItem(props)
-          ) : (
-            <TabBarItem {...props} />
-          )}
-        </>
-      );
-    },
-    [
-      activeColor,
-      gap,
-      getAccessibilityLabel,
-      getAccessible,
-      getLabelText,
-      getTestID,
-      inactiveColor,
-      isWidthDynamic,
-      jumpTo,
-      labelStyle,
-      layout,
-      navigationState,
-      onTabLongPress,
-      onTabPress,
-      position,
-      pressColor,
-      pressOpacity,
-      renderBadge,
-      renderIcon,
-      renderLabel,
-      renderTabBarItem,
-      routes,
-      scrollEnabled,
-      tabStyle,
-      tabWidths,
-    ]
-  );
-
-  const keyExtractor = React.useCallback((item: T) => item.key, []);
-
-  const contentContainerStyleMemoized = React.useMemo(
-    () => [
-      styles.tabContent,
-      scrollEnabled
-        ? {
-            width:
-              tabBarWidth > separatorsWidth ? tabBarWidth : tabBarWidthPercent,
-          }
-        : styles.container,
-      contentContainerStyle,
-    ],
-    [
-      contentContainerStyle,
-      scrollEnabled,
-      separatorsWidth,
-      tabBarWidth,
-      tabBarWidthPercent,
-    ]
-  );
-
-  const handleScroll = React.useMemo(
-    () =>
-      Animated.event(
-        [
-          {
-            nativeEvent: {
-              contentOffset: { x: scrollAmount },
-            },
-          },
-        ],
-        { useNativeDriver: true }
-      ),
-    [scrollAmount]
-  );
-
-  return (
-    <Animated.View onLayout={handleLayout} style={[styles.tabBar, style]}>
-      <Animated.View
-        pointerEvents="none"
-        style={[
-          styles.indicatorContainer,
-          scrollEnabled ? { transform: [{ translateX }] as any } : null,
-          tabBarWidth > separatorsWidth
-            ? { width: tabBarWidth - separatorsWidth }
-            : scrollEnabled
-            ? { width: tabBarWidthPercent }
-            : null,
-          indicatorContainerStyle,
-        ]}
-      >
-        {renderIndicator({
-          position,
-          layout,
-          navigationState,
-          jumpTo,
-          width: isWidthDynamic
-            ? 'auto'
-            : `${(100 - separatorPercent) / routes.length}%`,
-          style: indicatorStyle,
-          getTabWidth: (i: number) =>
-            getComputedTabWidth(
-              i,
-              layout,
-              routes,
-              scrollEnabled,
-              tabWidths,
-              flattenedTabWidth
-            ),
-          gap,
-        })}
+              return (
+                <React.Fragment key={route.key}>
+                  {gap > 0 && index > 0 ? <Separator width={gap} /> : null}
+                  {renderTabBarItem ? (
+                    renderTabBarItem(props)
+                  ) : (
+                    <TabBarItem {...props} />
+                  )}
+                </React.Fragment>
+              );
+            }}
+            onScroll={Animated.event(
+              [
+                {
+                  nativeEvent: {
+                    contentOffset: { x: this.scrollAmount },
+                  },
+                },
+              ],
+              { useNativeDriver: true }
+            )}
+            ref={this.flatListRef}
+          />
+        </View>
       </Animated.View>
-      <View style={styles.scroll}>
-        <Animated.FlatList
-          data={routes as Animated.WithAnimatedValue<T>[]}
-          keyExtractor={keyExtractor}
-          horizontal
-          accessibilityRole="tablist"
-          keyboardShouldPersistTaps="handled"
-          scrollEnabled={scrollEnabled}
-          bounces={bounces}
-          alwaysBounceHorizontal={false}
-          scrollsToTop={false}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          automaticallyAdjustContentInsets={false}
-          overScrollMode="never"
-          contentContainerStyle={contentContainerStyleMemoized}
-          scrollEventThrottle={16}
-          renderItem={renderItem}
-          onScroll={handleScroll}
-          ref={flatListRef}
-        />
-      </View>
-    </Animated.View>
-  );
+    );
+  }
 }
 
 const styles = StyleSheet.create({
