@@ -78,7 +78,7 @@ const getInactiveOpacity = (
   }
 };
 
-export default function TabBarItem2<T extends Route>({
+export default function TabBarItem<T extends Route>({
   getAccessibilityLabel,
   getAccessible,
   getLabelText,

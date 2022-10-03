@@ -44,7 +44,7 @@ const getTranslateX = (
   return Animated.multiply(translateX, I18nManager.isRTL ? -1 : 1);
 };
 
-export default function TabBarIndicator2<T extends Route>({
+export default function TabBarIndicator<T extends Route>({
   getTabWidth,
   layout,
   navigationState,
