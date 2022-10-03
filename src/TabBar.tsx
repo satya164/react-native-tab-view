@@ -62,7 +62,7 @@ export type Props<T extends Route> = SceneRendererProps & {
   contentContainerStyle?: StyleProp<ViewStyle>;
   style?: StyleProp<ViewStyle>;
   gap?: number;
-  tabBarTestId?: string;
+  testID?: string;
 };
 
 type FlattenedTabWidth = string | number | undefined;
@@ -273,6 +273,7 @@ const renderIndicatorDefault = (props: IndicatorProps<Route>) => (
       style,
       indicatorContainerStyle,
       gap = 0,
+      testID,
     } = this.props;
     const { layout, tabWidths } = this.state;
     const { routes } = navigationState;
@@ -397,6 +398,7 @@ const renderIndicatorDefault = (props: IndicatorProps<Route>) => (
               { useNativeDriver: true }
             )}
             ref={this.flatListRef}
+            testID={testID}
           />
         </View>
       </Animated.View>

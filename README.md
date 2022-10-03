@@ -408,10 +408,6 @@ Function which takes an object with the current route and returns a test id for 
 />
 ```
 
-##### `tabBarTestID`
-
-Test id for the tabBar. Can be used for scrolling the tab bar in tests
-
 ##### `renderIcon`
 
 Function which takes an object with the current route, focused status and color and returns a custom React Element to be used as a icon.
@@ -533,6 +529,10 @@ Style to apply to the tab bar container.
 ### `gap`
 
 Define a spacing between tabs.
+
+##### `testID`
+
+Test id for the tabBar. Can be used for scrolling the tab bar in tests
 
 ## Using with other libraries
 
