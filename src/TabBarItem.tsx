@@ -78,7 +78,7 @@ const getInactiveOpacity = (
   }
 };
 
-export default function TabBarItem<T extends Route>({
+function TabBarItem<T extends Route>({
   getAccessibilityLabel,
   getAccessible,
   getLabelText,
@@ -250,6 +250,8 @@ export default function TabBarItem<T extends Route>({
     </PlatformPressable>
   );
 }
+
+export default React.memo(TabBarItem) as typeof TabBarItem;
 
 const styles = StyleSheet.create({
   label: {
