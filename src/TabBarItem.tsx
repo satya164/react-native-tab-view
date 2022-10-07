@@ -9,12 +9,13 @@ import {
   ViewStyle,
 } from 'react-native';
 import PlatformPressable from './PlatformPressable';
-import type { Scene, Route, NavigationState } from './types';
+import type { Scene, Route } from './types';
 
 export type Props<T extends Route> = {
   position: Animated.AnimatedInterpolation;
   route: T;
-  navigationState: NavigationState<T>;
+  routes: T[];
+  isFocused: boolean;
   activeColor?: string;
   inactiveColor?: string;
   pressColor?: string;
@@ -34,9 +35,9 @@ export type Props<T extends Route> = {
     color: string;
   }) => React.ReactNode;
   renderBadge?: (scene: Scene<T>) => React.ReactNode;
-  onLayout?: (event: LayoutChangeEvent) => void;
-  onPress: () => void;
-  onLongPress: () => void;
+  onLayout?: (event: LayoutChangeEvent, route: Route) => void;
+  onPress: (route: T) => void;
+  onLongPress?: (scene: Scene<T>) => void;
   labelStyle?: StyleProp<TextStyle>;
   style: StyleProp<ViewStyle>;
 };
@@ -83,9 +84,10 @@ function TabBarItem<T extends Route>({
   getAccessible,
   getLabelText,
   getTestID,
-  navigationState,
+  routes,
   onLongPress,
   onPress,
+  isFocused,
   position,
   route,
   style,
@@ -99,8 +101,7 @@ function TabBarItem<T extends Route>({
   renderIcon,
   renderLabel: renderLabelCustom,
 }: Props<T>) {
-  const tabIndex = navigationState.routes.indexOf(route);
-  const isFocused = navigationState.index === tabIndex;
+  const tabIndex = routes.indexOf(route);
 
   const labelColorFromStyle = StyleSheet.flatten(labelStyle || {}).color;
 
@@ -117,16 +118,8 @@ function TabBarItem<T extends Route>({
       ? labelColorFromStyle
       : DEFAULT_INACTIVE_COLOR;
 
-  const activeOpacity = getActiveOpacity(
-    position,
-    navigationState.routes,
-    tabIndex
-  );
-  const inactiveOpacity = getInactiveOpacity(
-    position,
-    navigationState.routes,
-    tabIndex
-  );
+  const activeOpacity = getActiveOpacity(position, routes, tabIndex);
+  const inactiveOpacity = getInactiveOpacity(position, routes, tabIndex);
 
   let icon: React.ReactNode | null = null;
   let label: React.ReactNode | null = null;
@@ -237,9 +230,9 @@ function TabBarItem<T extends Route>({
       pressColor={pressColor}
       pressOpacity={pressOpacity}
       delayPressIn={0}
-      onLayout={onLayout}
-      onPress={onPress}
-      onLongPress={onLongPress}
+      onLayout={(e) => onLayout?.(e, route)}
+      onPress={() => onPress(route)}
+      onLongPress={() => onLongPress?.({ route })}
       style={[styles.pressable, tabContainerStyle]}
     >
       <View pointerEvents="none" style={[styles.item, tabStyle]}>

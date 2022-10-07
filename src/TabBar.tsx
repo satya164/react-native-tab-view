@@ -199,21 +199,31 @@ const getTranslateX = (
     I18nManager.isRTL ? 1 : -1
   );
 
+const getLabelTextDefault = ({ route }: Scene<Route>) => route.title;
+
+const getAccessibleDefault = ({ route }: Scene<Route>) =>
+  typeof route.accessible !== 'undefined' ? route.accessible : true;
+
+const getAccessibilityLabelDefault = ({ route }: Scene<Route>) =>
+  typeof route.accessibilityLabel === 'string'
+    ? route.accessibilityLabel
+    : typeof route.title === 'string'
+    ? route.title
+    : undefined;
+
+const renderIndicatorDefault = (props: IndicatorProps<Route>) => (
+  <TabBarIndicator {...props} />
+);
+
+const getTestIdDefault = ({ route }: Scene<Route>) => route.testID;
+
 export default function TabBar<T extends Route>(props: Props<T>) {
   const {
-    getLabelText = ({ route }: Scene<Route>) => route.title,
-    getAccessible = ({ route }: Scene<Route>) =>
-      typeof route.accessible !== 'undefined' ? route.accessible : true,
-    getAccessibilityLabel = ({ route }: Scene<Route>) =>
-      typeof route.accessibilityLabel === 'string'
-        ? route.accessibilityLabel
-        : typeof route.title === 'string'
-        ? route.title
-        : undefined,
-    getTestID = ({ route }: Scene<Route>) => route.testID,
-    renderIndicator = (props: IndicatorProps<Route>) => (
-      <TabBarIndicator {...props} />
-    ),
+    getLabelText = getLabelTextDefault,
+    getAccessible = getAccessibleDefault,
+    getAccessibilityLabel = getAccessibilityLabelDefault,
+    getTestID = getTestIdDefault,
+    renderIndicator = renderIndicatorDefault,
     gap = 0,
     scrollEnabled,
     jumpTo,
@@ -300,11 +310,17 @@ export default function TabBar<T extends Route>(props: Props<T>) {
     [tabStyle]
   );
   const isWidthDynamic = flattenedTabWidth === 'auto';
-  const tabBarWidth = getTabBarWidth(props, { layout, tabWidths });
+  const tabBarWidth = React.useMemo(
+    () => getTabBarWidth(props, { layout, tabWidths }),
+    [layout, props, tabWidths]
+  );
   const separatorsWidth = Math.max(0, routes.length - 1) * gap;
   const separatorPercent = (separatorsWidth / tabBarWidth) * 100;
 
-  const tabBarWidthPercent = `${routes.length * 40}%`;
+  const tabBarWidthPercent = React.useMemo(
+    () => `${routes.length * 40}%`,
+    [routes.length]
+  );
 
   const translateX = React.useMemo(
     () =>
@@ -315,13 +331,52 @@ export default function TabBar<T extends Route>(props: Props<T>) {
     [layout.width, scrollAmount, tabBarWidth]
   );
 
+  const onPress = React.useCallback(
+    (route: T) => {
+      const event: Scene<T> & Event = {
+        route,
+        defaultPrevented: false,
+        preventDefault: () => {
+          event.defaultPrevented = true;
+        },
+      };
+
+      onTabPress?.(event);
+
+      if (event.defaultPrevented) {
+        return;
+      }
+
+      jumpTo(route.key);
+    },
+    [jumpTo, onTabPress]
+  );
+
+  const itemOnLayout = React.useCallback(
+    (e: LayoutChangeEvent, route: Route) => {
+      measuredTabWidths.current[route.key] = e.nativeEvent.layout.width;
+
+      // When we have measured widths for all of the tabs, we should updates the state
+      // We avoid doing separate setState for each layout since it triggers multiple renders and slows down app
+      if (
+        routes.every(
+          (r) => typeof measuredTabWidths.current[r.key] === 'number'
+        )
+      ) {
+        setTabWidths({ ...measuredTabWidths.current });
+      }
+    },
+    [routes]
+  );
+
   const renderItem = React.useCallback(
     ({ item: route, index }: ListRenderItemInfo<T>) => {
       const props: TabBarItemProps<T> & { key: string } = {
         key: route.key,
         position: position,
         route: route,
-        navigationState: navigationState,
+        isFocused: navigationState.index === index,
+        routes: navigationState.routes,
         getAccessibilityLabel: getAccessibilityLabel,
         getAccessible: getAccessible,
         getLabelText: getLabelText,
@@ -333,58 +388,15 @@ export default function TabBar<T extends Route>(props: Props<T>) {
         inactiveColor: inactiveColor,
         pressColor: pressColor,
         pressOpacity: pressOpacity,
-        onLayout: isWidthDynamic
-          ? (e) => {
-              measuredTabWidths.current[route.key] = e.nativeEvent.layout.width;
-
-              // When we have measured widths for all of the tabs, we should updates the state
-              // We avoid doing separate setState for each layout since it triggers multiple renders and slows down app
-              if (
-                routes.every(
-                  (r) => typeof measuredTabWidths.current[r.key] === 'number'
-                )
-              ) {
-                setTabWidths({ ...measuredTabWidths.current });
-              }
-            }
-          : undefined,
-        onPress: () => {
-          const event: Scene<T> & Event = {
-            route,
-            defaultPrevented: false,
-            preventDefault: () => {
-              event.defaultPrevented = true;
-            },
-          };
-
-          onTabPress?.(event);
-
-          if (event.defaultPrevented) {
-            return;
-          }
-
-          jumpTo(route.key);
-        },
-        onLongPress: () => onTabLongPress?.({ route }),
+        onLayout: isWidthDynamic ? itemOnLayout : undefined,
+        onPress: onPress,
+        onLongPress: onTabLongPress,
         labelStyle: labelStyle,
-        style: [
-          tabStyle,
-          // Calculate the deafult width for tab for FlatList to work.
-          flattenedTabWidth === undefined && {
-            width: getComputedTabWidth(
-              index,
-              layout,
-              routes,
-              scrollEnabled,
-              tabWidths,
-              flattenedTabWidth
-            ),
-          },
-        ],
+        style: tabStyle,
       };
 
       return (
-        <React.Fragment key={route.key}>
+        <React.Fragment>
           {gap > 0 && index > 0 ? <Separator width={gap} /> : null}
           {renderTabBarItem ? (
             renderTabBarItem(props)
@@ -396,7 +408,6 @@ export default function TabBar<T extends Route>(props: Props<T>) {
     },
     [
       activeColor,
-      flattenedTabWidth,
       gap,
       getAccessibilityLabel,
       getAccessible,
@@ -404,12 +415,12 @@ export default function TabBar<T extends Route>(props: Props<T>) {
       getTestID,
       inactiveColor,
       isWidthDynamic,
-      jumpTo,
+      itemOnLayout,
       labelStyle,
-      layout,
-      navigationState,
+      navigationState.index,
+      navigationState.routes,
+      onPress,
       onTabLongPress,
-      onTabPress,
       position,
       pressColor,
       pressOpacity,
@@ -417,10 +428,7 @@ export default function TabBar<T extends Route>(props: Props<T>) {
       renderIcon,
       renderLabel,
       renderTabBarItem,
-      routes,
-      scrollEnabled,
       tabStyle,
-      tabWidths,
     ]
   );
 
