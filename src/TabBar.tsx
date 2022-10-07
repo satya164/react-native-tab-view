@@ -63,11 +63,6 @@ export type Props<T extends Route> = SceneRendererProps & {
   gap?: number;
 };
 
-type State = {
-  layout: Layout;
-  tabWidths: Record<string, number>;
-};
-
 const Separator = ({ width }: { width: number }) => {
   return <View style={{ width }} />;
 };
@@ -111,15 +106,34 @@ const getComputedTabWidth = (
 const getMaxScrollDistance = (tabBarWidth: number, layoutWidth: number) =>
   tabBarWidth - layoutWidth;
 
-const getTabBarWidth = <T extends Route>(props: Props<T>, state: State) => {
-  const { layout, tabWidths } = state;
-  const { scrollEnabled, tabStyle } = props;
-  const { routes } = props.navigationState;
+const getTranslateX = (
+  scrollAmount: Animated.Value,
+  maxScrollDistance: number
+) =>
+  Animated.multiply(
+    Platform.OS === 'android' && I18nManager.isRTL
+      ? Animated.add(maxScrollDistance, Animated.multiply(scrollAmount, -1))
+      : scrollAmount,
+    I18nManager.isRTL ? 1 : -1
+  );
+
+const getTabBarWidth = <T extends Route>({
+  navigationState,
+  layout,
+  gap,
+  scrollEnabled,
+  tabStyle,
+  tabWidths,
+}: Pick<
+  Props<T>,
+  'navigationState' | 'gap' | 'layout' | 'scrollEnabled' | 'tabStyle'
+> & { tabWidths: Record<string, number> }) => {
+  const { routes } = navigationState;
 
   return routes.reduce<number>(
     (acc, _, i) =>
       acc +
-      (i > 0 ? props.gap ?? 0 : 0) +
+      (i > 0 ? gap ?? 0 : 0) +
       getComputedTabWidth(
         i,
         layout,
@@ -132,13 +146,26 @@ const getTabBarWidth = <T extends Route>(props: Props<T>, state: State) => {
   );
 };
 
-const normalizeScrollValue = <T extends Route>(
-  props: Props<T>,
-  state: State,
-  value: number
-) => {
-  const { layout } = state;
-  const tabBarWidth = getTabBarWidth(props, state);
+const normalizeScrollValue = <T extends Route>({
+  layout,
+  navigationState,
+  gap,
+  scrollEnabled,
+  tabWidths,
+  value,
+  tabStyle,
+}: Pick<
+  Props<T>,
+  'layout' | 'navigationState' | 'gap' | 'scrollEnabled' | 'tabStyle'
+> & { tabWidths: Record<string, number>; value: number }) => {
+  const tabBarWidth = getTabBarWidth({
+    layout,
+    navigationState,
+    tabWidths,
+    gap,
+    scrollEnabled,
+    tabStyle,
+  });
   const maxDistance = getMaxScrollDistance(tabBarWidth, layout.width);
   const scrollValue = Math.max(Math.min(value, maxDistance), 0);
 
@@ -151,53 +178,51 @@ const normalizeScrollValue = <T extends Route>(
   return scrollValue;
 };
 
-const getScrollAmount = <T extends Route>(
-  props: Props<T>,
-  state: State,
-  index: number
-) => {
-  const { layout, tabWidths } = state;
-  const { scrollEnabled, tabStyle } = props;
-  const { routes } = props.navigationState;
+const getScrollAmount = <T extends Route>({
+  layout,
+  navigationState,
+  gap,
+  scrollEnabled,
+  tabStyle,
+  tabWidths,
+}: Pick<
+  Props<T>,
+  'layout' | 'navigationState' | 'scrollEnabled' | 'tabStyle' | 'gap'
+> & { tabWidths: Record<string, number> }) => {
+  const centerDistance = Array.from({
+    length: navigationState.index + 1,
+  }).reduce<number>((total, _, i) => {
+    const tabWidth = getComputedTabWidth(
+      i,
+      layout,
+      navigationState.routes,
+      scrollEnabled,
+      tabWidths,
+      getFlattenedTabWidth(tabStyle)
+    );
 
-  const centerDistance = Array.from({ length: index + 1 }).reduce<number>(
-    (total, _, i) => {
-      const tabWidth = getComputedTabWidth(
-        i,
-        layout,
-        routes,
-        scrollEnabled,
-        tabWidths,
-        getFlattenedTabWidth(tabStyle)
-      );
-
-      // To get the current index centered we adjust scroll amount by width of indexes
-      // 0 through (i - 1) and add half the width of current index i
-      return (
-        total +
-        (index === i
-          ? (tabWidth + (props.gap ?? 0)) / 2
-          : tabWidth + (props.gap ?? 0))
-      );
-    },
-    0
-  );
+    // To get the current index centered we adjust scroll amount by width of indexes
+    // 0 through (i - 1) and add half the width of current index i
+    return (
+      total +
+      (navigationState.index === i
+        ? (tabWidth + (gap ?? 0)) / 2
+        : tabWidth + (gap ?? 0))
+    );
+  }, 0);
 
   const scrollAmount = centerDistance - layout.width / 2;
 
-  return normalizeScrollValue(props, state, scrollAmount);
+  return normalizeScrollValue({
+    layout,
+    navigationState,
+    tabWidths,
+    value: scrollAmount,
+    gap,
+    scrollEnabled,
+    tabStyle,
+  });
 };
-
-const getTranslateX = (
-  scrollAmount: Animated.Value,
-  maxScrollDistance: number
-) =>
-  Animated.multiply(
-    Platform.OS === 'android' && I18nManager.isRTL
-      ? Animated.add(maxScrollDistance, Animated.multiply(scrollAmount, -1))
-      : scrollAmount,
-    I18nManager.isRTL ? 1 : -1
-  );
 
 const getLabelTextDefault = ({ route }: Scene<Route>) => route.title;
 
@@ -251,10 +276,17 @@ export default function TabBar<T extends Route>(props: Props<T>) {
   const [layout, setLayout] = React.useState<Layout>({ width: 0, height: 0 });
   const [tabWidths, setTabWidths] = React.useState<Record<string, number>>({});
   const flatListRef = React.useRef<FlatList>(null);
-  const scrollAmount = React.useRef(new Animated.Value(0)).current;
+  const isMounted = React.useRef(false);
+  const scrollAmount = React.useRef(new Animated.Value(0));
   const measuredTabWidths = React.useRef<Record<string, number>>({});
 
+  const { routes } = navigationState;
+
   React.useEffect(() => {
+    if (!isMounted.current) {
+      isMounted.current = true;
+      return;
+    }
     if (
       getFlattenedTabWidth(tabStyle) === 'auto' &&
       !(
@@ -270,40 +302,38 @@ export default function TabBar<T extends Route>(props: Props<T>) {
 
     if (scrollEnabled) {
       flatListRef.current?.scrollToOffset({
-        offset: getScrollAmount(
-          props,
-          { layout, tabWidths },
-          navigationState.index
-        ),
+        offset: getScrollAmount({
+          layout,
+          navigationState,
+          tabWidths,
+          gap,
+          scrollEnabled,
+          tabStyle,
+        }),
         animated: true,
       });
     }
   }, [
-    layout,
     layout.width,
-    navigationState,
-    props,
-    scrollEnabled,
-    tabStyle,
     tabWidths,
+    tabStyle,
+    layout,
+    scrollEnabled,
+    gap,
+    navigationState,
   ]);
 
-  const handleLayout = React.useCallback(
-    (e: LayoutChangeEvent) => {
-      const { height, width } = e.nativeEvent.layout;
+  const handleLayout = (e: LayoutChangeEvent) => {
+    const { height, width } = e.nativeEvent.layout;
 
-      if (layout.width === width && layout.height === height) {
-        return;
-      }
-      setLayout({
-        height,
-        width,
-      });
-    },
-    [layout]
-  );
-
-  const { routes } = navigationState;
+    if (layout.width === width && layout.height === height) {
+      return;
+    }
+    setLayout({
+      height,
+      width,
+    });
+  };
 
   const flattenedTabWidth = React.useMemo(
     () => getFlattenedTabWidth(tabStyle),
@@ -311,8 +341,16 @@ export default function TabBar<T extends Route>(props: Props<T>) {
   );
   const isWidthDynamic = flattenedTabWidth === 'auto';
   const tabBarWidth = React.useMemo(
-    () => getTabBarWidth(props, { layout, tabWidths }),
-    [layout, props, tabWidths]
+    () =>
+      getTabBarWidth({
+        layout,
+        navigationState,
+        tabWidths,
+        gap,
+        scrollEnabled,
+        tabStyle,
+      }),
+    [gap, layout, navigationState, scrollEnabled, tabStyle, tabWidths]
   );
   const separatorsWidth = Math.max(0, routes.length - 1) * gap;
   const separatorPercent = (separatorsWidth / tabBarWidth) * 100;
@@ -325,10 +363,10 @@ export default function TabBar<T extends Route>(props: Props<T>) {
   const translateX = React.useMemo(
     () =>
       getTranslateX(
-        scrollAmount,
+        scrollAmount.current,
         getMaxScrollDistance(tabBarWidth, layout.width)
       ),
-    [layout.width, scrollAmount, tabBarWidth]
+    [layout.width, tabBarWidth]
   );
 
   const onPress = React.useCallback(
@@ -396,14 +434,14 @@ export default function TabBar<T extends Route>(props: Props<T>) {
       };
 
       return (
-        <React.Fragment>
+        <>
           {gap > 0 && index > 0 ? <Separator width={gap} /> : null}
           {renderTabBarItem ? (
             renderTabBarItem(props)
           ) : (
             <TabBarItem {...props} />
           )}
-        </React.Fragment>
+        </>
       );
     },
     [
@@ -417,8 +455,7 @@ export default function TabBar<T extends Route>(props: Props<T>) {
       isWidthDynamic,
       itemOnLayout,
       labelStyle,
-      navigationState.index,
-      navigationState.routes,
+      navigationState,
       onPress,
       onTabLongPress,
       position,
@@ -460,13 +497,13 @@ export default function TabBar<T extends Route>(props: Props<T>) {
         [
           {
             nativeEvent: {
-              contentOffset: { x: scrollAmount },
+              contentOffset: { x: scrollAmount.current },
             },
           },
         ],
         { useNativeDriver: true }
       ),
-    [scrollAmount]
+    []
   );
 
   return (
