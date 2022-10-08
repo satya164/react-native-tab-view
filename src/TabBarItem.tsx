@@ -39,6 +39,7 @@ export type Props<T extends Route> = {
   onPress: (route: T) => void;
   onLongPress?: (scene: Scene<T>) => void;
   labelStyle?: StyleProp<TextStyle>;
+  defaultTabWidth?: number;
   style: StyleProp<ViewStyle>;
 };
 
@@ -100,6 +101,7 @@ function TabBarItem<T extends Route>({
   renderBadge,
   renderIcon,
   renderLabel: renderLabelCustom,
+  defaultTabWidth,
 }: Props<T>) {
   const tabIndex = routes.indexOf(route);
 
@@ -204,7 +206,10 @@ function TabBarItem<T extends Route>({
 
   const tabStyle = StyleSheet.flatten(style);
   const isWidthSet = tabStyle?.width !== undefined;
-  const tabContainerStyle: ViewStyle | null = isWidthSet ? null : { flex: 1 };
+
+  const tabContainerStyle: ViewStyle | null = isWidthSet
+    ? null
+    : { width: defaultTabWidth };
 
   const scene = { route };
 

@@ -431,6 +431,17 @@ export default function TabBar<T extends Route>(props: Props<T>) {
         onLongPress: onTabLongPress,
         labelStyle: labelStyle,
         style: tabStyle,
+        // Calculate the deafult width for tab for FlatList to work
+        defaultTabWidth: !isWidthDynamic
+          ? getComputedTabWidth(
+              index,
+              layout,
+              routes,
+              scrollEnabled,
+              tabWidths,
+              getFlattenedTabWidth(tabStyle)
+            )
+          : undefined,
       };
 
       return (
@@ -455,6 +466,7 @@ export default function TabBar<T extends Route>(props: Props<T>) {
       isWidthDynamic,
       itemOnLayout,
       labelStyle,
+      layout,
       navigationState,
       onPress,
       onTabLongPress,
@@ -465,7 +477,10 @@ export default function TabBar<T extends Route>(props: Props<T>) {
       renderIcon,
       renderLabel,
       renderTabBarItem,
+      routes,
+      scrollEnabled,
       tabStyle,
+      tabWidths,
     ]
   );
 
