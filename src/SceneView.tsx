@@ -30,7 +30,6 @@ export default function SceneView<T extends Route>({
   const [isLoading, setIsLoading] = React.useState(
     Math.abs(navigationState.index - index) > lazyPreloadDistance
   );
-  const timerHandler = React.useRef<NodeJS.Timeout | null>(null);
 
   if (
     isLoading &&
@@ -40,8 +39,8 @@ export default function SceneView<T extends Route>({
     setIsLoading(false);
   }
 
-  const handleEnter = React.useCallback(
-    (value: number) => {
+  React.useEffect(() => {
+    const handleEnter = (value: number) => {
       // If we're entering the current route, we need to load it
       if (value === index) {
         setIsLoading((prevState) => {
@@ -51,25 +50,25 @@ export default function SceneView<T extends Route>({
           return prevState;
         });
       }
-    },
-    [index]
-  );
+    };
 
-  React.useEffect(() => {
-    let unsubscribe: (() => void) | null;
+    let unsubscribe: (() => void) | undefined;
+    let timer: NodeJS.Timeout;
+
     if (lazy && isLoading) {
       // If lazy mode is enabled, listen to when we enter screens
       unsubscribe = addEnterListener(handleEnter);
     } else if (isLoading) {
       // If lazy mode is not enabled, render the scene with a delay if not loaded already
       // This improves the initial startup time as the scene is no longer blocking
-      timerHandler.current = setTimeout(() => setIsLoading(false), 0);
+      timer = setTimeout(() => setIsLoading(false), 0);
     }
+
     return () => {
       unsubscribe?.();
-      timerHandler.current && clearTimeout(timerHandler.current);
+      clearTimeout(timer);
     };
-  }, [addEnterListener, handleEnter, isLoading, lazy]);
+  }, [addEnterListener, index, isLoading, lazy]);
 
   const focused = navigationState.index === index;
 
