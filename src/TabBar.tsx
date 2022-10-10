@@ -349,52 +349,13 @@ export default function TabBar<T extends Route>({
     [layout.width, scrollAmount, tabBarWidth]
   );
 
-  const onItemPress = React.useCallback(
-    (route: T) => {
-      const event: Scene<T> & Event = {
-        route,
-        defaultPrevented: false,
-        preventDefault: () => {
-          event.defaultPrevented = true;
-        },
-      };
-
-      onTabPress?.(event);
-
-      if (event.defaultPrevented) {
-        return;
-      }
-
-      jumpTo(route.key);
-    },
-    [jumpTo, onTabPress]
-  );
-
-  const onItemLayout = React.useCallback(
-    (e: LayoutChangeEvent, route: Route) => {
-      measuredTabWidths.current[route.key] = e.nativeEvent.layout.width;
-
-      // When we have measured widths for all of the tabs, we should updates the state
-      // We avoid doing separate setState for each layout since it triggers multiple renders and slows down app
-      if (
-        routes.every(
-          (r) => typeof measuredTabWidths.current[r.key] === 'number'
-        )
-      ) {
-        setTabWidths({ ...measuredTabWidths.current });
-      }
-    },
-    [routes]
-  );
-
   const renderItem = React.useCallback(
     ({ item: route, index }: ListRenderItemInfo<T>) => {
       const props: TabBarItemProps<T> & { key: string } = {
         key: route.key,
         position: position,
         route: route,
-        isFocused: navigationState.index === index,
-        routes: navigationState.routes,
+        navigationState: navigationState,
         getAccessibilityLabel: getAccessibilityLabel,
         getAccessible: getAccessible,
         getLabelText: getLabelText,
@@ -406,9 +367,39 @@ export default function TabBar<T extends Route>({
         inactiveColor: inactiveColor,
         pressColor: pressColor,
         pressOpacity: pressOpacity,
-        onLayout: isWidthDynamic ? onItemLayout : undefined,
-        onPress: onItemPress,
-        onLongPress: onTabLongPress,
+        onLayout: isWidthDynamic
+          ? (e: LayoutChangeEvent) => {
+              measuredTabWidths.current[route.key] = e.nativeEvent.layout.width;
+
+              // When we have measured widths for all of the tabs, we should updates the state
+              // We avoid doing separate setState for each layout since it triggers multiple renders and slows down app
+              if (
+                routes.every(
+                  (r) => typeof measuredTabWidths.current[r.key] === 'number'
+                )
+              ) {
+                setTabWidths({ ...measuredTabWidths.current });
+              }
+            }
+          : undefined,
+        onPress: () => {
+          const event: Scene<T> & Event = {
+            route,
+            defaultPrevented: false,
+            preventDefault: () => {
+              event.defaultPrevented = true;
+            },
+          };
+
+          onTabPress?.(event);
+
+          if (event.defaultPrevented) {
+            return;
+          }
+
+          jumpTo(route.key);
+        },
+        onLongPress: () => onTabLongPress?.({ route }),
         labelStyle: labelStyle,
         style: tabStyle,
         // Calculate the deafult width for tab for FlatList to work
@@ -444,12 +435,12 @@ export default function TabBar<T extends Route>({
       getTestID,
       inactiveColor,
       isWidthDynamic,
-      onItemLayout,
+      jumpTo,
       labelStyle,
       layout,
       navigationState,
-      onItemPress,
       onTabLongPress,
+      onTabPress,
       position,
       pressColor,
       pressOpacity,

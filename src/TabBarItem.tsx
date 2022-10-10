@@ -8,14 +8,14 @@ import {
   TextStyle,
   ViewStyle,
 } from 'react-native';
+import useLatestCallback from 'use-latest-callback';
 import PlatformPressable from './PlatformPressable';
-import type { Scene, Route } from './types';
+import type { Scene, Route, NavigationState } from './types';
 
 export type Props<T extends Route> = {
   position: Animated.AnimatedInterpolation;
   route: T;
-  routes: T[];
-  isFocused: boolean;
+  navigationState: NavigationState<T>;
   activeColor?: string;
   inactiveColor?: string;
   pressColor?: string;
@@ -35,11 +35,11 @@ export type Props<T extends Route> = {
     color: string;
   }) => React.ReactNode;
   renderBadge?: (scene: Scene<T>) => React.ReactNode;
-  onLayout?: (event: LayoutChangeEvent, route: Route) => void;
-  onPress: (route: T) => void;
-  onLongPress?: (scene: Scene<T>) => void;
-  labelStyle?: StyleProp<TextStyle>;
+  onLayout?: (event: LayoutChangeEvent) => void;
+  onPress: () => void;
+  onLongPress: () => void;
   defaultTabWidth?: number;
+  labelStyle?: StyleProp<TextStyle>;
   style: StyleProp<ViewStyle>;
 };
 
@@ -48,11 +48,11 @@ const DEFAULT_INACTIVE_COLOR = 'rgba(255, 255, 255, 0.7)';
 
 const getActiveOpacity = (
   position: Animated.AnimatedInterpolation,
-  routes: Route[],
+  routesLength: number,
   tabIndex: number
 ) => {
-  if (routes.length > 1) {
-    const inputRange = routes.map((_, i) => i);
+  if (routesLength > 1) {
+    const inputRange = Array.from({ length: routesLength }, (_, i) => i);
 
     return position.interpolate({
       inputRange,
@@ -65,11 +65,11 @@ const getActiveOpacity = (
 
 const getInactiveOpacity = (
   position: Animated.AnimatedInterpolation,
-  routes: Route[],
+  routesLength: number,
   tabIndex: number
 ) => {
-  if (routes.length > 1) {
-    const inputRange = routes.map((_: Route, i: number) => i);
+  if (routesLength > 1) {
+    const inputRange = Array.from({ length: routesLength }, (_, i) => i);
 
     return position.interpolate({
       inputRange,
@@ -80,12 +80,20 @@ const getInactiveOpacity = (
   }
 };
 
-function TabBarItem<T extends Route>({
+type TabBarItemInternalProps<T extends Route> = Omit<
+  Props<T>,
+  'navigationState'
+> & {
+  isFocused: boolean;
+  index: number;
+  routesLength: number;
+};
+
+const TabBarItemInternal = <T extends Route>({
   getAccessibilityLabel,
   getAccessible,
   getLabelText,
   getTestID,
-  routes,
   onLongPress,
   onPress,
   isFocused,
@@ -96,15 +104,15 @@ function TabBarItem<T extends Route>({
   activeColor: activeColorCustom,
   labelStyle,
   onLayout,
+  index: tabIndex,
   pressColor,
   pressOpacity,
   renderBadge,
   renderIcon,
-  renderLabel: renderLabelCustom,
   defaultTabWidth,
-}: Props<T>) {
-  const tabIndex = routes.indexOf(route);
-
+  routesLength,
+  renderLabel: renderLabelCustom,
+}: TabBarItemInternalProps<T>) => {
   const labelColorFromStyle = StyleSheet.flatten(labelStyle || {}).color;
 
   const activeColor =
@@ -120,8 +128,8 @@ function TabBarItem<T extends Route>({
       ? labelColorFromStyle
       : DEFAULT_INACTIVE_COLOR;
 
-  const activeOpacity = getActiveOpacity(position, routes, tabIndex);
-  const inactiveOpacity = getInactiveOpacity(position, routes, tabIndex);
+  const activeOpacity = getActiveOpacity(position, routesLength, tabIndex);
+  const inactiveOpacity = getInactiveOpacity(position, routesLength, tabIndex);
 
   let icon: React.ReactNode | null = null;
   let label: React.ReactNode | null = null;
@@ -235,9 +243,9 @@ function TabBarItem<T extends Route>({
       pressColor={pressColor}
       pressOpacity={pressOpacity}
       delayPressIn={0}
-      onLayout={(e) => onLayout?.(e, route)}
-      onPress={() => onPress(route)}
-      onLongPress={() => onLongPress?.({ route })}
+      onLayout={onLayout}
+      onPress={onPress}
+      onLongPress={onLongPress}
       style={[styles.pressable, tabContainerStyle]}
     >
       <View pointerEvents="none" style={[styles.item, tabStyle]}>
@@ -247,9 +255,36 @@ function TabBarItem<T extends Route>({
       </View>
     </PlatformPressable>
   );
+};
+
+const MemoizedTabBarItemInternal = React.memo(
+  TabBarItemInternal
+) as typeof TabBarItemInternal;
+
+function TabBarItem<T extends Route>(props: Props<T>) {
+  const { onPress, onLongPress, onLayout, navigationState, route, ...rest } =
+    props;
+  const onPressLatest = useLatestCallback(onPress);
+  const onLongPressLatest = useLatestCallback(onLongPress);
+  const onLayoutLatest = useLatestCallback(onLayout ? onLayout : () => {});
+
+  const tabIndex = navigationState.routes.indexOf(route);
+
+  return (
+    <MemoizedTabBarItemInternal
+      {...rest}
+      onPress={onPressLatest}
+      onLayout={onLayoutLatest}
+      onLongPress={onLongPressLatest}
+      isFocused={navigationState.index === tabIndex}
+      route={route}
+      index={tabIndex}
+      routesLength={navigationState.routes.length}
+    />
+  );
 }
 
-export default React.memo(TabBarItem) as typeof TabBarItem;
+export default TabBarItem;
 
 const styles = StyleSheet.create({
   label: {
