@@ -31,10 +31,10 @@ export type Layout = {
 
 export type Listener = (value: number) => void;
 
-export type SceneRendererProps = {
+export type SceneRendererProps<TKeys extends string = string> = {
   layout: Layout;
   position: Animated.AnimatedInterpolation;
-  jumpTo: (key: string) => void;
+  jumpTo: (key: TKeys) => void;
 };
 
 export type EventEmitterProps = {
