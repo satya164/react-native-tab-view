@@ -62,7 +62,6 @@ export type Props<T extends Route> = SceneRendererProps & {
   contentContainerStyle?: StyleProp<ViewStyle>;
   style?: StyleProp<ViewStyle>;
   gap?: number;
-  testID?: string;
 };
 
 type FlattenedTabWidth = string | number | undefined;
@@ -121,7 +120,7 @@ const getTranslateX = (
     I18nManager.isRTL ? 1 : -1
   );
 
-const getTabBarWidth = <T extends Route>({
+const getTabBarWidth = <T extends Route> ({
   navigationState,
   layout,
   gap,
@@ -150,7 +149,7 @@ const getTabBarWidth = <T extends Route>({
   );
 };
 
-const normalizeScrollValue = <T extends Route>({
+const normalizeScrollValue = <T extends Route> ({
   layout,
   navigationState,
   gap,
@@ -183,7 +182,7 @@ const normalizeScrollValue = <T extends Route>({
   return scrollValue;
 };
 
-const getScrollAmount = <T extends Route>({
+const getScrollAmount = <T extends Route> ({
   layout,
   navigationState,
   gap,
@@ -238,8 +237,8 @@ const getAccessibilityLabelDefault = ({ route }: Scene<Route>) =>
   typeof route.accessibilityLabel === 'string'
     ? route.accessibilityLabel
     : typeof route.title === 'string'
-    ? route.title
-    : undefined;
+      ? route.title
+      : undefined;
 
 const renderIndicatorDefault = (props: IndicatorProps<Route>) => (
   <TabBarIndicator {...props} />
@@ -247,7 +246,7 @@ const renderIndicatorDefault = (props: IndicatorProps<Route>) => (
 
 const getTestIdDefault = ({ route }: Scene<Route>) => route.testID;
 
-export default function TabBar<T extends Route>({
+export default function TabBar<T extends Route> ({
   getLabelText = getLabelTextDefault,
   getAccessible = getAccessibleDefault,
   getAccessibilityLabel = getAccessibilityLabelDefault,
@@ -275,7 +274,6 @@ export default function TabBar<T extends Route>({
   renderTabBarItem,
   style,
   tabStyle,
-  testID,
 }: Props<T>) {
   const [layout, setLayout] = React.useState<Layout>({ width: 0, height: 0 });
   const [tabWidths, setTabWidths] = React.useState<Record<string, number>>({});
@@ -283,6 +281,7 @@ export default function TabBar<T extends Route>({
   const isFirst = React.useRef(true);
   const scrollAmount = useAnimatedValue(0);
   const measuredTabWidths = React.useRef<Record<string, number>>({});
+  const measureTabWidthsTimer = React.useRef<null | ReturnType<typeof setTimeout>>(null);
 
   const { routes } = navigationState;
   const flattenedTabWidth = getFlattenedTabWidth(tabStyle);
@@ -296,9 +295,10 @@ export default function TabBar<T extends Route>({
     flattenedTabWidth,
   });
 
+  const mesureRoutes = routes.slice(0, navigationState.index + 1)
   const hasMeasuredTabWidths =
     Boolean(layout.width) &&
-    routes.every((r) => typeof tabWidths[r.key] === 'number');
+    mesureRoutes.every((r) => typeof tabWidths[r.key] === 'number');
 
   React.useEffect(() => {
     if (isFirst.current) {
@@ -371,18 +371,17 @@ export default function TabBar<T extends Route>({
         pressOpacity: pressOpacity,
         onLayout: isWidthDynamic
           ? (e: LayoutChangeEvent) => {
-              measuredTabWidths.current[route.key] = e.nativeEvent.layout.width;
+            measuredTabWidths.current[route.key] = e.nativeEvent.layout.width;
 
-              // When we have measured widths for all of the tabs, we should updates the state
-              // We avoid doing separate setState for each layout since it triggers multiple renders and slows down app
-              if (
-                routes.every(
-                  (r) => typeof measuredTabWidths.current[r.key] === 'number'
-                )
-              ) {
-                setTabWidths({ ...measuredTabWidths.current });
-              }
+            // When we have measured widths for all of the tabs, we should updates the state
+            // We avoid doing separate setState for each layout since it triggers multiple renders and slows down app
+            if (measureTabWidthsTimer.current) {
+              clearTimeout(measureTabWidthsTimer.current)
             }
+            measureTabWidthsTimer.current = setTimeout(() => {
+              setTabWidths({ ...measuredTabWidths.current });
+            }, 300)
+          }
           : undefined,
         onPress: () => {
           const event: Scene<T> & Event = {
@@ -407,13 +406,13 @@ export default function TabBar<T extends Route>({
         // Calculate the deafult width for tab for FlatList to work
         defaultTabWidth: !isWidthDynamic
           ? getComputedTabWidth(
-              index,
-              layout,
-              routes,
-              scrollEnabled,
-              tabWidths,
-              getFlattenedTabWidth(tabStyle)
-            )
+            index,
+            layout,
+            routes,
+            scrollEnabled,
+            tabWidths,
+            getFlattenedTabWidth(tabStyle)
+          )
           : undefined,
       };
 
@@ -464,9 +463,9 @@ export default function TabBar<T extends Route>({
       styles.tabContent,
       scrollEnabled
         ? {
-            width:
-              tabBarWidth > separatorsWidth ? tabBarWidth : tabBarWidthPercent,
-          }
+          width:
+            tabBarWidth > separatorsWidth ? tabBarWidth : tabBarWidthPercent,
+        }
         : styles.container,
       contentContainerStyle,
     ],
@@ -504,8 +503,8 @@ export default function TabBar<T extends Route>({
           tabBarWidth > separatorsWidth
             ? { width: tabBarWidth - separatorsWidth }
             : scrollEnabled
-            ? { width: tabBarWidthPercent }
-            : null,
+              ? { width: tabBarWidthPercent }
+              : null,
           indicatorContainerStyle,
         ]}
       >
@@ -550,7 +549,6 @@ export default function TabBar<T extends Route>({
           renderItem={renderItem}
           onScroll={handleScroll}
           ref={flatListRef}
-          testID={testID}
         />
       </View>
     </Animated.View>
