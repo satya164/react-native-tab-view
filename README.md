@@ -1,3 +1,5 @@
+> The repo has been moved to <https://github.com/react-navigation/react-navigation/tree/main/packages/react-native-tab-view>. Please open issues and pull requests there.
+
 # React Native Tab View
 
 [![Build Status][build-badge]][build]
